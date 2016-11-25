@@ -5,23 +5,27 @@ all: game board server client
 clean:
 	rm *.o
 
-server: server.c game.o rng.o tile.o board.o slot.o serialization.o
+server: server.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
 	$(CC) $(CFLAGS) -o server server.c game.o rng.o tile.o move.o board.o \
-		slot.o serialization.o -lm -pthread
+		slot.o serialization.o feature.o -lm -pthread
 
-client: client.c game.o rng.o tile.o board.o slot.o serialization.o
+client: client.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
 	$(CC) $(CFLAGS) -o client client.c game.o rng.o tile.o move.o board.o \
-		slot.o serialization.o -lm
+		slot.o serialization.o feature.o -lm
 
-game: game.c game.h rng.o tile.o board.o slot.o
+game: game.c game.h rng.o tile.o board.o slot.o feature.o 
 	$(CC) $(CFLAGS) -DTEST -o test_game game.c rng.o tile.o board.o slot.o \
-		-lm
+		feature.o -lm
 
 board: board.c board.h tile.o slot.o move.o
 	$(CC) $(CFLAGS) -DTEST -o test_board board.c tile.o slot.o move.o
 
+feature.o: feature.c feature.h
+	$(CC) $(CFLAGS) -c -o feature.o feature.c
+
 serialization.o: serialization.c serialization.h
 	$(CC) $(CFLAGS) -c -o serialization.o serialization.c
+
 game.o: game.c game.h
 	$(CC) $(CFLAGS) -c -o game.o game.c
 

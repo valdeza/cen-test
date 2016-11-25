@@ -18,6 +18,7 @@
 #include "limits.h"
 #include "tile.h"
 #include "board.h"
+#include "feature.h"
 #include "rngs/mt19937-64.h" /* Mersenne Twister PRNG. Try PCG if too slow */
 
 #define TILE_COUNT 72
@@ -27,11 +28,11 @@
 struct game {
 	struct board board;
 	struct tile tile_deck[TILE_COUNT];
-	size_t graphs_used;
+	size_t features_used;
 	size_t tiles_used;
 	size_t scores[PLAYER_COUNT];
 	size_t meeples[PLAYER_COUNT];
-	size_t graph_indices[TILE_COUNT * TILE_COUNT * 3];
+	struct feature *features[TILE_COUNT * TILE_COUNT * 3];
 };
 
 void make_game(struct game *g);

@@ -5,6 +5,29 @@ static size_t index_slot(struct slot s)
 	return AXIS * s.x + s.y;
 }
 
+static int slot_on_board(struct slot s)
+{
+	if (s.x < AXIS && s.y < AXIS) {
+		return 1;
+	}
+	return 0;
+}
+
+static void list_adjacent_slots(struct slot s, struct slot **adjs)
+{
+	/*			  up	 right	 bottom	   left */
+	int n[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
+	/* Check adjacent tiles to make sure edges match. */
+	for (int i = 0; i < 4; ++i) {
+		struct slot sprime = make_slot(s.x + n[i][0], s.y + n[i][1]);
+		if (!slot_on_board(s)) {
+			adjs[i] = NULL;
+		} else {
+			*(adjs[i]) = sprime;
+		}
+	}
+}
+
 static int slot_placeable(struct board b, struct slot s)
 {
 	/* TODO: Switch to linear search? */
@@ -31,14 +54,6 @@ static int slot_empty(struct board b, struct slot s)
 		}
 	}
 	return 1;
-}
-
-static int slot_on_board(struct slot s)
-{
-	if (s.x < AXIS && s.y < AXIS) {
-		return 1;
-	}
-	return 0;
 }
 
 size_t find_spot(struct slot *slots, size_t count, struct slot s)
@@ -70,14 +85,18 @@ static struct board remove_placeable_slot(struct board b, struct slot s)
 
 static struct board update_slot_spots(struct board b, struct slot s)
 {
-	/* Check the slots above, left, right, and below. */
-	struct slot adj[4] = { 
-		make_slot(s.x, s.y - 1), make_slot(s.x - 1, s.y),
-		make_slot(s.x + 1, s.y), make_slot(s.x, s.y + 1)
-	};
+	struct slot adj[4];
+	struct slot *adjs[4];
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &adj[i];
+	}
+	list_adjacent_slots(s, adjs);
 	b = remove_placeable_slot(b, s);
 	for (int i = 0; i < 4; ++i) {
-		if (slot_empty(b, adj[i]) && slot_on_board(adj[i])) {
+		if (adjs[i] == NULL) {
+			continue;
+		}
+		if (slot_empty(b, *adjs[i])) {
 			b = add_placeable_slot(b, adj[i]);
 		}
 	}
@@ -85,24 +104,18 @@ static struct board update_slot_spots(struct board b, struct slot s)
 }
 
 /* TODO: Switch int error codes to error enums for cleanliness. */
-static int invalid_move(struct board b, struct move m)
+static int invalid_move(struct board b, struct move m, struct slot **adjs)
 {
 	if (!slot_placeable(b, m.slot)) {
 		return 1; /* Slot not placeable. */
 	}
-	/* Check adjacent tiles to make sure edges match. */
-	struct slot adj[4] = {
-		make_slot(m.slot.x, m.slot.y + 1),	/* up */
-		make_slot(m.slot.x + 1, m.slot.y),	/* right */
-		make_slot(m.slot.x, m.slot.y - 1),	/* down */
-		make_slot(m.slot.x - 1, m.slot.y)	/* left*/
-	};
-	for (unsigned int i = 0; i < sizeof(adj); ++i) { /* Need wrapping */
-		if (!slot_on_board(adj[i])) { /* ignore if not on board. */
+	list_adjacent_slots(m.slot, adjs);
+	for (unsigned int i = 0; i < 4; ++i) { /* Need wrapping */
+		if (adjs[i] == NULL) { /* Ignore if not on board. */
 			continue;
 		}
 		/* The (i + 2) % 4 math here is a bit evil, but it works. */
-		enum edge pair = b.tiles[index_slot(adj[i])].edges[(i + 2) % 4];
+		enum edge pair = b.tiles[index_slot(*adjs[i])].edges[(i+2)%4];
 		if (pair == EMPTY) {
 			continue; /* Empty tiles match with everything. */
 		}
@@ -151,10 +164,10 @@ char *print_board(struct board b, char res[BOARD_LEN])
 }
 
 /* See TODO for invalid_move. */
-int play_move_board(struct board *b, struct move m)
+int play_move_board(struct board *b, struct move m, struct slot **adj)
 {
 	int rc;
-	if ((rc = invalid_move(*b, m))) {
+	if ((rc = invalid_move(*b, m, adj))) {
 		return rc;
 	}
 	b->tiles[index_slot(m.slot)] = rotate_tile(m.tile, m.rotation);
@@ -173,10 +186,10 @@ static void print_placeable_slots(struct board b)
 	return;
 }
 
-static void play_and_check_move(struct board *b, struct move m)
+static void play_and_check_move(struct board *b,struct move m,struct slot **adj)
 {
 	int rc;
-	if ((rc = play_move_board(b, m))) {
+	if ((rc = play_move_board(b, m, adj))) {
 		printf("Invalid move! %d\n", rc);
 	} else {
 		printf("Good move!\n");
@@ -229,19 +242,33 @@ int main(void)
 	print_placeable_slots(b);
 	const unsigned int mid = AXIS / 2;
 	printf("\nPlay the center (%d, %d), the starting move.\n", mid, mid);
-	play_and_check_move(&b, make_move(tiles[3], make_slot(mid, mid), 0));
+	struct slot adj[4];
+	struct slot *adjs[4];
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &adj[i];
+	}
+	play_and_check_move(&b,
+			make_move(tiles[3], make_slot(mid, mid), 0), adjs);
 	printf("%s\n", print_board(b, board_buffer));
 
 	printf("\nAnd now what slots are placeable?\n");
 	print_placeable_slots(b);
 
 	printf("\nTest tile validator (should fail): (%d, %d)\n", mid, mid + 1);
-	play_and_check_move(&b,make_move(tiles[2], make_slot(mid, mid + 1), 0));
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &adj[i];
+	}
+	play_and_check_move(&b,make_move(tiles[2],
+				make_slot(mid, mid + 1), 0), adjs);
 	printf("%s\n", print_board(b, board_buffer));
 	print_placeable_slots(b);
 
 	printf("\nTest tile validator (should pass): (%d, %d)\n", mid, mid + 1);
-	play_and_check_move(&b,make_move(tiles[3], make_slot(mid, mid + 1), 0));
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &adj[i];
+	}
+	play_and_check_move(&b,
+			make_move(tiles[3], make_slot(mid, mid + 1), 0), adjs);
 	printf("%s\n", print_board(b, board_buffer));
 	print_placeable_slots(b);
 

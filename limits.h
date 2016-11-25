@@ -2,5 +2,6 @@
 #define LIMITS_H_
 
 #define AXIS 77			/* AXIS by AXIS board */
+#define PLAYER_COUNT 2
 
 #endif

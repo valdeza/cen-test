@@ -125,7 +125,7 @@ static void init_deck(struct tile deck[TILE_COUNT])
 
 void make_game(struct game *g)
 {
-	g->graphs_used = 1;
+	g->features_used = 1;
 	g->tiles_used = 0;
 	for (size_t i = 0; i < PLAYER_COUNT; ++i) {
 		g->scores[i] = 0;
@@ -135,8 +135,8 @@ void make_game(struct game *g)
 	/* The first index must be 0 (have to start with start tile). */
 	shuffle_tiles(&g->tile_deck[1], TILE_COUNT - 1);
 	g->board = make_board();
-	memset(g->graph_indices, 0,
-			sizeof(g->graph_indices[3])*TILE_COUNT*TILE_COUNT*3);
+	memset(g->features, 0,
+			sizeof(g->features[1]) * TILE_COUNT * TILE_COUNT * 3);
 	return;
 }
 
@@ -147,8 +147,18 @@ void make_game_with_deck(struct game *g, struct tile *deck)
 
 int play_move(struct game *g, struct move m, int player)
 {
-	return play_move_board(&g->board, m);
-	// Graph and score stuff here.
+	int rc;
+	struct slot neighbors[4];
+	struct slot *adjs[4];
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &neighbors[i];
+	}
+	rc = play_move_board(&g->board, m, adjs);
+	if (rc) {
+		return rc;
+	}
+	return play_move_feature(m, adjs, g->features);
+	// Meeple stuff here.
 }
 
 int more_tiles(struct game *g)

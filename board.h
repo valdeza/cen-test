@@ -21,5 +21,5 @@ struct board {
 
 struct board make_board(void);
 char *print_board(struct board b, char res[BOARD_LEN]);
-int play_move_board(struct board *b, struct move m);
+int play_move_board(struct board *b, struct move m, struct slot **adjs);
 #endif
