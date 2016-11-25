@@ -218,7 +218,6 @@ int play_move_feature(struct move m,struct slot **neighbors,struct feature **f)
 		const size_t index = get_index(m.slot.x, m.slot.y, i/3, i%3);
 		if (f[index] == NULL) {
 			/* TODO When creating feature add open slot opposite. */
-			// make_slot
 			if (create_feature(&f[index], m.tile.edges[i / 3],
 					make_slot(adjs[i/4][0], adjs[i/4][1]))){
 				return 1;
@@ -228,7 +227,7 @@ int play_move_feature(struct move m,struct slot **neighbors,struct feature **f)
 		if (adj[i * 12] == 0) {
 			continue;
 		}
-		//add_tile_feature(f[index], adj);
+		// TODO: add_tile_feature(f[index], adj);
 	}
 	for (size_t i = 0; i < 12; ++i) { /* add adjencies. */
 		const size_t index = get_index(m.slot.x, m.slot.y, i/3, i%3);
