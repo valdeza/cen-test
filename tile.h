@@ -2,6 +2,7 @@
 #define TILE_H_
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>	/* malloc() */
 #include <string.h>	/* memcpy() */
 #include "edge.h"	/* edges. */
@@ -21,7 +22,7 @@ struct tile {
 	enum attribute attribute;
 };
 
-int tile_eq(struct tile a, struct tile b);
+bool is_tile_equal(struct tile a, struct tile b);
 struct tile make_tile(const enum edge edges[5], enum attribute a);
 struct tile rotate_tile(const struct tile old, const int rotation);
 char *print_tile(struct tile t, char b[TILE_LEN]);

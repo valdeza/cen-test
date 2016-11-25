@@ -1,5 +1,8 @@
 #include "game.h"
 
+/** Returns a random int
+ * between the given <em>low</em> and <em>high</em> bounds, inclusive.
+ */
 static size_t rand_bound(size_t low, size_t high)
 {
 	size_t r;
@@ -26,6 +29,7 @@ static void shuffle_tiles(struct tile *a, size_t top)
 	}
 }
 
+/** Creates all tiles, unshuffled. */
 static void init_deck(struct tile deck[TILE_COUNT])
 {
 	/* Tileset: http://russcon.org/RussCon/carcassonne/tiles.html */
@@ -123,6 +127,7 @@ static void init_deck(struct tile deck[TILE_COUNT])
 	return;
 }
 
+/** Initialises the given game. */
 void make_game(struct game *g)
 {
 	g->features_used = 1;
@@ -132,7 +137,7 @@ void make_game(struct game *g)
 		g->meeples[i] = MEEPLE_COUNT;
 	}
 	init_deck(g->tile_deck);
-	/* The first index must be 0 (have to start with start tile). */
+	/* Leave index 0 untouched. That index will be the starting tile. */
 	shuffle_tiles(&g->tile_deck[1], TILE_COUNT - 1);
 	g->board = make_board();
 	memset(g->features, 0,
@@ -140,11 +145,13 @@ void make_game(struct game *g)
 	return;
 }
 
-void make_game_with_deck(struct game *g, struct tile *deck)
+/** Writes the given deck into the given game's tile_deck by deep copy. */
+void set_game_deck(struct game *g, struct tile *deck)
 {
 	memcpy(g->tile_deck, deck, sizeof(*deck) * TILE_COUNT);
 }
 
+/** Tries to play the given move by the player on the given game. */
 int play_move(struct game *g, struct move m, int player)
 {
 	int rc;
@@ -161,14 +168,20 @@ int play_move(struct game *g, struct move m, int player)
 	// Meeple stuff here.
 }
 
-int more_tiles(struct game *g)
+/** Returns whether the number of tiles dealt for the given game exceeds
+ * <em>TILE_COUNT</em>.
+ *
+ * @see game.h: TILE_COUNT
+ */
+bool is_tile_deck_empty(struct game *g)
 {
-	return TILE_COUNT - g->tiles_used - 1;
+	return (TILE_COUNT - (g->curr_tile_deck_idx + 1)) <= 0;
 }
 
+/** Returns the next tile from the given game's tile_deck */
 struct tile deal_tile(struct game *g)
 {
-	return g->tile_deck[g->tiles_used++];
+	return g->tile_deck[g->curr_tile_deck_idx++];
 }
 
 #ifdef TEST

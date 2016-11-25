@@ -131,7 +131,7 @@ static struct game *init_game(int socket)
 	struct game *g = malloc(sizeof(*g));
 	struct tile *tileset = malloc(sizeof(*tileset) * TILE_COUNT);
 	get_deck(socket, tileset, TILE_SZ, TILE_COUNT);
-	make_game_with_deck(g, tileset);
+	set_game_deck(g, tileset);
 	free(tileset);
 	return g;
 }

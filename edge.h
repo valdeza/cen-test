@@ -1,6 +1,7 @@
 #ifndef EDGE_H_
 #define EDGE_H_
 
+/** aka "region type" */
 enum edge {
 	EMPTY = 0,
 	CITY = 1,

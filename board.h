@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>	/* memcpy */
 #include <stdlib.h>	/* free() */
+#include <stdbool.h>
 #include "edge.h"	/* edges. */
 #include "tile.h"	/* tiles. */
 #include "slot.h"	/* slots. */
@@ -15,11 +16,12 @@
 struct board {
 	struct tile tiles[AXIS*AXIS];
 	struct slot slot_spots[AXIS*AXIS];
-	unsigned int sps; /* # of open slot spots (placeable slots) */
+	unsigned int empty_slot_count;
 	char column_terminators[AXIS];
 };
 
 struct board make_board(void);
 char *print_board(struct board b, char res[BOARD_LEN]);
-int play_move_board(struct board *b, struct move m, struct slot **adjs);
+enum game_error_code \
+	play_move_board(struct board *b, struct move m, struct slot **adjs);
 #endif

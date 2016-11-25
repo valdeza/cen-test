@@ -1,0 +1,13 @@
+# Our output executables
+client
+server
+test
+test_board
+test_game
+# Windows
+*.exe
+# OSX?
+*.app
+
+# Object files
+*.o

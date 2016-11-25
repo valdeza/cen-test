@@ -126,7 +126,7 @@ static void protocol(void *args)
 	struct move previous;
 	while (1) { /* Play game. */
 		buf[0] = 0; /* Assume we keep playing. */
-		if (!more_tiles(g)) {
+		if (is_tile_deck_empty(g)) {
 			/* TODO: Scoring. replace 0 with high scoring player. */
 			game_over(players, 0, SCORE);
 			break;
@@ -140,7 +140,7 @@ static void protocol(void *args)
 			break;
 		}
 		struct move m = deserialize_move(buf);
-		if (!tile_eq(m.tile, t) || play_move(g, m, current_player)) {
+		if (!is_tile_equal(m.tile, t) || play_move(g, m, current_player)) {
 			game_over(players, current_player ^ 1, INVALID);
 			break;
 		}
