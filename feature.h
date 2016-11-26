@@ -25,5 +25,7 @@ struct feature {
 
 int play_move_feature(struct move m,struct slot **neighbors,struct feature **f);
 int play_meeple(struct move m, int player, int cnr, struct feature **f);
+void update_scores(size_t **scores, struct feature *scratch,
+		struct feature **a, size_t alen);
 
 #endif

@@ -127,6 +127,13 @@ static void init_deck(struct tile deck[TILE_COUNT])
 	return;
 }
 
+static void calculate_scores(struct game *g)
+{
+	struct feature scratch[TILE_COUNT * TILE_COUNT * 4 * 3];
+	update_scores(&g->scores, scratch, g->features,
+			TILE_COUNT * TILE_COUNT * 4 * 3);
+}
+
 /** Initialises the given game. */
 void make_game(struct game *g)
 {
@@ -164,6 +171,7 @@ int play_move(struct game *g, struct move m, int player)
 	if (rc) {
 		return rc;
 	}
+	calculate_scores(g);
 	return play_move_feature(m, adjs, g->features);
 	// Meeple stuff here.
 }

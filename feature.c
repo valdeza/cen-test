@@ -9,6 +9,19 @@ static void init_feature(struct feature *f, enum edge type)
 	f->type = type;
 }
 
+/* Refactor to use a vector of features. */
+static int create_feature(struct feature **f, enum edge type, struct slot s)
+{
+	*f = malloc(sizeof(f));
+	if (!f) {
+		return 1;
+	}
+	init_feature(*f, type);
+	(*f)->slot_count++;
+	(*f)->open_slots[0] = s;
+	return 0;
+}
+
 static unsigned int count_roads(struct tile t)
 {
 	int road_count = 0;
@@ -157,17 +170,66 @@ static size_t get_index(int x, int y, int side, int corner)
 	return (((x * AXIS + y) * 4) + side) * 3 + corner;
 }
 
-/* Refactor to use a vector of features. */
-static int create_feature(struct feature **f, enum edge type, struct slot s)
+static void merge_nodupes(struct feature **out, struct feature **a, size_t *len)
 {
-	*f = malloc(sizeof(f));
-	if (!f) {
-		return 1;
+	size_t top = *len;
+	size_t count = 0;
+
+	/* Simple insertion sort without dupes. */
+	for (size_t i = 0; i < top; ++i) {
+		struct feature *f = a[i];
+		size_t j;
+		for (j = 0; j < count; ++j) {
+			if (out[j] >= a) {
+				break;
+			}
+		}
+		if (out[j] == f) {
+			continue; /* No dupes. */
+		}
+		memmove(&out[j + 1], &out[j], sizeof(out[0]) * (count - j));
+		out[j] = f;
+		count++;
 	}
-	init_feature(*f, type);
-	(*f)->slot_count++;
-	(*f)->open_slots[0] = s;
-	return 0;
+	*len = count;
+	return;
+}
+
+void update_scores(size_t **scores, struct feature *scratch,
+		struct feature **a, size_t alen)
+{
+	merge_nodupes(&scratch, a, &alen);
+	for (size_t i = 0; i < alen; ++i) {
+		size_t score = 0;
+		struct feature *f = &scratch[i];
+		switch(f->type) {
+		case ROAD:
+			score = f->weighted_size;
+			break;
+		case CITY:
+			if (f->slot_count == 0) { // Closed
+				score = 2 * f->weighted_size;
+			} else {
+				score = f->weighted_size;
+			}
+			break;
+		case FIELD:
+			for (size_t j = 0; j < f->neighbor_count; ++j) {
+				if (a[f->neighbors[i]]->type == CITY) {
+					score++;
+				}
+			}
+			score *= 3; /* 3 points per neighboring city. */
+		case EMPTY:
+			continue;
+		}
+		if (f->meeples[0] >= f->meeples[1]) {
+			(*scores)[0] += score;
+		}
+		if (f->meeples[0] <= f->meeples[1]) {
+			(*scores)[1] += score;
+		}
+	}
 }
 
 static void add_adjacency(struct feature *a, size_t ind)
@@ -269,5 +331,3 @@ int play_meeple(struct move m, int player, int cnr, struct feature **f)
 	feat->meeples[player]++;
 	return 0;
 }
-
-
