@@ -107,45 +107,50 @@ static void protocol(void *args)
 {
 	int *hostfd = (int *)args;
 	struct game *g = malloc(sizeof(*g));
-	make_game(g);
 	listen(*hostfd, 10);
 
-	int current_player = 0; /* TODO: Randomly pick player to go first. */
 	int players[PLAYER_COUNT] = {0};
 	for (size_t i = 0; i < PLAYER_COUNT; ++i) {
 		players[i] = accept(*hostfd, NULL, NULL);
 	}
-	if (send_clock_and_order(players, current_player, 5)) {
-		printf("Failed to send clock and order.\n");
-	}
-	if (send_deck(players, PLAYER_COUNT, g->tile_deck, TILE_COUNT)) {
-		printf("Failed to send deck.\n");
-	}
-
-	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; // Game_over? + tile + move
-	struct move previous;
-	while (1) { /* Play game. */
-		buf[0] = 0; /* Assume we keep playing. */
-		if (is_tile_deck_empty(g)) {
-			/* TODO: Scoring. replace 0 with high scoring player. */
-			game_over(players, 0, SCORE);
-			break;
+	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; //Game_over?+tile+move
+	while (1) { /* Play tournament. */
+		make_game(g);
+		int current_player = 0;
+		if (send_clock_and_order(players, current_player, 5)) {
+			printf("Failed to send clock and order.\n");
 		}
-		struct tile t = deal_tile(g);
-		serialize_move(previous, serialize_tile(t, &buf[1]));
-		write(players[current_player], buf, sizeof(buf));
-		if (read(players[current_player], buf, sizeof(buf))
-				< (ssize_t)sizeof(buf)) {
-			game_over(players, current_player ^ 1, TIMEOUT);
-			break;
+		if (send_deck(players, PLAYER_COUNT, g->tile_deck,TILE_COUNT)) {
+			printf("Failed to send deck.\n");
 		}
-		struct move m = deserialize_move(buf);
-		if (!is_tile_equal(m.tile, t)||play_move(g, m,current_player)) {
-			game_over(players, current_player ^ 1, INVALID);
-			break;
+		struct move previous;
+		while (1) { /* Play game. */
+			buf[0] = 0; /* Assume we keep playing. */
+			if (is_tile_deck_empty(g)) {
+				/* TODO: Scoring. replace 0 with high scoring player. */
+				game_over(players, 0, SCORE);
+				break;
+			}
+			struct tile t = deal_tile(g);
+			serialize_move(previous, serialize_tile(t, &buf[1]));
+			write(players[current_player], buf, sizeof(buf));
+			if (read(players[current_player], buf, sizeof(buf))
+					< (ssize_t)sizeof(buf)) {
+				game_over(players, current_player ^ 1, TIMEOUT);
+				break;
+			}
+			struct move m = deserialize_move(buf);
+			printf("Got here!\n");
+			int rc = !is_tile_equal(m.tile, t) ||
+				play_move(g,m,current_player);
+			printf("DEBUG: %d\n", rc);
+			if (rc) {
+				game_over(players, current_player ^ 1, INVALID);
+				break;
+			}
+			previous = m;
+			current_player ^= 1;
 		}
-		previous = m;
-		current_player ^= 1;
 	}
 	buf[0] = 2;
 	for (int i = 0; i < PLAYER_COUNT; ++i) {
@@ -211,7 +216,7 @@ int main(void)
 
 	pthread_attr_t attr; /* Child opttions TODO REFACTOR */
 	pthread_attr_init(&attr);
-	pthread_attr_setstacksize(&attr, 4096*1024); /* 4k Is big enough */
+	pthread_attr_setstacksize(&attr, 2*4096*1024); /* 4k Is big enough */
 
         while (1) {
 		/* TODO Ensure unique clients (can't play with self) */

@@ -155,9 +155,10 @@ int main(void)
 		printf("I'm second!\n");
 	}
 
-	struct game *g = init_game(sockfd); /* TODO: Refactor? */
 	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; // game_over? + tile + move
-	do {
+	buf[0] = 0;
+	while (buf[0] != 2) { /* Play tournament */
+		struct game *g = init_game(sockfd); /* TODO: Refactor? */
 		while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
 			printf("Recieved: ");
 			print_buffer(buf, sizeof(buf));
@@ -190,9 +191,8 @@ int main(void)
 			printf("Try playing the center.\n");
 			write(sockfd, buf, sizeof(buf));
 		}
-		// reset_game(g);
-	} while (buf[0] != 2);
+		free(g);
+	}
 	close(sockfd);
-	free(g);
 	return 0;
 }
