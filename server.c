@@ -140,14 +140,16 @@ static void protocol(void *args)
 			break;
 		}
 		struct move m = deserialize_move(buf);
-		if (!is_tile_equal(m.tile, t) || play_move(g, m, current_player)) {
+		if (!is_tile_equal(m.tile, t)||play_move(g, m,current_player)) {
 			game_over(players, current_player ^ 1, INVALID);
 			break;
 		}
 		previous = m;
 		current_player ^= 1;
 	}
+	buf[0] = 2;
 	for (int i = 0; i < PLAYER_COUNT; ++i) {
+		write(players[i], buf, sizeof(buf));
 		close(players[i]);
 	}
 	free(g);

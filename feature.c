@@ -117,8 +117,9 @@ static void merge_sorted_lists(void *merged, size_t *total,
 	*total = t;
 }
 
-static void merge_features(struct feature *a, struct feature *b)
+static void merge_features(struct feature **ap, struct feature **bp)
 {
+	struct feature *a = *ap, *b = *bp;
 	if (a == b) {
 		return;
 	} else if (b < a) { /* Swap so a is smaller. */
@@ -147,6 +148,8 @@ static void merge_features(struct feature *a, struct feature *b)
 	a->slot_count = total;
 	memcpy(a->open_slots, merged_slots, sizeof(a->open_slots[0]) * total);
 	free(b);
+	*ap = a;
+	*bp = a;
 }
 
 static size_t get_index(int x, int y, int side, int corner)
@@ -218,7 +221,7 @@ int play_move_feature(struct move m,struct slot **neighbors,struct feature **f)
 			const int a = adj[lead * 12 + j];
 			size_t lead_ind =get_index(m.slot.x, m.slot.y, a/3,a%3);
 			if (f[lead_ind]!=NULL && f[lead_ind]!=matched_feature) {
-				merge_features(f[lead_ind], matched_feature);
+				merge_features(&f[lead_ind], &matched_feature);
 			}
 			f[lead_ind] = matched_feature;
 		}
@@ -266,3 +269,5 @@ int play_meeple(struct move m, int player, int cnr, struct feature **f)
 	feat->meeples[player]++;
 	return 0;
 }
+
+

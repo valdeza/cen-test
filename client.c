@@ -157,37 +157,41 @@ int main(void)
 
 	struct game *g = init_game(sockfd); /* TODO: Refactor? */
 	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; // game_over? + tile + move
-	while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
-		printf("Recieved: ");
-		print_buffer(buf, sizeof(buf));
-		if (buf[0]) { /* game over. */
-			if (buf[1]) {
-				printf("I won!\n");
-			} else {
-				printf("I lost!\n");
+	do {
+		while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
+			printf("Recieved: ");
+			print_buffer(buf, sizeof(buf));
+			if (buf[0] == 1) { /* game over. */
+				if (buf[1]) {
+					printf("I won!\n");
+				} else {
+					printf("I lost!\n");
+				}
+				break;
 			}
-			break;
+			/* Deserialize tile and move. */
+			struct tile t = deserialize_tile(&buf[1]);
+			unsigned char b[100];
+			printf("Tile: \n%s\n", print_tile(t, b));
+			if (!first) {
+				struct move prev = deserialize_move(&buf[7]);
+				printf("Prev move"
+					"| x: %d y: %d: rotation: %d \n%s\n",
+					prev.slot.x, prev.slot.y, prev.rotation,
+					print_tile(prev.tile, b));
+				play_move(g, prev, 1);
+			} else { /* No previous move to deal with. */
+				first = 0;
+			}
+			int mid = (AXIS - 1) / 2;
+			struct move m = make_move(t, make_slot(mid, mid), 0);
+			play_move(g, m, 0);
+			serialize_move(m, buf);
+			printf("Try playing the center.\n");
+			write(sockfd, buf, sizeof(buf));
 		}
-		/* Deserialize tile and move. */
-		struct tile t = deserialize_tile(&buf[1]);
-		unsigned char b[100];
-		printf("Tile: \n%s\n", print_tile(t, b));
-		if (!first) {
-			struct move prev = deserialize_move(&buf[7]);
-			printf("Prev move | x: %d y: %d: rotation: %d \n%s\n",
-				prev.slot.x, prev.slot.y, prev.rotation,
-				print_tile(prev.tile, b));
-			play_move(g, prev, 1);
-		} else { /* No previous move to deal with. */
-			first = 0;
-		}
-		int mid = (AXIS - 1) / 2;
-		struct move m = make_move(t, make_slot(mid, mid), 0);
-		play_move(g, m, 0);
-		serialize_move(m, buf);
-		printf("Try playing the center.\n");
-		write(sockfd, buf, sizeof(buf));
-	}
+		// reset_game(g);
+	} while (buf[0] != 2);
 	close(sockfd);
 	free(g);
 	return 0;
