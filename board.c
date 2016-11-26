@@ -9,12 +9,12 @@ static inline size_t get_index_from_slot(struct slot s)
 	return AXIS * s.x + s.y;
 }
 
-static int slot_on_board(struct slot s)
+/** Returns whether the given slot's x/y position
+ * exists somewhere within (0, 0) to (AXIS, AXIS)
+ */
+static inline bool is_slot_in_boundary(struct slot s)
 {
-	if (s.x < AXIS && s.y < AXIS) {
-		return 1;
-	}
-	return 0;
+	return (s.x < AXIS && s.y < AXIS);
 }
 
 static void list_adjacent_slots(struct slot s, struct slot **adjs)
@@ -24,10 +24,10 @@ static void list_adjacent_slots(struct slot s, struct slot **adjs)
 	/* Check adjacent tiles to make sure edges match. */
 	for (int i = 0; i < 4; ++i) {
 		struct slot sprime = make_slot(s.x + n[i][0], s.y + n[i][1]);
-		if (!slot_on_board(s)) {
-			adjs[i] = NULL;
-		} else {
+		if (is_slot_in_boundary(s)) {
 			*(adjs[i]) = sprime;
+		} else {
+			adjs[i] = NULL;
 		}
 	}
 }
@@ -65,14 +65,6 @@ static bool is_slot_empty(struct board b, struct slot s)
 		}
 	}
 	return true;
-}
-
-/** Returns whether the given slot's x/y position
- * exists somewhere within (0, 0) to (AXIS, AXIS)
- */
-static inline bool is_slot_in_boundary(struct slot s)
-{
-	return (s.x < AXIS && s.y < AXIS);
 }
 
 /** Returns the index of <em>slots</em> at/immediately following the
@@ -132,7 +124,7 @@ static struct board update_slot_spots(struct board b, struct slot s)
 		if (adjs[i] == NULL) {
 			continue;
 		}
-		if (slot_empty(b, *adjs[i])) {
+		if (is_slot_empty(b, *adjs[i])) {
 			b = add_placeable_slot(b, adj[i]);
 		}
 	}
@@ -143,7 +135,8 @@ static struct board update_slot_spots(struct board b, struct slot s)
  * @returns 0 (OK) if a legal valid move, non-zero otherwise.
  * @see move.h:enum game_error_code
  */
-static enum game_error_code validate_move(struct board b, struct move m)
+static enum game_error_code invalid_move(struct board b, struct move m,
+		struct slot **adjs)
 {
 	if (!is_slot_placeable(b, m.slot)) {
 		return E_TILE_NOT_PLACEABLE; /* Slot not placeable. */
@@ -154,7 +147,7 @@ static enum game_error_code validate_move(struct board b, struct move m)
 			continue;
 		}
 		/* The (i + 2) % 4 math here is a bit evil, but it works. */
-		enum edge pair = b.tiles[index_slot(*adjs[i])].edges[(i+2)%4];
+		enum edge pair = b.tiles[get_index_from_slot(*adjs[i])].edges[(i+2)%4];
 		if (pair == EMPTY) {
 			continue; /* Empty tiles match with everything. */
 		}
@@ -209,10 +202,11 @@ char *print_board(struct board b, char res[BOARD_LEN])
  * @postcondition Board is updated if given move is valid.
  * @returns 0 (OK) on success, otherwise a respective <code>game_error_code</code>
  */
-enum game_error_code play_move_board(struct board *b, struct move m)
+enum game_error_code
+play_move_board(struct board *b, struct move m, struct slot **adjs)
 {
 	enum game_error_code rc;
-	if ((rc = invalid_move(*b, m, adj))) {
+	if ((rc = invalid_move(*b, m, adjs))) {
 		return rc;
 	}
 	b->tiles[get_index_from_slot(m.slot)] = rotate_tile(m.tile, m.rotation);

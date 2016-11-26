@@ -143,7 +143,7 @@ static void merge_features(struct feature *a, struct feature *b)
 	merge_sorted_lists(&merged_slots, &total,
 			a->open_slots, a->slot_count,
 			b->open_slots, b->slot_count,
-			compare_slots, sizeof(a->open_slots[0]));
+			compare_slot_positions, sizeof(a->open_slots[0]));
 	a->slot_count = total;
 	memcpy(a->open_slots, merged_slots, sizeof(a->open_slots[0]) * total);
 	free(b);
@@ -183,6 +183,15 @@ static void add_adjacency(struct feature *a, size_t ind)
 			sizeof(a->neighbors[i]) * (a->neighbor_count - i));
 	a->neighbors[i] = ind;
 	a->neighbor_count++;
+}
+
+static void add_tile_feature(struct feature *f, struct tile t)
+{
+	if (t.attribute == SHIELD) {
+		f->weighted_size++;
+	}
+	f->weighted_size++;
+	return;
 }
 
 int play_move_feature(struct move m,struct slot **neighbors,struct feature **f)
@@ -227,7 +236,7 @@ int play_move_feature(struct move m,struct slot **neighbors,struct feature **f)
 		if (adj[i * 12] == 0) {
 			continue;
 		}
-		// TODO: add_tile_feature(f[index], adj);
+		add_tile_feature(f[index], m.tile);
 	}
 	for (size_t i = 0; i < 12; ++i) { /* add adjencies. */
 		const size_t index = get_index(m.slot.x, m.slot.y, i/3, i%3);

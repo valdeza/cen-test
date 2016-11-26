@@ -175,13 +175,13 @@ int play_move(struct game *g, struct move m, int player)
  */
 bool is_tile_deck_empty(struct game *g)
 {
-	return (TILE_COUNT - (g->curr_tile_deck_idx + 1)) <= 0;
+	return (TILE_COUNT - (g->tiles_used + 1)) <= 0;
 }
 
 /** Returns the next tile from the given game's tile_deck */
 struct tile deal_tile(struct game *g)
 {
-	return g->tile_deck[g->curr_tile_deck_idx++];
+	return g->tile_deck[g->tiles_used++];
 }
 
 #ifdef TEST
