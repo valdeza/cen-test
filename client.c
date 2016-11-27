@@ -181,6 +181,8 @@ int main(void)
 					prev.slot.x, prev.slot.y, prev.rotation,
 					print_tile(prev.tile, b));
 				play_move(g, prev, 1);
+				printf("DEBUG: %zu %zu\n",
+						g->scores[0], g->scores[1]);
 			} else { /* No previous move to deal with. */
 				first = 0;
 			}

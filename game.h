@@ -28,11 +28,11 @@
 struct game {
 	struct board board;
 	struct tile tile_deck[TILE_COUNT];
-	size_t features_used;
 	size_t tiles_used;
 	size_t scores[PLAYER_COUNT];
 	size_t meeples[PLAYER_COUNT];
-	struct feature *features[TILE_COUNT * TILE_COUNT * 4 * 3];
+	struct feature *features[TILE_COUNT * TILE_COUNT * 3 * 4];
+	size_t features_used;
 };
 
 void make_game(struct game *g);

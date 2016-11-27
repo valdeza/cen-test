@@ -106,6 +106,7 @@ static int game_over(int *players, int winner, enum reason r)
 static void protocol(void *args)
 {
 	int *hostfd = (int *)args;
+	printf("%zu bytes\n", sizeof(struct game));
 	struct game *g = malloc(sizeof(*g));
 	listen(*hostfd, 10);
 
@@ -140,11 +141,8 @@ static void protocol(void *args)
 				break;
 			}
 			struct move m = deserialize_move(buf);
-			printf("Got here!\n");
-			int rc = !is_tile_equal(m.tile, t) ||
-				play_move(g,m,current_player);
-			printf("DEBUG: %d\n", rc);
-			if (rc) {
+			if (!is_tile_equal(m.tile, t) ||
+					play_move(g, m, current_player)) {
 				game_over(players, current_player ^ 1, INVALID);
 				break;
 			}

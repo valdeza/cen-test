@@ -129,9 +129,11 @@ static void init_deck(struct tile deck[TILE_COUNT])
 
 static void calculate_scores(struct game *g)
 {
-	struct feature scratch[TILE_COUNT * TILE_COUNT * 4 * 3];
+	struct feature **scratch = malloc(sizeof(*scratch) * g->features_used);
 	update_scores(&g->scores, scratch, g->features,
 			TILE_COUNT * TILE_COUNT * 4 * 3);
+	printf("DEBUG: %zu %zu\n", g->scores[0], g->scores[1]);
+	free(scratch);
 }
 
 /** Initialises the given game. */
@@ -148,7 +150,7 @@ void make_game(struct game *g)
 	shuffle_tiles(&g->tile_deck[1], TILE_COUNT - 1);
 	g->board = make_board();
 	memset(g->features, 0,
-			sizeof(g->features[1]) * TILE_COUNT * TILE_COUNT * 3);
+			sizeof(g->features[1]) * TILE_COUNT * TILE_COUNT * 4*3);
 	return;
 }
 
@@ -172,7 +174,7 @@ int play_move(struct game *g, struct move m, int player)
 		return rc;
 	}
 	calculate_scores(g);
-	return play_move_feature(m, adjs, g->features);
+	return play_move_feature(m, adjs, g->features, &g->features_used);
 	// Meeple stuff here.
 }
 

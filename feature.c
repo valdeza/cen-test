@@ -13,11 +13,16 @@ static void init_feature(struct feature *f, enum edge type)
 static int create_feature(struct feature **f, enum edge type, struct slot s)
 {
 	*f = malloc(sizeof(f));
-	if (!f) {
+	if (!(*f)) {
 		return 1;
 	}
-	init_feature(*f, type);
-	(*f)->slot_count++;
+	(*f)->weighted_size = (*f)->neighbor_count = 0;
+	(*f)->slot_count = 0;
+	for (int i = 0; i < PLAYER_COUNT; ++i) {
+		(*f)->meeples[i] = 0;
+	}
+	(*f)->type = type;
+	(*f)->slot_count = 1;
 	(*f)->open_slots[0] = s;
 	return 0;
 }
@@ -36,7 +41,7 @@ static unsigned int count_roads(struct tile t)
 /* General solution. Monasterys are different. Matches up connected graphs */
 static void init_adj(struct tile t, int *adj)
 {
-	memset(adj, 0, 12 * 12);
+	memset(adj, 0, sizeof(int) * 12 * 12);
 	for (unsigned int i = 0; i < 12; ++i) {
 		adj[i * 12] = 1; /* bs nonzero value to init. */
 	}
@@ -50,8 +55,9 @@ static void init_adj(struct tile t, int *adj)
 		const enum edge edge = t.edges[i];
 		if (edge == CITY || edge == FIELD) {
 			/* All of this edge's other corners are in our group. */
-			for (unsigned int k = 1; k < 2; ++k) {
-				adj[ind++] = i * 3 + k; /* In a group. */
+			for (unsigned int k = 1; k < 3; ++k) {
+				adj[ind] = i * 3 + k; /* In a group. */
+				ind++;
 				adj[(i * 3 + k) * 12] = 0; /*We're its leader */
 				adj[(i * 3 + k) * 12 + 1] = i * 3;
 			}
@@ -87,6 +93,23 @@ static void init_adj(struct tile t, int *adj)
 				}
 			}
 		}
+	}
+	printf("DEBUG:\n");
+	unsigned char buf[TILE_LEN];
+	printf("%s\n", print_tile(t, buf));
+	for (size_t i = 0; i < 12; ++i) {
+		if (i + 1 % 12 == 0) {
+			printf("\n");
+		}
+		if (adj[i * 12] == 0) {
+			printf("Member of %d group.\n", adj[i * 12 + 1]);
+			continue;
+		}
+		printf("Leader of group. Members: ");
+		for (size_t j = 0; j < 12; ++j) {
+			printf("%d ", adj[i * 12 + j]);
+		}
+		printf("\n");
 	}
 }
 
@@ -180,7 +203,7 @@ static void merge_nodupes(struct feature **out, struct feature **a, size_t *len)
 		struct feature *f = a[i];
 		size_t j;
 		for (j = 0; j < count; ++j) {
-			if (out[j] >= a) {
+			if (out[j] >= f) {
 				break;
 			}
 		}
@@ -191,17 +214,18 @@ static void merge_nodupes(struct feature **out, struct feature **a, size_t *len)
 		out[j] = f;
 		count++;
 	}
+	printf("Count: %zu\n", count);
 	*len = count;
 	return;
 }
 
-void update_scores(size_t **scores, struct feature *scratch,
+void update_scores(size_t **scores, struct feature **scratch,
 		struct feature **a, size_t alen)
 {
-	merge_nodupes(&scratch, a, &alen);
+	merge_nodupes(scratch, a, &alen);
 	for (size_t i = 0; i < alen; ++i) {
 		size_t score = 0;
-		struct feature *f = &scratch[i];
+		struct feature *f = scratch[i];
 		switch(f->type) {
 		case ROAD:
 			score = f->weighted_size;
@@ -234,8 +258,8 @@ void update_scores(size_t **scores, struct feature *scratch,
 
 static void add_adjacency(struct feature *a, size_t ind)
 {
-	assert(a->neighbor_count < 99);
 	size_t i;
+	assert(a->neighbor_count < 99);
 	for (i = 0; i < a->neighbor_count; ++i) {
 		if (a->neighbors[i] < ind) {
 			break;
@@ -259,7 +283,8 @@ static void add_tile_feature(struct feature *f, struct tile t)
 	return;
 }
 
-int play_move_feature(struct move m,struct slot **neighbors,struct feature **f)
+int play_move_feature(struct move m, struct slot **neighbors,
+		struct feature **f, size_t *features_used)
 {
 	int adj[12 * 12];
 	const int adjs[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
@@ -296,6 +321,7 @@ int play_move_feature(struct move m,struct slot **neighbors,struct feature **f)
 					make_slot(adjs[i/4][0], adjs[i/4][1]))){
 				return 1;
 			}
+			*features_used += 1;
 		}
 		/* Add tile to each group. */
 		if (adj[i * 12] == 0) {
@@ -321,6 +347,7 @@ int play_move_feature(struct move m,struct slot **neighbors,struct feature **f)
 	return 0;
 }
 
+/* Refactor to use a vector of features. */
 int play_meeple(struct move m, int player, int cnr, struct feature **f)
 {
 	struct feature *feat = f[get_index(m.slot.x, m.slot.y, cnr/3, cnr%3)];
@@ -331,3 +358,17 @@ int play_meeple(struct move m, int player, int cnr, struct feature **f)
 	feat->meeples[player]++;
 	return 0;
 }
+
+#ifdef TEST
+int main(void)
+{
+	int adj[144];
+	struct tile t = make_tile((enum edge[5]){ROAD, ROAD, ROAD, ROAD, ROAD}, NONE);
+	init_adj(t, adj);
+	t = make_tile((enum edge[5]){CITY, CITY, CITY, CITY, CITY}, SHIELD);
+	init_adj(t, adj);
+	t = make_tile((enum edge[5]){CITY, ROAD, FIELD, ROAD, ROAD}, NONE);
+	init_adj(t, adj);
+	return 0;
+}
+#endif
