@@ -135,7 +135,7 @@ static struct board update_slot_spots(struct board b, struct slot s)
  * @returns 0 (OK) if a legal valid move, non-zero otherwise.
  * @see move.h:enum game_error_code
  */
-static enum game_error_code invalid_move(struct board b, struct move m,
+enum game_error_code invalid_move(struct board b, struct move m,
 		struct slot **adjs)
 {
 	if (!is_slot_placeable(b, m.slot)) {

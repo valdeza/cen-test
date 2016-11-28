@@ -202,31 +202,63 @@ bool is_tile_deck_empty(struct game *g)
 	return (TILE_COUNT - (g->tiles_used + 1)) <= 0;
 }
 
-/** Returns the next tile from the given game's tile_deck */
+/** Returns the next tile from the given game's tile_deck.
+ * Unlike peek_current_tile(), \e does advance pointer to next tile.
+ */
 struct tile deal_tile(struct game *g)
 {
 	return g->tile_deck[g->tiles_used++];
 }
 
-static void generate_available_moves(struct tile t){
-	struct board b;
-	struct move m;
-	struct slot **adjs;
-	struct slot s;
-	struct move array[1000];
+/** Returns the next tile from the given game's tile_deck.
+ * Unlike deal_tile(), <em>does not</em> advance pointer to next tile.
+ */
+inline struct tile peek_current_tile(struct game *g)
+{
+	return g->tile_deck[g->tiles_used];
+}
+
+/**
+ * @param out_moves Array to write moves to
+ * @param out_moves_len Length of \a out_moves
+ * @param g Game to generate possible moveset from
+ *
+ * @return Number of possible moves supplied into \a out_moves,
+ * 	limited by \a out_moves_len.
+ *
+ * @remarks //TODO
+ * 	- Currently does not consider tiger/crocodile placement.
+ * 	- If a tile cannot be placed anywhere,
+ * 		-# does not indicate that this exceptional event has occurred, and
+ * 		-# does not return a set of fallback moves when said event occurs.
+ */
+int generate_available_moves(struct move* out_moves, int out_moves_len,
+	struct game* g)
+{
+	struct board* b = &g->board;
+	struct tile t = peek_current_tile(g);
+	struct slot **adjs; // placeholder variable?
 	size_t num_possible_moves = 0;
 
-	for(int i = 0; i < empty_slot_count; i++){
-		m.slot = slot_spot[i];
-		if(invalid_move(b, m.slot, adjs) == 0){
-			for(int j = 0; j < 4; j++){
-				m.rotation = slot_spot[j];
-				if(invalid_move(b, m.rotation, adjs) == 0){
-					array[num_possible_moves++]=m;
-				}
+	for(int i = 0; i < b->empty_slot_count; i++){
+		// From all possible empty spots...
+		struct slot slot_probe = b->slot_spots[i];
+
+		// Test all possible rotations
+		for(int rot_probe = 0; rot_probe < 4; rot_probe++){
+			struct move move_probe = make_move(t, slot_probe, rot_probe);
+
+			if(invalid_move(*b, move_probe, adjs) == OK){
+				out_moves[num_possible_moves++] = move_probe;
+
+				// Check if out_moves can hold anymore moves.
+				if(num_possible_moves >= out_moves_len)
+					return num_possible_moves; // Quit early, if so
 			}
 		}
 	}
+
+	return num_possible_moves;
 }
 
 #ifdef TEST

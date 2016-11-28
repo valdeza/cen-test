@@ -13,9 +13,9 @@ client: client.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
 	$(CC) $(CFLAGS) -o client client.c game.o rng.o tile.o move.o board.o \
 		slot.o serialization.o feature.o -lm
 
-game: game.c game.h rng.o tile.o board.o slot.o feature.o 
+game: game.c game.h rng.o tile.o board.o slot.o feature.o move.o
 	$(CC) $(CFLAGS) -DTEST -o test_game game.c rng.o tile.o board.o slot.o \
-		feature.o -lm
+		feature.o move.o -lm
 
 board: board.c board.h tile.o slot.o move.o
 	$(CC) $(CFLAGS) -DTEST -o test_board board.c tile.o slot.o move.o
