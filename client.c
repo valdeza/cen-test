@@ -193,7 +193,8 @@ int main(void)
 			}
 			/* A.I. HERE */
 			int mid = (AXIS - 1) / 2;
-			struct move m = make_move(t, make_slot(mid, mid), 0);
+			struct move m =
+				make_move(t, make_slot(mid, mid), 0, -1, -1);
 			/* End A.I. */
 			play_move(g, m, 0);
 			serialize_move(m, buf);

@@ -179,17 +179,14 @@ int play_move(struct game *g, struct move m, int player)
 	for (size_t i = 0; i < 4; ++i) {
 		adjs[i] = &neighbors[i];
 	}
-	rc = play_move_board(&g->board, m, adjs);
-	for (size_t i = 0; i < 4; ++i) {
-		if (adjs[i] != NULL) {
-			printf("%d %d\n", adjs[i]->x, adjs[i]->y);
-		}
-	}
-	if (rc) {
+	if ((rc = play_move_board(&g->board, m, adjs))) {
 		return rc;
 	}
-	return play_move_feature(m, adjs, g->features, &g->features_used);
+	if ((rc = play_move_feature(m, adjs, g->features, &g->features_used))) {
+		return rc;
+	}
 	// Meeple stuff here.
+	return play_meeple(m, player, g->features);
 }
 
 /** Returns whether the number of tiles dealt for the given game exceeds

@@ -88,7 +88,7 @@ static struct board add_placeable_slot(struct board b, struct slot s)
 	struct slot *spots = b.slot_spots;
 	size_t i = get_insertion_index(spots, b.empty_slot_count, s);
 	if (i < b.empty_slot_count) { /* Make room for the element (Sorted insert). */
-		memmove(&spots[i + 1], &spots[i], sizeof(s) * b.empty_slot_count - i);
+		memmove(&spots[i+1], &spots[i], sizeof(s)*b.empty_slot_count-i);
 	}
 	spots[i] = s;
 	b.empty_slot_count++;
@@ -287,7 +287,8 @@ int main(void)
 		adjs[i] = &adj[i];
 	}
 	play_and_check_move(&b,
-			make_move(tiles[3], make_slot(mid, mid), 0), adjs);
+			make_move(tiles[3], make_slot(mid, mid), 0, -1, -1),
+			adjs);
 	printf("%s\n", print_board(b, board_buffer));
 
 	printf("\nAnd now what slots are placeable?\n");
@@ -298,7 +299,8 @@ int main(void)
 		adjs[i] = &adj[i];
 	}
 	play_and_check_move(&b,make_move(tiles[2],
-				make_slot(mid, mid + 1), 0), adjs);
+			make_slot(mid, mid + 1), 0, -1, -1),
+			adjs);
 	printf("%s\n", print_board(b, board_buffer));
 	print_placeable_slots(b);
 
@@ -307,7 +309,8 @@ int main(void)
 		adjs[i] = &adj[i];
 	}
 	play_and_check_move(&b,
-			make_move(tiles[3], make_slot(mid, mid + 1), 0), adjs);
+			make_move(tiles[3], make_slot(mid, mid + 1), 0, -1, -1),
+			adjs);
 	printf("%s\n", print_board(b, board_buffer));
 	print_placeable_slots(b);
 

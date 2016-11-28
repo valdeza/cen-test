@@ -9,7 +9,7 @@ static struct feature *create_feature(enum edge type, struct slot s)
 	}
 	f->weighted_size = f->neighbor_count = 0;
 	for (int i = 0; i < PLAYER_COUNT; ++i) {
-		f->meeples[i] = 0;
+		f->tigers[i] = f->crocodiles[i] = 0;
 	}
 	f->type = type;
 	f->slot_count = 1;
@@ -25,7 +25,7 @@ static void init_adj(struct tile t, int *adj)
 		adj[i * 12] = i + 1; /* nonzero value (assume leader). */
 	}
 	const enum edge center_edge = t.edges[4];
-	for (unsigned int i = 0; i < 4; ++i) {
+	for (unsigned int i = 0; i < 4; ++i) { /* Connect roads and fields */
 		const enum edge edge = t.edges[i];
 		if (edge != CITY && edge != FIELD) {
 			continue;
@@ -57,67 +57,30 @@ static void init_adj(struct tile t, int *adj)
 			}
 		}
 	}
-	for (unsigned int i = 0; i < 4; ++i) {
+	/* anticlockwise, clockwise, clockwise. */
+	const unsigned int r[3][4] ={{3, 0, 1, 2}, {1, 2, 3, 0}, {1, 2, 3, 0}};
+	for (unsigned int i = 0; i < 4; ++i) { /* connect roads. */
 		const enum edge edge = t.edges[i];
 		if (edge != ROAD) {
 			continue;
 		}
 
-		unsigned int ind = (i * 3 + 0) * 12 + 1;
-		if (adj[ind - 1] != 0) {
-			for (unsigned int j=(i-1)%4; j!=i; j=(j-1) % 4) {
-				if (t.edges[j] != edge) {
-					continue;
-				}
-				adj[ind++] = (j * 3 + 2) + 1;
-				adj[(j * 3 + 2) * 12] = 0;
-				adj[(j * 3 + 2) * 12 + 1] = i * 3;
-				break;
+		for (unsigned int j = 0; j < 3; ++j) { /* left, mid, right */
+			unsigned int ind = (i * 3 + j) * 12 + 1;
+			if (adj[ind - 1] == 0) {
+				continue;
 			}
-		}
-
-		ind = (i * 3 + 1) * 12 + 1;
-		if (adj[ind - 1] != 0) {
-			for (unsigned int j=(i + 1)%4; j!=i; j=(j + 1)%4) {
-				if (t.edges[j] != edge) {
-					continue;
+			for (unsigned int k = r[j][i]; k != i; k = r[j][k]) {
+				adj[ind++] = (k * 3 + (2 - j)) + 1;
+				adj[(k * 3 + (2 - j)) * 12] = 0;
+				adj[(k * 3 + (2 - j)) * 12 + 1] = i * 3 + j;
+				/* Only middle sections are multi-attached */
+				if (j != 1) {
+					break;
 				}
-				adj[ind++] = (j * 3 + 1) + 1;
-				adj[(j * 3 + 1) * 12] = 0;
-				adj[(j * 3 + 1) * 12 + 1] = i * 3 + 1;
-			}
-		}
-
-		ind = (i * 3 + 2) * 12 + 1;
-		if (adj[ind - 1] != 0) {
-			for (unsigned int j=(i + 1) % 4; j!=i; j=(j + 1)%4) {
-				if (t.edges[j] != edge) {
-					continue;
-				}
-				adj[ind++] = (j * 3 + 0) + 1;
-				adj[(j * 3 + 0) * 12] = 0;
-				adj[(j * 3 + 0) * 12 + 1] = i * 3 + 2;
-				break;
 			}
 		}
 	}
-#if 0
-				if (edge == ROAD) { // 0->2, 1->1, 2->0 (Draw)
-					/* Credit to Ben Hammack for finding the
-					 * f(x) = 2 - x function (mod 3).
-					*/
-					int opposite = j * 3 + (2 - k);
-					adj[ind[k]++] = opposite + 1;
-					adj[opposite * 12] = 0;
-					adj[opposite * 12 + 1] = i * 3 + k;
-#if 0
-					int index = i * 3 + k;
-					int opposite = j * 3 + (2 - k);
-					adj[(index) * 12 + 1] = opposite + 1;
-					adj[opposite * 12] = 0;
-					adj[opposite * 12 + 1] = index;
-#endif
-#endif
 }
 
 /* For use with below. */
@@ -172,7 +135,8 @@ static void merge_features(struct feature **ap, struct feature **bp)
 	}
 	a->weighted_size += b->weighted_size;
 	for (size_t i = 0; i < PLAYER_COUNT; ++i) {
-		a->meeples[i] += b->meeples[i];
+		a->tigers[i] += b->tigers[i];
+		a->crocodiles[i] += b->crocodiles[i];
 	}
 	/* merge neighbors (assumes sorted) */
 	size_t total, merged_neighbors[200]; /* 100 + 100 */
@@ -256,10 +220,10 @@ void update_scores(size_t *scores, struct feature **scratch,
 		case EMPTY:
 			continue;
 		}
-		if (f->meeples[0] >= f->meeples[1]) {
+		if (f->tigers[0] >= f->tigers[1]) {
 			scores[0] += score;
 		}
-		if (f->meeples[0] <= f->meeples[1]) {
+		if (f->tigers[0] <= f->tigers[1]) {
 			scores[1] += score;
 		}
 	}
@@ -324,7 +288,7 @@ int play_move_feature(struct move m, struct slot **neighbors,
 			for (size_t k = 0; adj[lead * 12 + k] != 0; ++k) {
 				const int b = adj[lead * 12 + k] - 1;
 				size_t ind2 =
-					get_index(m.slot.x, m.slot.y, a/3, a%3);
+					get_index(m.slot.x, m.slot.y, b/3, b%3);
 				if (f[ind2] == dupe) {
 					f[ind2] = companion_feature;
 				}
@@ -385,15 +349,28 @@ int play_move_feature(struct move m, struct slot **neighbors,
 	return 0;
 }
 
-/* Refactor to use a vector of features. */
-int play_meeple(struct move m, int player, int cnr, struct feature **f)
+int play_meeple(struct move m, int player, struct feature **f)
 {
-	struct feature *feat = f[get_index(m.slot.x, m.slot.y, cnr/3, cnr%3)];
-	assert(feat != NULL);
-	if (feat->meeples[player]) {
-		return 1; /* Invalid move */
+	if (m.tcorner > 0) {
+		struct feature *feat =
+			f[get_index(m.slot.x, m.slot.y,
+					m.tcorner/3, m.tcorner%3)];
+		assert(feat != NULL);
+		if (feat->tigers[player]) {
+			return 1; /* Invalid move */
+		}
+		feat->tigers[player]++;
 	}
-	feat->meeples[player]++;
+	if (m.ccorner > 0) {
+		struct feature *feat =
+			f[get_index(m.slot.x, m.slot.y,
+					m.ccorner/3, m.ccorner%3)];
+		assert(feat != NULL);
+		if (feat->crocodiles[player]) {
+			return 1; /* Invalid move */
+		}
+		feat->crocodiles[player]++;
+	}
 	return 0;
 }
 
@@ -435,11 +412,11 @@ int main(void)
 	struct game g;
 	make_game(&g);
 	int mid = (AXIS - 1) / 2;
-	struct move m = make_move(t, make_slot(mid, mid), 0);
+	struct move m = make_move(t, make_slot(mid, mid), 0, -1, -1);
 	play_move(&g, m, 0);
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
-	m = make_move(t, make_slot(mid + 1, mid), 0);
+	m = make_move(t, make_slot(mid + 1, mid), 0, -1, -1);
 	play_move(&g, m, 0);
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
