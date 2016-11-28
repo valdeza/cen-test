@@ -17,17 +17,6 @@ static struct feature *create_feature(enum edge type, struct slot s)
 	return f;
 }
 
-static unsigned int count_roads(struct tile t)
-{
-	int road_count = 0;
-	for (int i = 0; i < 4; ++i) {
-		if (t.edges[i] == ROAD) {
-			road_count++;
-		}
-	}
-	return road_count;
-}
-
 /* General solution. Monasterys are different. Matches up connected graphs */
 static void init_adj(struct tile t, int *adj)
 {
@@ -35,25 +24,21 @@ static void init_adj(struct tile t, int *adj)
 	for (unsigned int i = 0; i < 12; ++i) {
 		adj[i * 12] = i + 1; /* nonzero value (assume leader). */
 	}
-	const unsigned int roadcount = count_roads(t);
 	const enum edge center_edge = t.edges[4];
 	for (unsigned int i = 0; i < 4; ++i) {
+		const enum edge edge = t.edges[i];
+		if (edge != CITY && edge != FIELD) {
+			continue;
+		}
 		if (adj[(i * 3) * 12] == 0) { /* Already in a group. */
 			continue;
 		}
 		unsigned int ind = i * 3 * 12 + 1;
-		const enum edge edge = t.edges[i];
-		if (edge == CITY || edge == FIELD) {
-			/* All of this edge's other corners are in our group. */
-			for (unsigned int k = 1; k < 3; ++k) {
-				adj[ind++] = i * 3 + k + 1; /* In a group. */
-				adj[(i * 3 + k) * 12] = 0; /*We're its leader */
-				adj[(i * 3 + k) * 12 + 1] = i * 3;
-			}
-		}
-		if (edge == ROAD && roadcount != 2) {
-			/* Roads are only ever connected if exactly 2 roads. */
-			continue;
+		/* All of this edge's other corners are in our group. */
+		for (unsigned int k = 1; k < 3; ++k) {
+			adj[ind++] = i * 3 + k + 1; /* In a group. */
+			adj[(i * 3 + k) * 12] = 0; /*We're its leader */
+			adj[(i * 3 + k) * 12 + 1] = i * 3;
 		}
 		if (edge == CITY && center_edge != CITY) {
 			/* Cities are only connected by center city */
@@ -65,24 +50,74 @@ static void init_adj(struct tile t, int *adj)
 				continue;
 			}
 			for (unsigned int k = 0; k < 3; ++k) {
+				/* Add whole side to group */
+				adj[ind++] = j * 3 + k + 1;
+				adj[(j * 3 + k) * 12] = 0;
+				adj[(j * 3 + k) * 12 + 1] = i * 3;
+			}
+		}
+	}
+	for (unsigned int i = 0; i < 4; ++i) {
+		const enum edge edge = t.edges[i];
+		if (edge != ROAD) {
+			continue;
+		}
+
+		unsigned int ind = (i * 3 + 0) * 12 + 1;
+		if (adj[ind - 1] != 0) {
+			for (unsigned int j=(i-1)%4; j!=i; j=(j-1) % 4) {
+				if (t.edges[j] != edge) {
+					continue;
+				}
+				adj[ind++] = (j * 3 + 2) + 1;
+				adj[(j * 3 + 2) * 12] = 0;
+				adj[(j * 3 + 2) * 12 + 1] = i * 3;
+				break;
+			}
+		}
+
+		ind = (i * 3 + 1) * 12 + 1;
+		if (adj[ind - 1] != 0) {
+			for (unsigned int j=(i + 1)%4; j!=i; j=(j + 1)%4) {
+				if (t.edges[j] != edge) {
+					continue;
+				}
+				adj[ind++] = (j * 3 + 1) + 1;
+				adj[(j * 3 + 1) * 12] = 0;
+				adj[(j * 3 + 1) * 12 + 1] = i * 3 + 1;
+			}
+		}
+
+		ind = (i * 3 + 2) * 12 + 1;
+		if (adj[ind - 1] != 0) {
+			for (unsigned int j=(i + 1) % 4; j!=i; j=(j + 1)%4) {
+				if (t.edges[j] != edge) {
+					continue;
+				}
+				adj[ind++] = (j * 3 + 0) + 1;
+				adj[(j * 3 + 0) * 12] = 0;
+				adj[(j * 3 + 0) * 12 + 1] = i * 3 + 2;
+				break;
+			}
+		}
+	}
+#if 0
 				if (edge == ROAD) { // 0->2, 1->1, 2->0 (Draw)
 					/* Credit to Ben Hammack for finding the
 					 * f(x) = 2 - x function (mod 3).
 					*/
+					int opposite = j * 3 + (2 - k);
+					adj[ind[k]++] = opposite + 1;
+					adj[opposite * 12] = 0;
+					adj[opposite * 12 + 1] = i * 3 + k;
+#if 0
 					int index = i * 3 + k;
 					int opposite = j * 3 + (2 - k);
 					adj[(index) * 12 + 1] = opposite + 1;
 					adj[opposite * 12] = 0;
 					adj[opposite * 12 + 1] = index;
-				} else {
-					/* Add whole side to group */
-					adj[ind++] = j * 3 + k + 1;
-					adj[(j * 3 + k) * 12] = 0;
-					adj[(j * 3 + k) * 12 + 1] = i * 3;
-				}
-			}
-		}
-	}
+#endif
+#endif
 }
 
 /* For use with below. */
