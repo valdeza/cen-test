@@ -35,7 +35,9 @@ struct game {
 	size_t features_used;
 };
 
+void calculate_scores(struct game *g);
 void make_game(struct game *g);
+void free_game(struct game *g);
 void set_game_deck(struct game *g, struct tile *deck);
 int play_move(struct game *g, struct move m, int player);
 bool is_tile_deck_empty(struct game *g);

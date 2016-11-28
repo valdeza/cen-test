@@ -127,20 +127,30 @@ static void init_deck(struct tile deck[TILE_COUNT])
 	return;
 }
 
-static void calculate_scores(struct game *g)
+void calculate_scores(struct game *g)
 {
 	struct feature **scratch = malloc(sizeof(*scratch) * g->features_used);
-	update_scores(&g->scores, scratch, g->features,
-			TILE_COUNT * TILE_COUNT * 4 * 3);
+	size_t len = TILE_COUNT * TILE_COUNT * 4 * 3;
+	update_scores(g->scores, scratch, g->features, &len);
 	printf("DEBUG: %zu %zu\n", g->scores[0], g->scores[1]);
+	free(scratch);
+}
+
+void free_game(struct game *g)
+{
+	struct feature **scratch = malloc(sizeof(*scratch) * g->features_used);
+	size_t len = TILE_COUNT * TILE_COUNT * 4 * 3;
+	update_scores(g->scores, scratch, g->features, &len);
+	for (size_t i = 0; i < len; ++i) {
+		free(scratch[i]);
+	}
 	free(scratch);
 }
 
 /** Initialises the given game. */
 void make_game(struct game *g)
 {
-	g->features_used = 1;
-	g->tiles_used = 0;
+	g->features_used = g->tiles_used = 0;
 	for (size_t i = 0; i < PLAYER_COUNT; ++i) {
 		g->scores[i] = 0;
 		g->meeples[i] = MEEPLE_COUNT;
@@ -170,10 +180,14 @@ int play_move(struct game *g, struct move m, int player)
 		adjs[i] = &neighbors[i];
 	}
 	rc = play_move_board(&g->board, m, adjs);
+	for (size_t i = 0; i < 4; ++i) {
+		if (adjs[i] != NULL) {
+			printf("%d %d\n", adjs[i]->x, adjs[i]->y);
+		}
+	}
 	if (rc) {
 		return rc;
 	}
-	calculate_scores(g);
 	return play_move_feature(m, adjs, g->features, &g->features_used);
 	// Meeple stuff here.
 }

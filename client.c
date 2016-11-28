@@ -136,6 +136,18 @@ static struct game *init_game(int socket)
 	return g;
 }
 
+void game_over(char *buf)
+{
+	if (buf[0] == 1) {
+		if (buf[1]) {
+			printf("I won!\n");
+		} else {
+			printf("I lost!\n");
+		}
+	}
+	return;
+}
+
 int main(void)
 {
 	int sockfd;
@@ -145,36 +157,31 @@ int main(void)
 	}
 	printf("Successfully connected.\n");
 
-	int first;
-	uint64_t move_clock;
-	get_clock_and_order(sockfd, &first, &move_clock);
-	printf("Clock: %llu\n", move_clock);
-	if (first) {
-		printf("I'm first!\n");
-	} else {
-		printf("I'm second!\n");
-	}
-
+	int first; uint64_t move_clock;
 	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; // game_over? + tile + move
-	buf[0] = 0;
-	while (buf[0] != 2) { /* Play tournament */
+	do { /* Play tournament */
+		get_clock_and_order(sockfd, &first, &move_clock);
+		printf("Clock: %llu\n", move_clock);
+		if (first) {
+			printf("I'm first!\n");
+		} else {
+			printf("I'm second!\n");
+		}
+
 		struct game *g = init_game(sockfd); /* TODO: Refactor? */
 		while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
-			printf("Recieved: ");
-			print_buffer(buf, sizeof(buf));
-			if (buf[0] == 1) { /* game over. */
-				if (buf[1]) {
-					printf("I won!\n");
-				} else {
-					printf("I lost!\n");
-				}
+			printf("Recieved: "); print_buffer(buf, sizeof(buf));
+			if (buf[0] != 0) { /* game over. */
+				game_over(buf);
 				break;
 			}
 			/* Deserialize tile and move. */
 			struct tile t = deserialize_tile(&buf[1]);
 			unsigned char b[100];
 			printf("Tile: \n%s\n", print_tile(t, b));
-			if (!first) {
+			if (first) { /* No previous move to deal with. */
+				first = 0;
+			} else {
 				struct move prev = deserialize_move(&buf[7]);
 				printf("Prev move"
 					"| x: %d y: %d: rotation: %d \n%s\n",
@@ -183,18 +190,18 @@ int main(void)
 				play_move(g, prev, 1);
 				printf("DEBUG: %zu %zu\n",
 						g->scores[0], g->scores[1]);
-			} else { /* No previous move to deal with. */
-				first = 0;
 			}
+			/* A.I. HERE */
 			int mid = (AXIS - 1) / 2;
 			struct move m = make_move(t, make_slot(mid, mid), 0);
+			/* End A.I. */
 			play_move(g, m, 0);
 			serialize_move(m, buf);
-			printf("Try playing the center.\n");
 			write(sockfd, buf, sizeof(buf));
 		}
+		free_game(g);
 		free(g);
-	}
+	} while (buf[0] != 2);
 	close(sockfd);
 	return 0;
 }

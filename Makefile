@@ -20,8 +20,9 @@ game: game.c game.h rng.o tile.o board.o slot.o feature.o
 board: board.c board.h tile.o slot.o move.o
 	$(CC) $(CFLAGS) -DTEST -o test_board board.c tile.o slot.o move.o
 
-feature: feature.c feature.h tile.o slot.o move.o edge.h
-	$(CC) $(CFLAGS) -DTEST -o test_feature feature.c tile.o slot.o move.o
+feature: feature.c feature.h tile.o slot.o move.o edge.h rng.o board.o
+	$(CC) $(CFLAGS) -DTEST -o test_feature feature.c tile.o slot.o move.o \
+		game.o rng.o board.o -lm
 
 feature.o: feature.c feature.h
 	$(CC) $(CFLAGS) -c -o feature.o feature.c

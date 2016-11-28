@@ -35,8 +35,10 @@ static int send_deck(int *players, size_t pcnt, struct tile *deck, size_t dlen)
 	for (size_t i = 0; i < dlen; ++i) {
 		serialize_tile(deck[i], &buf[0]);
 		for (size_t j = 0; j < pcnt; ++j) {
+			/*
 			printf("Sending to player %zu: ", j);
 			print_buffer(buf, sizeof(buf));
+			*/
 			write(players[j], buf, TILE_SZ);
 		}
 	}
@@ -116,11 +118,11 @@ static void protocol(void *args)
 	}
 	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; //Game_over?+tile+move
 	while (1) { /* Play tournament. */
-		make_game(g);
 		int current_player = 0;
 		if (send_clock_and_order(players, current_player, 5)) {
 			printf("Failed to send clock and order.\n");
 		}
+		make_game(g);
 		if (send_deck(players, PLAYER_COUNT, g->tile_deck,TILE_COUNT)) {
 			printf("Failed to send deck.\n");
 		}
@@ -155,6 +157,7 @@ static void protocol(void *args)
 		write(players[i], buf, sizeof(buf));
 		close(players[i]);
 	}
+	free_game(g);
 	free(g);
 	free(hostfd);
         return;
