@@ -208,6 +208,27 @@ struct tile deal_tile(struct game *g)
 	return g->tile_deck[g->tiles_used++];
 }
 
+static void generate_available_moves(struct tile t){
+	struct board b;
+	struct move m;
+	struct slot **adjs;
+	struct slot s;
+	struct move array[1000];
+	size_t num_possible_moves = 0;
+
+	for(int i = 0; i < empty_slot_count; i++){
+		m.slot = slot_spot[i];
+		if(invalid_move(b, m.slot, adjs) == 0){
+			for(int j = 0; j < 4; j++){
+				m.rotation = slot_spot[j];
+				if(invalid_move(b, m.rotation, adjs) == 0){
+					array[num_possible_moves++]=m;
+				}
+			}
+		}
+	}
+}
+
 #ifdef TEST
 int main(void)
 {
