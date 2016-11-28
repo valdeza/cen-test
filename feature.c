@@ -41,12 +41,12 @@ static void init_adj(struct tile t, int *adj)
 		if (adj[(i * 3) * 12] == 0) { /* Already in a group. */
 			continue;
 		}
-		unsigned int ind = i * 3 * 12;
+		unsigned int ind = i * 3 * 12 + 1;
 		const enum edge edge = t.edges[i];
 		if (edge == CITY || edge == FIELD) {
 			/* All of this edge's other corners are in our group. */
 			for (unsigned int k = 1; k < 3; ++k) {
-				adj[ind++] = i * 3 + k; /* In a group. */
+				adj[ind++] = i * 3 + k + 1; /* In a group. */
 				adj[(i * 3 + k) * 12] = 0; /*We're its leader */
 				adj[(i * 3 + k) * 12 + 1] = i * 3;
 			}
@@ -71,12 +71,12 @@ static void init_adj(struct tile t, int *adj)
 					*/
 					int index = i * 3 + k;
 					int opposite = j * 3 + (2 - k);
-					adj[(index) * 12] = opposite;
+					adj[(index) * 12 + 1] = opposite + 1;
 					adj[opposite * 12] = 0;
 					adj[opposite * 12 + 1] = index;
 				} else {
 					/* Add whole side to group */
-					adj[ind++] = j * 3 + k;
+					adj[ind++] = j * 3 + k + 1;
 					adj[(j * 3 + k) * 12] = 0;
 					adj[(j * 3 + k) * 12 + 1] = i * 3;
 				}
@@ -280,7 +280,7 @@ int play_move_feature(struct move m, struct slot **neighbors,
 		}
 		printf("DEBUG: lead: %zu\n", lead);
 		for (size_t j = 0; adj[lead * 12 + j] != 0; j++) {
-			const int a = adj[lead * 12 + j];
+			const int a = adj[lead * 12 + j] - 1;
 			printf("DEBUG: %d\n", a);
 			size_t alt_ind = get_index(m.slot.x, m.slot.y, a/3,a%3);
 			if (f[alt_ind]!=NULL && f[alt_ind]!=companion_feature) {
@@ -310,7 +310,7 @@ int play_move_feature(struct move m, struct slot **neighbors,
 			return 1;
 		}
 		for (size_t j = 0; adj[12 * i + j] != 0; ++j) {
-			size_t a = adj[12 * i + j];
+			size_t a = adj[12 * i + j] - 1;
 			size_t ip= get_index(m.slot.x,m.slot.y,a/3,a%3);
 			f[ip] = f[index];
 		}
@@ -396,12 +396,6 @@ int main(void)
 	play_move(&g, m, 0);
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
-#if 0
-	m = make_move(t, make_slot(mid + 2, mid), 0);
-	play_move(&g, m, 0);
-	calculate_scores(&g);
-	printf("%zu %zu\n", g.scores[0], g.scores[1]);
-#endif
 	m = make_move(t, make_slot(mid + 1, mid), 0);
 	play_move(&g, m, 0);
 	calculate_scores(&g);
