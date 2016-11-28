@@ -155,7 +155,6 @@ static void merge_features(struct feature **ap, struct feature **bp)
 			compare_slot_positions, sizeof(a->open_slots[0]));
 	a->slot_count = total;
 	memcpy(a->open_slots, merged_slots, sizeof(a->open_slots[0]) * total);
-	free(b);
 	*ap = a;
 	*bp = a;
 }
@@ -273,6 +272,7 @@ int play_move_feature(struct move m, struct slot **neighbors,
 		if (companion_feature == NULL) {
 			continue;
 		}
+		const struct feature *dupe = companion_feature;
 
 		size_t lead = i; /* Base case, we're the group leader. */
 		if (adj[i * 12] == 0) { /* Not group leader, switch to it. */
@@ -285,6 +285,14 @@ int play_move_feature(struct move m, struct slot **neighbors,
 			size_t alt_ind = get_index(m.slot.x, m.slot.y, a/3,a%3);
 			if (f[alt_ind]!=NULL && f[alt_ind]!=companion_feature) {
 				merge_features(&f[alt_ind], &companion_feature);
+			}
+			for (size_t k = 0; adj[lead * 12 + k] != 0; ++k) {
+				const int b = adj[lead * 12 + k] - 1;
+				size_t ind2 =
+					get_index(m.slot.x, m.slot.y, a/3, a%3);
+				if (f[ind2] == dupe) {
+					f[ind2] = companion_feature;
+				}
 			}
 			f[alt_ind] = companion_feature;
 		}
