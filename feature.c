@@ -64,13 +64,15 @@ static void init_adj(struct tile t, int *adj)
 		if (edge != ROAD) {
 			continue;
 		}
-
 		for (unsigned int j = 0; j < 3; ++j) { /* left, mid, right */
 			unsigned int ind = (i * 3 + j) * 12 + 1;
 			if (adj[ind - 1] == 0) {
 				continue;
 			}
 			for (unsigned int k = r[j][i]; k != i; k = r[j][k]) {
+				if (t.edges[k] != edge) {
+					continue;
+				}
 				adj[ind++] = (k * 3 + (2 - j)) + 1;
 				adj[(k * 3 + (2 - j)) * 12] = 0;
 				adj[(k * 3 + (2 - j)) * 12 + 1] = i * 3 + j;

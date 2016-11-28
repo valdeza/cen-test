@@ -22,6 +22,9 @@ def authentication(sockObj, TournamentPassword, authDictionary):
     else:
         print "Bad client\n"
 
+    sockObj.send("WELCOME " + recieved_username +
+            " PLEASE WAIT FOR THE NEXT CHALLENGE\r\n")
+
 Host = ""
 Port = 50001
 TournamentPassword = "derp"
