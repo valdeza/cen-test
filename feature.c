@@ -57,6 +57,26 @@ static void init_adj(struct tile t, int *adj)
 				adj[(j * 3 + k) * 12 + 1] = i * 3;
 			}
 		}
+		if (edge == CITY) {
+			continue;
+		}
+		/* Additionally, fields can be connected to the roads to their
+		 * immedieate clockwise and anticlockwise.
+		*/
+		unsigned int j = (i + 1) % 4; /* Clockwise */
+		if (t.edges[j] == ROAD) {
+			adj[ind++] = 3 * j + 1;
+			adj[3 * j * 12] = 0;
+			adj[3 * j * 12 + 1] = i * 3;
+		}
+
+		j = (i - 1) % 4; /* Anticlockwise */
+		if (t.edges[j] == ROAD) {
+			adj[ind++] = 3 * (j + 1) - 1 + 1;
+			adj[(3 * (j + 1) - 1) * 12] = 0;
+			adj[(3 * (j + 1) - 1) * 12 + 1] = i * 3;
+		}
+
 	}
 	/* anticlockwise, clockwise, clockwise. */
 	const unsigned int r[3][4] ={{3, 0, 1, 2}, {1, 2, 3, 0}, {1, 2, 3, 0}};

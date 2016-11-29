@@ -153,7 +153,7 @@ static enum game_error_code invalid_move(struct board b, struct move m,
 		if (pair == EMPTY) {
 			continue; /* Empty tiles match with everything. */
 		}
-		if (pair != t[i]) { /* Corresponding don't match. */
+		if (pair != t.edges[i]) { /* Corresponding don't match. */
 			return E_TILE_EDGE_CONFLICT;
 		}
 	}
