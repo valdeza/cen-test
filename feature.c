@@ -300,10 +300,8 @@ int play_move_feature(struct move m, struct slot **neighbors,
 		if (adj[i * 12] == 0) { /* Not group leader, switch to it. */
 			lead = adj[i * 12 + 1];
 		}
-		printf("DEBUG: lead: %zu\n", lead);
 		for (size_t j = 0; adj[lead * 12 + j] != 0; j++) {
 			const int a = adj[lead * 12 + j] - 1;
-			printf("DEBUG: %d\n", a);
 			size_t alt_ind = get_index(m.slot.x, m.slot.y, a/3,a%3);
 			if (f[alt_ind]!=NULL && f[alt_ind]!=companion_feature) {
 				merge_features(&f[alt_ind], &companion_feature);
@@ -318,11 +316,6 @@ int play_move_feature(struct move m, struct slot **neighbors,
 			}
 			f[alt_ind] = companion_feature;
 		}
-	}
-	printf("Preassignment:\n");
-	for (size_t i = 0; i < 12; ++i) { /* DEBUG: */
-		printf("%zu: %p\n", i,
-			f[get_index(m.slot.x, m.slot.y, i/3, i%3)]);
 	}
 	for (size_t i = 0; i < 12; ++i) { /* Assign to unassigned corners */
 		if (adj[i * 12] == 0) {
@@ -345,11 +338,6 @@ int play_move_feature(struct move m, struct slot **neighbors,
 			f[ip] = f[index];
 		}
 		*features_used += 1;
-	}
-	printf("Post Assignment:\n");
-	for (size_t i = 0; i < 12; ++i) { /* DEBUG: */
-		printf("%zu: %p\n", i,
-			f[get_index(m.slot.x, m.slot.y, i/3, i%3)]);
 	}
 	for (size_t i = 0; i < 12; ++i) {/* add adjencies & tile 2 each group */
 		const size_t index = get_index(m.slot.x, m.slot.y, i/3, i%3);
