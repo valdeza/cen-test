@@ -185,8 +185,22 @@ int play_move(struct game *g, struct move m, int player)
 	if ((rc = play_move_feature(m, adjs, g->features, &g->features_used))) {
 		return rc;
 	}
-	// Meeple stuff here.
-	return play_meeple(m, player, g->features);
+	if (m.tcorner > 0 && m.ccorner > 0 ) { /* Either tiger or meeple. */
+		return 1;
+	}
+	if (m.tcorner < 0 && m.ccorner < 0) {
+		return rc;
+	}
+	if ((rc = play_meeple(m, player, g->features))) {
+		return rc;
+	}
+	if (m.tcorner > 0) {
+		m.tcorner--;
+	}
+	if (m.ccorner > 0) {
+		m.ccorner--;
+	}
+	return 0;
 }
 
 /** Returns whether the number of tiles dealt for the given game exceeds

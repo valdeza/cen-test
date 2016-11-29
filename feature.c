@@ -24,6 +24,7 @@ static void init_adj(struct tile t, int *adj)
 	for (unsigned int i = 0; i < 12; ++i) {
 		adj[i * 12] = i + 1; /* nonzero value (assume leader). */
 	}
+	/* TODO: Refactor into loops elements into functions. */
 	const enum edge center_edge = t.edges[4];
 	for (unsigned int i = 0; i < 4; ++i) { /* Connect roads and fields */
 		const enum edge edge = t.edges[i];

@@ -142,16 +142,18 @@ static enum game_error_code invalid_move(struct board b, struct move m,
 		return E_TILE_NOT_PLACEABLE; /* Slot not placeable. */
 	}
 	list_adjacent_slots(m.slot, adjs);
+	struct tile t = rotate_tile(m.tile, m.rotation);
 	for (unsigned int i = 0; i < 4; ++i) { /* Need wrapping */
 		if (adjs[i] == NULL) { /* Ignore if not on board. */
 			continue;
 		}
 		/* The (i + 2) % 4 math here is a bit evil, but it works. */
-		enum edge pair = b.tiles[get_index_from_slot(*adjs[i])].edges[(i+2)%4];
+		enum edge pair =
+			b.tiles[get_index_from_slot(*adjs[i])].edges[(i+2)%4];
 		if (pair == EMPTY) {
 			continue; /* Empty tiles match with everything. */
 		}
-		if (pair != m.tile.edges[i]) { /* Corresponding don't match. */
+		if (pair != t[i]) { /* Corresponding don't match. */
 			return E_TILE_EDGE_CONFLICT;
 		}
 	}
