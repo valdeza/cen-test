@@ -26,5 +26,6 @@ bool is_tile_equal(struct tile a, struct tile b);
 struct tile make_tile(const enum edge edges[5], enum attribute a);
 struct tile rotate_tile(const struct tile old, const int rotation);
 char *print_tile(struct tile t, char b[TILE_LEN]);
+void init_adj(const struct tile t, int adj[12*12]);
 
 #endif
