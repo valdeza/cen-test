@@ -159,7 +159,6 @@ int main(void)
 
 	int first; uint64_t move_clock;
 	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; // game_over? + tile + move
-#if 0
 	while (1) { /* Play tournament */
 		get_clock_and_order(sockfd, &first, &move_clock);
 		printf("Clock: %llu\n", move_clock);
@@ -171,6 +170,7 @@ int main(void)
 		while (1) { /* Play game. */
 			struct game *g = init_game(sockfd); /*TODO: Refactor? */
 			while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
+				int gfirst = first;
 				printf("Recieved: "); print_buffer(buf,
 						sizeof(buf));
 				if (buf[0] != 0) { /* Game over. */
@@ -180,46 +180,35 @@ int main(void)
 				struct tile t = deserialize_tile(&buf[1]);
 				unsigned char b[100];
 				printf("Tile: \n%s\n", print_tile(t, b));
-			}
-		}
-	}
-#endif
-	do { /* Play tournament */
-		struct game *g = init_game(sockfd); /* TODO: Refactor? */
-		while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
-			printf("Recieved: "); print_buffer(buf, sizeof(buf));
-			if (buf[0] != 0) { /* game over. */
-				game_over(buf);
-				break;
-			}
-			/* Deserialize tile and move. */
-			struct tile t = deserialize_tile(&buf[1]);
-			unsigned char b[100];
-			printf("Tile: \n%s\n", print_tile(t, b));
-			if (first) { /* No previous move to deal with. */
-				first = 0;
-			} else {
-				struct move prev = deserialize_move(&buf[7]);
-				printf("Prev move"
-					"| x: %d y: %d: rotation: %d \n%s\n",
+				if (gfirst) { /* No previous move. */
+					gfirst = 0;
+				} else {
+					struct move prev =
+						deserialize_move(&buf[7]);
+					printf("Prev move | x: %d y: %d: "
+						"rotation: %d \n%s\n",
 					prev.slot.x, prev.slot.y, prev.rotation,
 					print_tile(prev.tile, b));
-				play_move(g, prev, 1);
-				printf("DEBUG: %zu %zu\n",
+					play_move(g, prev, 1);
+					printf("DEBUG: %zu %zu\n",
 						g->scores[0], g->scores[1]);
+				}
+				/* A.I. HERE */
+				int mid = (AXIS - 1) / 2;
+				struct move m =
+					make_move(t,make_slot(mid,mid),0,-1,-1);
+				/* End A.I. */
+				play_move(g, m, 0);
+				serialize_move(m, buf);
+				write(sockfd, buf, sizeof(buf));
 			}
-			/* A.I. HERE */
-			int mid = (AXIS - 1) / 2;
-			struct move m =
-				make_move(t, make_slot(mid, mid), 0, -1, -1);
-			/* End A.I. */
-			play_move(g, m, 0);
-			serialize_move(m, buf);
-			write(sockfd, buf, sizeof(buf));
+			free_game(g);
+			free(g);
 		}
-		free_game(g);
-		free(g);
-	} while (buf[0] != 2);
+		if (buf[2] == 0) {
+			break;
+		}
+	}
 	close(sockfd);
 	return 0;
 }
