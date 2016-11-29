@@ -1,22 +1,25 @@
 import sys
 import socket
 import string
-import select
 
 buf = ''
 
 def better_recv(sockObj, buf):
-    sockObj.setblocking(0)
-    ready = select.select([sockObj], [], [], 10.0)
-    if ready[0]:
-            buf = buf + sockObj.recv(4096)
-    return buf
+    if "\r\n" not in buf:
+        buf = buf + sockObj.recv(4096)
+    split = string.split(buf, "\r\n")
+    message = split[0]
+    del split[0]
+    buf = "\r\n".join(map(str, split))
+    return buf, message
 
 def authentication(sockObj, TournamentPassword, authDictionary):
     sockObj.send("THIS IS SPARTA!\r\n")
 
-    buf = '' + sockObj.recv(1024)
-    recieved_password = string.split(string.split(buf, "\r\n")[0], " ")[1]
+    buf = ''
+    buf, message = better_recv(sockObj, buf)
+    print message
+    recieved_password = string.split(message, " ")[1]
     if recieved_password == TournamentPassword:
         print "Good Password\n"
     else:
@@ -26,9 +29,9 @@ def authentication(sockObj, TournamentPassword, authDictionary):
 
     sockObj.send("Hello!\r\n")
 
-    buf = '' + sockObj.recv(1024)
-    recieved_username = string.split(string.split(buf, "\r\n")[0], " ")[2];
-    recieved_password = string.split(string.split(buf, "\r\n")[0], " ")[3];
+    buf, message = better_recv(sockObj, buf)
+    recieved_username = string.split(message, " ")[2];
+    recieved_password = string.split(message, " ")[3];
     if recieved_password == authDictionary[recieved_username]:
         print "Authenticated " + recieved_username + "\n"
     else:
@@ -75,30 +78,45 @@ def move(sockObj):
     send_move_information = 1 # glo
 
     sockObj.send("MAKE YOUR MOVE IN GAME " + str(send_gameid) + " WITHIN " + str(send_time_move) + " SECOND: MOVE " + str(send_move_number) + " PLACE " + str(send_tile) + "\r\n")
-    buf = '' + sockObj.recv(1024)
-    #buf = '' + better_recv(sockObj, '')
-    print buf
-    recieved_gameid = string.split(string.split(buf, "\r\n")[0], " ")[1]
-    recieved_move_number = string.split(string.split(buf, "\r\n")[0], " ")[3]
-    recieved_tile = string.split(string.split(buf, "\r\n")[0], " ")[5]
-    recieved_move_information = string.split(string.split(buf, "\r\n")[0], " ")[7]
+    buf, message = better_recv(sockObj, '')
+    recieved_gameid = string.split(message, " ")[1]
+    recieved_move_number = string.split(message, " ")[3]
+    recieved_tile = string.split(message, " ")[5]
+    recieved_move_information = string.split(message, " ")[7]
 
-    sockObj.send("GAME " + str(send_gameid) + " MOVE " + str(send_move_number) + " PLAYER " +  str(send_playerid) + " PLACED " + str(send_tile) + " AT " + str(send_move_information) + "\r\n")
-    sockObj.send("GAME " + str(send_gameid) + " MOVE " + str(send_move_number) + " PLAYER " +  str(send_playerid) + " PLACED " + str(send_tile) + " AT " + str(send_move_information) + "\r\n")
+    sockObj.send("GAME " + str(send_gameid) +
+            " MOVE " + str(send_move_number) +
+            " PLAYER " +  str(send_playerid) +
+            " PLACED " + str(send_tile) +
+            " AT " + str(send_move_information) + "\r\n")
+    sockObj.send("GAME " + str(send_gameid) +
+            " MOVE " + str(send_move_number) +
+            " PLAYER " +  str(send_playerid) +
+            " PLACED " + str(send_tile) +
+            " AT " + str(send_move_information) + "\r\n")
 
 def matchOver(sockObj):
     send_gameid = 1; # glo
     send_playerid = 1; # glo
     send_score = 1; # glo
 
-    sockObj.send("GAME " + str(send_gameid) + " OVER PLAYER " + str(send_playerid) + " " + str(send_score) + " PLAYER " + str(send_playerid) + " " + str(send_score) + "\r\n")
-    sockObj.send("GAME " + str(send_gameid) + " OVER PLAYER " + str(send_playerid) + " " + str(send_score) + " PLAYER " + str(send_playerid) + " " + str(send_score) + "\r\n")
+    sockObj.send("GAME " + str(send_gameid) +
+            " OVER PLAYER " + str(send_playerid) +
+            " " + str(send_score) +
+            " PLAYER " + str(send_playerid) +
+            " " + str(send_score) + "\r\n")
+    sockObj.send("GAME " + str(send_gameid) +
+            " OVER PLAYER " + str(send_playerid) +
+            " " + str(send_score) +
+            " PLAYER " + str(send_playerid) +
+            " " + str(send_score) + "\r\n")
 
 def roundOver(sockObj,buf):
     send_roundid = 1 # glo
     send_rounds = 1 # glo
 
-    sockObj.send("END OF ROUND " + str(send_roundid) + " OF " + str(send_rounds) + "\r\n")
+    sockObj.send("END OF ROUND " + str(send_roundid)
+            + " OF " + str(send_rounds) + "\r\n")
 
 def challengeOver(sockObj,buf):
     sockObj.send("END OF CHALLENGES\r\n")

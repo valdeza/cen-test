@@ -1,7 +1,6 @@
 import sys
 import socket
 import string
-import select
 
 #class move_information(object):
 #x = 0
@@ -21,121 +20,98 @@ import select
 
 
 def better_recv(sockObj, buf):
-    sockObj.setblocking(0)
-    ready = select.select([sockObj], [], [], 0.75)
-    if ready[0]:
+    if "\r\n" not in buf:
         buf = buf + sockObj.recv(4096)
-    return buf
-
-def print_buffer(buf):
-    for message in [string.split(buf, "\r\n")[0]]:
-        field = string.split(message, " ")
-        print field
     split = string.split(buf, "\r\n")
+    message = split[0]
     del split[0]
-    return "\r\n".join(map(str,split))
-
+    buf = "\r\n".join(map(str, split))
+    return message, buf
 
 def authentication(sockObj, TournamentPassword, Username, Password, buf):
-    buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
 
     sockObj.send("JOIN " + TournamentPassword + "\r\n")
 
-    buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
 
     sockObj.send("I AM " + Username + " " + Password + "\r\n")
 
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
     return buf
 
 def challengeStart(sockObj, buf):
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
     return buf
 
 def roundStart(sockObj, buf):
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    #print "roundstart heyyyyy"
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
     return buf
 
 def matchStart(sockObj, buf):
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
     print "opponent is hey"
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
 
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
     print "starting tile hey"
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
 
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
     print "remaing hey"
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
 
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
     print "match hey"
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
     return buf
 
 def move(sockObj, buf):
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    recieved_gameid = string.split(string.split(buf, "\r\n")[0], " ")[5]
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
 
+    recieved_gameid = string.split(message, " ")[5]
     print "game id: " + recieved_gameid
     
     move_number = 1;
     tile = 1;
     move_info = 1 #move_information()
-    sockObj.send("GAME " + str(recieved_gameid) + " MOVE " + str(move_number) + " PLACE " + str(tile) + " AT " + str(move_info) + "\r\n")
+    sockObj.send("GAME " + str(recieved_gameid) + " MOVE " + str(move_number)
+            + " PLACE " + str(tile) + " AT " + str(move_info) + "\r\n")
     
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
     
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
     return buf
 
 def matchOver(sockObj, buf):
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
 
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
-
+    message, buf = better_recv(sockObj, buf)
+    print message
     return buf
 
 def roundOver(sockObj, buf):
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
     return buf
 
 def challengeOver(sockObj, buf):
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
     return buf
 
 def tournamentOver(sockObj, buf):
-    buf = buf + better_recv(sockObj, buf)
-    #buf = buf + sockObj.recv(1024)
-    buf = print_buffer(buf)
+    message, buf = better_recv(sockObj, buf)
+    print message
     return buf
 
 Host = ""                     # Make a command line option.
