@@ -159,7 +159,7 @@ int main(void)
 
 	int first; uint64_t move_clock;
 	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; // game_over? + tile + move
-	do { /* Play tournament */
+	while (1) { /* Play tournament */
 		get_clock_and_order(sockfd, &first, &move_clock);
 		printf("Clock: %llu\n", move_clock);
 		if (first) {
@@ -167,7 +167,22 @@ int main(void)
 		} else {
 			printf("I'm second!\n");
 		}
-
+		while (1) { /* Play game. */
+			struct game *g = init_game(sockfd); /*TODO: Refactor? */
+			while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
+				printf("Recieved: "); print_buffer(buf,
+						sizeof(buf));
+				if (buf[0] != 0) { /* Game over. */
+					game_over(buf);
+					break;
+				}
+				struct tile t = deserialize_tile(&buf[1]);
+				unsigned char b[100];
+				printf("Tile: \n%s\n", print_tile(t, b));
+			}
+		}
+	}
+	do { /* Play tournament */
 		struct game *g = init_game(sockfd); /* TODO: Refactor? */
 		while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
 			printf("Recieved: "); print_buffer(buf, sizeof(buf));

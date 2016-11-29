@@ -10,7 +10,9 @@ def authentication(sockObj, TournamentPassword, authDictionary):
     if recieved_password == TournamentPassword:
         print "Good Password\n"
     else:
-        return 1;
+        print "Bad Password\n"
+        return 1
+
 
     sockObj.send("Hello!\r\n")
 
@@ -24,70 +26,83 @@ def authentication(sockObj, TournamentPassword, authDictionary):
 
     sockObj.send("WELCOME " + recieved_username + " PLEASE WAIT FOR THE NEXT CHALLENGE\r\n")
 
+    return sockObj
+
+
 def challengeStart(sockObj):
     send_challengeid = 1 # we need a global variable
     send_rounds = 1      # we need a global variable
     sockObj.send("NEW CHALLENGE " + str(send_challengeid) + " YOU WILL PLAY " + str(send_rounds) + " MATCH\r\n")
 
+    return sockObj
+
 def roundStart(sockObj):
     send_roundid = 1    # we need a glo var
     send_rounds = 1     # we need a glo var
     sockObj.send("BEGIN ROUND " + str(send_roundid) + " OF " + str(send_rounds) + "\r\n")
+    return sockObj
 
 def matchStart(sockObj):
     send_username = 1 #glo var
-    sockObj.send("YOUR OPPONENT IS PLAYER " + str(send_username) + " \r\n")
+    sockObj.send("YOUR OPPONENT IS PLAYER " + str(send_username) + "\r\n")
 
     send_tile = 1 # glo var
     send_x = 1 # glo var
     send_y = 1 # glo var
     send_orientation = 1 # glo var
-    sockObj.send("STARTING TILE IS " + str(send_tile) + " AT " + str(send_x) + " " + str(send_y) + " "+ str(send_orientation) + " \r\n")
+    sockObj.send("STARTING TILE IS " + str(send_tile) + " AT " + str(send_x) + " " + str(send_y) + " "+ str(send_orientation) + "\r\n")
 
     send_numb_tiles = 1 # glo var
     send_tiles_left = 1 # glo var
     sockObj.send("THE REMAINING " + str(send_numb_tiles) + " TILES ARE [" + str(send_tiles_left) + "]\r\n")
 
     send_time_plan = 1 # glo var
-    sockObj.send("MATCH BEGINS IN " + str(send_time_plan) + " SECONDS \r\n")
+    sockObj.send("MATCH BEGINS IN " + str(send_time_plan) + " SECONDS\r\n")
 
-def move(sockObj, game):
+    return sockObj
+
+def move(sockObj):
     send_gameid = 1 # glo var
     send_time_move = 1 # glo var
     send_move_number = 1 # glo var
     send_tile = 1 # glo var
-    send_player = 1 # glo var
-    send_move_information
+    send_playerid = 1 # glo var
+    send_move_information = 1 # glo
+
     sockObj.send("MAKE YOUR MOVE IN GAME " + str(send_gameid) + " WITHIN " + str(send_time_move) + " SECOND: MOVE " + str(send_move_number) + " PLACE " + str(send_tile) + "\r\n")
-
+    #print "hey"
     buf = '' + sockObj.recv(1024)
-    recieved_gameid = string.split(string.split(buf, "\r\n")[0], " ")[1]
-    recieved_move_number = string.split(string.split(buf, "\r\n")[0], " ")[3]
-    recieved_tile = string.split(string.split(buf, "\r\n")[0], " ")[5]
-    recieved_move_information = string.split(string.split(buf, "\r\n")[0], " ")[7]
+    #print "hey"
+#print buf
+    #recieved_gameid = string.split(string.split(buf, "\r\n")[0], " ")[1]
+    #recieved_move_number = string.split(string.split(buf, "\r\n")[0], " ")[3]
+    #recieved_tile = string.split(string.split(buf, "\r\n")[0], " ")[5]
+    #recieved_move_information = string.split(string.split(buf, "\r\n")[0], " ")[7]
 
-    sockObj.send("GAME " + str(send_gameid) + " MOVE " + str(send_move_number) + " PLAYER " +  str(send_player) + " PLACED " + str(send_tile) + " AT " + str(move) + " \r\n")
-    sockObj.send("GAME " + str(send_gameid) + " MOVE " + str(send_move_number) + " PLAYER " +  str(send_player) + " PLACED " + str(send_tile) + " AT " + str(move) + " \r\n")
+    sockObj.send("GAME " + str(send_gameid) + " MOVE " + str(send_move_number) + " PLAYER " +  str(send_playerid) + " PLACED " + str(send_tile) + " AT " + str(send_move_information) + "\r\n")
+#sockObj.send("GAME " + str(send_gameid) + " MOVE " + str(send_move_number) + " PLAYER " +  str(send_playerid) + " PLACED " + str(send_tile) + " AT " + str(send_move_information) + "\r\n")
+
+    return sockObj
 
 def matchOver(sockObj):
     send_gameid = 1; # glo
     send_playerid = 1; # glo
     send_score = 1; # glo
 
-    sockObj.send("GAME " + str(send_gameid) + " OVER PLAYER " + str(send_playerid) + " " + str(send_score) + " PLAYER " + str(send_playerid) + " " + str(send_score) + " \r\n")
-    sockObj.send("GAME " + str(send_gameid) + " OVER PLAYER " + str(send_playerid) + " " + str(send_score) + " PLAYER " + str(send_playerid) + " " + str(send_score) + " \r\n")
+    sockObj.send("GAME " + str(send_gameid) + " OVER PLAYER " + str(send_playerid) + " " + str(send_score) + " PLAYER " + str(send_playerid) + " " + str(send_score) + "\r\n")
+    sockObj.send("GAME " + str(send_gameid) + " OVER PLAYER " + str(send_playerid) + " " + str(send_score) + " PLAYER " + str(send_playerid) + " " + str(send_score) + "\r\n")
 
-def roundOver(sockObj):
+def roundOver(sockObj,buf):
     send_roundid = 1 # glo
     send_rounds = 1 # glo
 
-    sockObj.send("END OF ROUND " + str(send_roundid) + " OF " + str(send_rounds) + " \r\n")
+    sockObj.send("END OF ROUND " + str(send_roundid) + " OF " + str(send_rounds) + "\r\n")
 
-def challengeOver(sockObj):
+def challengeOver(sockObj,buf):
     sockObj.send("END OF CHALLENGES\r\n")
 
-def tournamentOver(sockObj):
-    sockObj.send("THANK YOU FOR PLAYING! GOODBYE")
+def tournamentOver(sockObj,buf):
+    sockObj.send("THANK YOU FOR PLAYING! GOODBYE\r\n")
 
 
 Host = ""
@@ -102,7 +117,10 @@ s.bind((Host, Port))
 s.listen(1)
 conn, addr = s.accept() # What is addr here?
 
-authentication(conn, TournamentPassword, authDictionary)
-challengeStart(conn)
-roundStart(conn)
-matchStart(conn)
+
+conn = authentication(conn, TournamentPassword, authDictionary)
+conn = challengeStart(conn)
+conn = roundStart(conn)
+conn = matchStart(conn)
+conn = move(conn)
+

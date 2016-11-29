@@ -33,7 +33,7 @@ uint8_t *serialize_move(struct move m, uint8_t *buf)
 struct move deserialize_move(uint8_t buf[MOVE_SZ])
 {
 	struct tile t = deserialize_tile(buf);
-	return make_move(t, make_slot(buf[6], buf[7]), buf[8]);
+	return make_move(t, make_slot(buf[6], buf[7]), buf[8], -1, -1);
 }
 
 void print_buffer(uint8_t *buf, size_t len)

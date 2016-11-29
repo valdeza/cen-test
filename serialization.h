@@ -10,7 +10,8 @@
 #include "limits.h"
 
 #define TILE_SZ 6		/* 1 byte per edge + ceneter + attribute */
-#define MOVE_SZ TILE_SZ + 3	/* 1 byte for x, y, rotation */
+#define MOVE_SZ TILE_SZ + 3	/* +1 for x, y, rotation, tcorner & ccorner */
+//#define MOVE_SZ TILE_SZ + 5	/* +1 for x, y, rotation, tcorner & ccorner */
 
 uint8_t *serialize_tile(struct tile t, uint8_t *buf);
 struct tile deserialize_tile(uint8_t buf[TILE_SZ]);

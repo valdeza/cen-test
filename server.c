@@ -122,12 +122,12 @@ static void protocol(void *args)
 		if (send_clock_and_order(players, current_player, 5)) {
 			printf("Failed to send clock and order.\n");
 		}
-		make_game(g);
-		if (send_deck(players, PLAYER_COUNT, g->tile_deck,TILE_COUNT)) {
-			printf("Failed to send deck.\n");
-		}
-		struct move previous;
 		while (1) { /* Play game. */
+			make_game(g);
+			if (send_deck(players, PLAYER_COUNT,
+						g->tile_deck,TILE_COUNT)) {
+				printf("Failed to send deck.\n");
+			struct move previous;
 			buf[0] = 0; /* Assume we keep playing. */
 			if (is_tile_deck_empty(g)) {
 				/* TODO: Scoring. replace 0 with high scoring player. */
@@ -150,6 +150,7 @@ static void protocol(void *args)
 			}
 			previous = m;
 			current_player ^= 1;
+			free_game(g);
 		}
 	}
 	buf[0] = 2;
