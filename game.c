@@ -190,7 +190,7 @@ int is_move_valid(struct game *g, struct move m, int player)
 	if ((rc = test_meeple(m, player, g->features))) {
 		return rc;
 	}
-	return 1;
+	return 0;
 }
 
 /** Tries to play the given move by the player on the given game. */
