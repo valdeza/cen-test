@@ -127,6 +127,7 @@ static void protocol(void *args)
 			if (send_deck(players, PLAYER_COUNT,
 						g->tile_deck,TILE_COUNT)) {
 				printf("Failed to send deck.\n");
+			}
 			struct move previous;
 			buf[0] = 0; /* Assume we keep playing. */
 			if (is_tile_deck_empty(g)) {

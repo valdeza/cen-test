@@ -159,6 +159,7 @@ int main(void)
 
 	int first; uint64_t move_clock;
 	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; // game_over? + tile + move
+#if 0
 	while (1) { /* Play tournament */
 		get_clock_and_order(sockfd, &first, &move_clock);
 		printf("Clock: %llu\n", move_clock);
@@ -182,6 +183,7 @@ int main(void)
 			}
 		}
 	}
+#endif
 	do { /* Play tournament */
 		struct game *g = init_game(sockfd); /* TODO: Refactor? */
 		while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {

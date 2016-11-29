@@ -170,6 +170,29 @@ void set_game_deck(struct game *g, struct tile *deck)
 	memcpy(g->tile_deck, deck, sizeof(*deck) * TILE_COUNT);
 }
 
+int is_move_valid(struct game *g, struct move m, int player)
+{
+	int rc;
+	struct slot neighbors[4];
+	struct slot *adjs[4];
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &neighbors[i];
+	}
+	if ((rc = test_move_board(&g->board, m, adjs))) {
+		return rc;
+	}
+	if (m.tcorner > 0 && m.ccorner > 0 ) { /* Either tiger or meeple. */
+		return 1;
+	}
+	if (m.tcorner < 0 && m.ccorner < 0) {
+		return rc;
+	}
+	if ((rc = test_meeple(m, player, g->features))) {
+		return rc;
+	}
+	return 1;
+}
+
 /** Tries to play the given move by the player on the given game. */
 int play_move(struct game *g, struct move m, int player)
 {
@@ -179,21 +202,12 @@ int play_move(struct game *g, struct move m, int player)
 	for (size_t i = 0; i < 4; ++i) {
 		adjs[i] = &neighbors[i];
 	}
-	if ((rc = play_move_board(&g->board, m, adjs))) {
+	if ((rc = is_move_valid(g, m, player))) {
 		return rc;
 	}
-	if ((rc = play_move_feature(m, adjs, g->features, &g->features_used))) {
-		return rc;
-	}
-	if (m.tcorner > 0 && m.ccorner > 0 ) { /* Either tiger or meeple. */
-		return 1;
-	}
-	if (m.tcorner < 0 && m.ccorner < 0) {
-		return rc;
-	}
-	if ((rc = play_meeple(m, player, g->features))) {
-		return rc;
-	}
+	play_move_board(&g->board, m, adjs);
+	play_move_feature(m, adjs, g->features, &g->features_used);
+	play_meeple(m, player, g->features);
 	if (m.tcorner > 0) {
 		m.tcorner--;
 	}

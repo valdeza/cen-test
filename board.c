@@ -199,6 +199,16 @@ char *print_board(struct board b, char res[BOARD_LEN])
 	return res;
 }
 
+enum game_error_code
+test_move_board(struct board *b, struct move m, struct slot **adjs)
+{
+	enum game_error_code rc;
+	if ((rc = invalid_move(*b, m, adjs))) {
+		return rc;
+	}
+	return OK;
+}
+
 /** Tries to play the given move on the given board, returning a status code.
  *
  * @postcondition Board is updated if given move is valid.
@@ -208,12 +218,12 @@ enum game_error_code
 play_move_board(struct board *b, struct move m, struct slot **adjs)
 {
 	enum game_error_code rc;
-	if ((rc = invalid_move(*b, m, adjs))) {
-		return rc;
+	if ((rc = test_move_board(b, m, adjs)) == OK) {
+		b->tiles[get_index_from_slot(m.slot)] =
+			rotate_tile(m.tile, m.rotation);
+		*b = update_slot_spots(*b, m.slot);
 	}
-	b->tiles[get_index_from_slot(m.slot)] = rotate_tile(m.tile, m.rotation);
-	*b = update_slot_spots(*b, m.slot);
-	return OK;
+	return rc;
 }
 
 #ifdef TEST

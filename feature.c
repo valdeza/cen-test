@@ -360,7 +360,7 @@ int play_move_feature(struct move m, struct slot **neighbors,
 	return 0;
 }
 
-int play_meeple(struct move m, int player, struct feature **f)
+int test_meeple(struct move m, int player, struct feature **f)
 {
 	if (m.tcorner > 0) {
 		struct feature *feat =
@@ -370,7 +370,6 @@ int play_meeple(struct move m, int player, struct feature **f)
 		if (feat->tigers[player]) {
 			return 1; /* Invalid move */
 		}
-		feat->tigers[player]++;
 	}
 	if (m.ccorner > 0) {
 		struct feature *feat =
@@ -380,6 +379,22 @@ int play_meeple(struct move m, int player, struct feature **f)
 		if (feat->crocodiles[player]) {
 			return 1; /* Invalid move */
 		}
+	}
+	return 0;
+}
+
+int play_meeple(struct move m, int player, struct feature **f)
+{
+	int rc = 0;
+	if ((rc = test_meeple(m, player, f))) {
+		return rc;
+	}
+	struct feature *feat = f[get_index(m.slot.x, m.slot.y,
+			m.tcorner/3, m.tcorner%3)];
+	if (m.tcorner > 0) {
+		feat->tigers[player]++;
+	}
+	if (m.ccorner > 0) {
 		feat->crocodiles[player]++;
 	}
 	return 0;
