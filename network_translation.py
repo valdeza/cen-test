@@ -17,6 +17,13 @@ ATTRIB_NONE = 0
 ATTRIB_SHIELD = 1
 ATTRIB_MONASTERY = 2
 
+BIDICT_ROT_NATIVE_TGZ = bidict({
+    0: 0,
+    1: 270,
+    2: 180,
+    3: 90,
+})
+
 #: bidict for converting network representations of tile strings
 #: to and from native representations of tile structs.
 BIDICT_TILE_STR_ABYTE = bidict({
@@ -424,6 +431,20 @@ def translate_coord_native_to_network(x, y):
     """
     return (x-NATIVE_ORIGIN_XY, y-NATIVE_ORIGIN_XY)
 
+def translate_rotation_network_to_native(i):
+    """
+    Given anti-clockwise degree rotation,
+    returns our native clockwise rotation index.
+    """
+    return BIDICT_ROT_NATIVE_TGZ.inv[i]
+
+def translate_rotation_native_to_network(i):
+    """
+    Given our native clockwise rotation index,
+    returns anti-clockwise degree rotation.
+    """
+    return BIDICT_ROT_NATIVE_TGZ[i]
+
 def main():
     # TODO Unit tests for all the things:
     # - Cursory sweep to see if all tiles exist in dictionaries.
@@ -439,5 +460,7 @@ def main():
     print translate_placement_tiger_to_meeple("JJJJX", 9)
     print translate_coord_native_to_network(0, 0)
     print translate_coord_network_to_native(0, 0)
+    print translate_rotation_native_to_network(1)
+    print translate_rotation_network_to_native(90)
 
 main()
