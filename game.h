@@ -21,7 +21,6 @@
 #include "feature.h"
 #include "rngs/mt19937-64.h" /* Mersenne Twister PRNG. Try PCG if too slow */
 
-#define TILE_COUNT 72
 #define MEEPLE_COUNT 7
 #define PLAYER_COUNT 2
 

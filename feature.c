@@ -236,6 +236,10 @@ int test_meeple(struct move m, int player, struct feature **f)
 		return 1;
 	}
 	if (m.tcorner >= 0) {
+		if ((m.tcorner > 11  || m.ccorner > 11)
+				&& m.tile.attribute != MONASTERY) {
+			return 1;
+		}
 		return test_corner_feature(1, player, m, f);
 	} else {
 		return test_corner_feature(0, player, m, f);
@@ -391,7 +395,39 @@ void print_adj(struct tile t, int *adj)
 	}
 }
 
-#if 0
+static void generate_available_moves(struct game *g, int player,
+		struct tile t, struct move *pmoves, size_t *pmoves_len)
+{
+	struct move m;
+	size_t num_moves = 0;
+	size_t max_possible_moves = *pmoves_len;
+
+	m.tile = t;
+	printf("DEBUG: empty_slot_count: %u\n", g->board.empty_slot_count);
+	for (size_t i = 0; i < g->board.empty_slot_count; i++){
+		m.slot = g->board.slot_spots[i];
+		for (int j = 0; j < 4; ++j) {
+			m.rotation = j;
+			for (int k = -1; k < 13; ++k) {
+				m.tcorner = k;
+				for (int l = -1; l < 13; ++l) {
+					m.ccorner = l;
+					if (is_move_valid(g, m, player)) {
+						continue;
+					}
+					pmoves[num_moves++] = m;
+					if (num_moves == max_possible_moves) {
+						*pmoves_len = num_moves;
+						return;
+					}
+				}
+			}
+		}
+	}
+	*pmoves_len = num_moves;
+	return;
+}
+
 int main(void)
 {
 	int adj[144];
@@ -399,29 +435,44 @@ int main(void)
 	init_adj(t, adj); print_adj(t, adj);
 	t = make_tile((enum edge[5]){CITY, CITY, CITY, CITY, CITY}, SHIELD);
 	init_adj(t, adj); print_adj(t, adj);
-	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, ROAD, ROAD}, NONE);
+	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
 	init_adj(t, adj); print_adj(t, adj);
 
 	printf("\n\n Trying game\n");
 	struct game g;
 	make_game(&g);
 	int mid = (AXIS - 1) / 2;
-	struct move m = make_move(t, make_slot(mid, mid), 0, 3, -1);
-	play_move(&g, m, 0);
-	calculate_scores(&g);
-	printf("%zu %zu\n", g.scores[0], g.scores[1]);
-	t = rotate_tile(t, 2);
-	m = make_move(t, make_slot(mid + 1, mid), 0, 11, -1);
+	struct move m = make_move(t, make_slot(mid, mid), 0, 3, 0);
 	if (play_move(&g, m, 0)) {
 		printf("Success!\n");
 	}
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
+	m = make_move(rotate_tile(t, 1), make_slot(mid + 1, mid), 0, 0, 0);
+	if (play_move(&g, m, 0)) {
+		printf("Success!\n");
+	}
+	printf("slot_count: %u\n", g.board.empty_slot_count);
+	calculate_scores(&g);
+	printf("%zu %zu\n", g.scores[0], g.scores[1]);
+	m = make_move(t, make_slot(mid + 1, mid + 1), 0, 6, 0);
+	if (play_move(&g, m, 0)) {
+		printf("Success!\n");
+	}
+	printf("slot_count: %u\n", g.board.empty_slot_count);
+	struct move moves[1000];
+	size_t max_moves = 1000;
+	generate_available_moves(&g, 0, t, &moves, &max_moves);
+	for (size_t i = 0; i < max_moves; ++i) {
+		printf("x: %d y: %d rotation: %d tcorner: %d\n",
+				moves[i].slot.x, moves[i].slot.y,
+				moves[i].rotation, moves[i].tcorner);
+	}
 
 	free_game(&g);
 	return 0;
 }
-#endif
+#if 0
 int main(void)
 {
 	int adj[144];
@@ -452,4 +503,5 @@ int main(void)
 	free_game(&g);
 	return 0;
 }
+#endif
 #endif
