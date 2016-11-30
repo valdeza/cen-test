@@ -245,12 +245,14 @@ def move(sockObj, buf, clientSockets, IdList, first):
     send_move(sockObj, network_tile, x, y, rotation, meeple)
     return buf
 
-Host = ""                     # Make a command line option.
-Port = 50001 
+Host = '10.136.28.60'                    # Make a command line option.
+Port = 4444
 Port2 = 50002                # This too
 TournamentPassword = "derp"   # Mhmm
-Username = "herpderp"         # Mhmm
-Password = "derp"             # Mhmm
+#Username = "herpderp"         # Mhmm
+#Password = "derp"             # Mhmm
+Username = "TEAML"         # Mhmm
+Password = "IAML"             # Mhmm
 
 listener = socket.socket( ) 	# default opts
 listener.bind((Host, Port2))
@@ -261,7 +263,6 @@ clients = [client1, client2]
 
 s = socket.socket( )
 s.connect((Host, Port))
-
 
 buf = ''
 buf = authentication(s, TournamentPassword, Username, Password, buf)

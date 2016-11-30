@@ -1,6 +1,6 @@
 CFLAGS=-std=c99 -g -march=native -flto -Wall -Wextra -pedantic -O0
 
-all: game board server client feature
+all: game board server client feature aiclient
 
 clean:
 	rm *.o
@@ -11,6 +11,10 @@ server: server.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
 
 client: client.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
 	$(CC) $(CFLAGS) -o client client.c game.o rng.o tile.o move.o board.o \
+		slot.o serialization.o feature.o -lm
+
+aiclient: ai_client.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
+	$(CC) $(CFLAGS) -o ai_client ai_client.c game.o rng.o tile.o move.o board.o \
 		slot.o serialization.o feature.o -lm
 
 game: game.c game.h rng.o tile.o board.o slot.o feature.o 
