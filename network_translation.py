@@ -1,8 +1,8 @@
 from bidict import bidict
 
-#: Our native client's starting position (38, 38).
+#: Our native client's starting position (76, 76).
 #: We will use this to offset positioning.
-NATIVE_ORIGIN_XY = 38
+NATIVE_ORIGIN_XY = 76
 
 
 
