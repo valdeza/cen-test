@@ -31,7 +31,7 @@ struct game {
 	size_t tiles_used;
 	size_t scores[PLAYER_COUNT];
 	size_t meeples[PLAYER_COUNT];
-	struct feature *features[TILE_COUNT * TILE_COUNT * 3 * 4];
+	struct feature *features[AXIS * AXIS * 3 * 4];
 	size_t features_used;
 };
 
@@ -40,6 +40,7 @@ void make_game(struct game *g);
 void free_game(struct game *g);
 void set_game_deck(struct game *g, struct tile *deck);
 int play_move(struct game *g, struct move m, int player);
+int is_move_valid(struct game *g, struct move m, int player);
 bool is_tile_deck_empty(struct game *g);
 struct tile deal_tile(struct game *g);
 

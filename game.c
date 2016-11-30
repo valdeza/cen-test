@@ -181,12 +181,6 @@ int is_move_valid(struct game *g, struct move m, int player)
 	if ((rc = test_move_board(&g->board, m, adjs))) {
 		return rc;
 	}
-	if (m.tcorner > 0 && m.ccorner > 0 ) { /* Either tiger or meeple. */
-		return 1;
-	}
-	if (m.tcorner < 0 && m.ccorner < 0) {
-		return rc;
-	}
 	if ((rc = test_meeple(m, player, g->features))) {
 		return rc;
 	}

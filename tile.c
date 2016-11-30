@@ -147,7 +147,6 @@ void init_adj(const struct tile t, int adj[12*12])
 	 * before roads, in order to handle the case where a field shares
 	 * a connection (a side of) a road.
 	*/
-	const enum edge center_edge = t.edges[4];
 	for (unsigned int i = 0; i < 4; ++i) { /* Connect roads and fields */
 		const enum edge edge = t.edges[i];
 		if (adj[(i * 3) * 12] == 0) { /* Already in a group. */

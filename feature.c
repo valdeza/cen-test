@@ -190,6 +190,53 @@ static void add_tile_feature(struct feature *f, struct tile t)
 	return;
 }
 
+static int test_corner_feature(int is_tiger, int player,
+		struct move m, struct feature **f)
+{
+	int opp_cnrs[12] = {8, 7, 6, 11, 10, 9, 2, 1, 0, 5, 4, 3};
+	int opp_side[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
+	int adjs[12 * 12];
+	init_adj(m.tile, adjs);
+	int check;
+	if (is_tiger) {
+		check = m.tcorner;
+	} else {
+		check = m.ccorner;
+	}
+	if (adjs[check * 12] == 0) {
+		check = adjs[check * 12 + 1] - 1; /* Get leader. */
+	}
+	for (int i = 0; adjs[check * 12 + i] != 0; ++i) {
+		struct feature *opp = f[get_index(
+			m.slot.x+ opp_side[i/3][0], m.slot.y+ opp_side[i/3][1],
+			opp_cnrs[i] / 3, opp_cnrs[i] % 3)];
+		if (!opp) {
+			continue;
+		}
+		if (m.tcorner && opp->tigers[player]) {
+			return 1;
+		}
+		if (m.ccorner && opp->crocodiles[player]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int test_meeple(struct move m, int player, struct feature **f)
+{
+	if (m.tcorner < 0 && m.ccorner < 0) {
+		return 0;
+	}
+	if (m.tcorner > 0 && m.ccorner > 0) {
+		return 1;
+	}
+	if (m.tcorner > 0) {
+		return test_corner_feature(1, player, m, f);
+	}
+	return test_corner_feature(0, player, m, f);
+}
+
 int play_move_feature(struct move m, struct slot **neighbors,
 		struct feature **f, size_t *features_used)
 {
@@ -271,12 +318,13 @@ int play_move_feature(struct move m, struct slot **neighbors,
 	return 0;
 }
 
+#if 0
 int test_meeple(struct move m, int player, struct feature **f)
 {
 	if (m.tcorner > 0) {
 		struct feature *feat =
 			f[get_index(m.slot.x, m.slot.y,
-					m.tcorner/3, m.tcorner%3)];
+					m.tcorner / 3, m.tcorner % 3)];
 		assert(feat != NULL);
 		if (feat->tigers[player]) {
 			return 1; /* Invalid move */
@@ -285,7 +333,7 @@ int test_meeple(struct move m, int player, struct feature **f)
 	if (m.ccorner > 0) {
 		struct feature *feat =
 			f[get_index(m.slot.x, m.slot.y,
-					m.ccorner/3, m.ccorner%3)];
+					m.ccorner / 3, m.ccorner % 3)];
 		assert(feat != NULL);
 		if (feat->crocodiles[player]) {
 			return 1; /* Invalid move */
@@ -293,6 +341,7 @@ int test_meeple(struct move m, int player, struct feature **f)
 	}
 	return 0;
 }
+#endif
 
 int play_meeple(struct move m, int player, struct feature **f)
 {
@@ -342,18 +391,18 @@ int main(void)
 	init_adj(t, adj); print_adj(t, adj);
 	t = make_tile((enum edge[5]){CITY, CITY, CITY, CITY, CITY}, SHIELD);
 	init_adj(t, adj); print_adj(t, adj);
-	t = make_tile((enum edge[5]){CITY, ROAD, FIELD, ROAD, ROAD}, NONE);
+	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, ROAD, ROAD}, NONE);
 	init_adj(t, adj); print_adj(t, adj);
 
 	printf("\n\n Trying game\n");
 	struct game g;
 	make_game(&g);
 	int mid = (AXIS - 1) / 2;
-	struct move m = make_move(t, make_slot(mid, mid), 0, -1, -1);
+	struct move m = make_move(t, make_slot(mid, mid), 0, 3, -1);
 	play_move(&g, m, 0);
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
-	m = make_move(t, make_slot(mid + 1, mid), 0, -1, -1);
+	m = make_move(t, make_slot(mid + 1, mid), 0, 11, -1);
 	play_move(&g, m, 0);
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
