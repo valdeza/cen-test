@@ -158,7 +158,6 @@ void calculate_scores(struct game *g)
 	struct feature **scratch = malloc(sizeof(*scratch) * g->features_used);
 	size_t len = TILE_COUNT * TILE_COUNT * 4 * 3;
 	update_scores(g->scores, scratch, g->features, &len);
-	printf("DEBUG: %zu %zu\n", g->scores[0], g->scores[1]);
 	free(scratch);
 }
 
@@ -196,6 +195,23 @@ void set_game_deck(struct game *g, struct tile *deck)
 	memcpy(g->tile_deck, deck, sizeof(*deck) * TILE_COUNT);
 }
 
+int is_move_valid(struct game *g, struct move m, int player)
+{
+	int rc;
+	struct slot neighbors[4];
+	struct slot *adjs[4];
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &neighbors[i];
+	}
+	if ((rc = test_move_board(&g->board, m, adjs))) {
+		return rc;
+	}
+	if ((rc = test_meeple(m, player, g->features))) {
+		return rc;
+	}
+	return 0;
+}
+
 /** Tries to play the given move by the player on the given game. */
 int play_move(struct game *g, struct move m, int player)
 {
@@ -205,17 +221,19 @@ int play_move(struct game *g, struct move m, int player)
 	for (size_t i = 0; i < 4; ++i) {
 		adjs[i] = &neighbors[i];
 	}
-	rc = play_move_board(&g->board, m, adjs);
-	for (size_t i = 0; i < 4; ++i) {
-		if (adjs[i] != NULL) {
-			printf("%d %d\n", adjs[i]->x, adjs[i]->y);
-		}
-	}
-	if (rc) {
+	if ((rc = is_move_valid(g, m, player))) {
 		return rc;
 	}
-	return play_move_feature(m, adjs, g->features, &g->features_used);
-	// Meeple stuff here.
+	play_move_board(&g->board, m, adjs);
+	play_move_feature(m, adjs, g->features, &g->features_used);
+	play_meeple(m, player, g->features);
+	if (m.tcorner > 0) {
+		m.tcorner--;
+	}
+	if (m.ccorner > 0) {
+		m.ccorner--;
+	}
+	return 0;
 }
 
 /** Returns whether the number of tiles dealt for the given game exceeds

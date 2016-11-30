@@ -27,13 +27,15 @@ uint8_t *serialize_move(struct move m, uint8_t *buf)
 	*buf++ = x;
 	*buf++ = y;
 	*buf++ = rotation;
+	*buf++ = m.tcorner;
+	*buf++ = m.ccorner;
 	return buf;
 }
 
 struct move deserialize_move(uint8_t buf[MOVE_SZ])
 {
 	struct tile t = deserialize_tile(buf);
-	return make_move(t, make_slot(buf[6], buf[7]), buf[8]);
+	return make_move(t, make_slot(buf[6], buf[7]), buf[8], buf[9], buf[10]);
 }
 
 void print_buffer(uint8_t *buf, size_t len)

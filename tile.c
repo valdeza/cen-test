@@ -64,3 +64,104 @@ char *print_tile(const struct tile t, char b[TILE_LEN])
 				b[9] = c[t.edges[2]];
 	return b;
 }
+
+static void add_to_group(int *adj, unsigned int leader,
+		unsigned int lead_offset, unsigned int follower)
+{
+	adj[leader * 12 + lead_offset] = follower + 1;
+	adj[follower * 12] = 0;
+	adj[follower * 12 + 1] = leader;
+}
+
+static void connect_road(int adj[12*12], unsigned int side, struct tile t)
+{
+	/* left looks anticlockwise, mid & right look clockwise. */
+	unsigned int r[3][4] ={ {3, 0, 1, 2}, {1, 2, 3, 0}, {1, 2, 3, 0} };
+	/* Variables are unsigned because we need wrapping. */
+	for (unsigned int third = 0; third < 3; ++third) {/* left, mid, right */
+		unsigned int offset = 1;
+		if (adj[(side * 3 + third) * 12] == 0) {
+			continue;
+		}
+		for (unsigned int k=r[third][side]; k!=side; k=r[third][k]) {
+			if (t.edges[k] != t.edges[side]) {
+				continue;
+			}
+			add_to_group(adj,
+				side * 3 + third, offset++, k * 3 + 2 - third);
+			/* Only the middle thirds are multi-attached */
+			if (third != 1) {
+				break;
+			}
+		}
+	}
+}
+
+static void connect_field_city(int adj[12*12], unsigned int i, struct tile t)
+{
+	const enum edge edge = t.edges[i];
+	const enum edge center_edge = t.edges[4];
+	unsigned int offset = 1;
+
+	for (unsigned int k = 1; k < 3; ++k) {
+		/* All of this edge's other corners are in our group. */
+		add_to_group(adj, i * 3, offset++, i * 3 + k);
+	}
+	if (edge == CITY && center_edge != CITY) {
+		return; /* Cities are only connected by center city */
+	}
+	for (unsigned int j = i + 1; j < 4; ++j) {
+		if (t.edges[j] != edge) { /* Dissimilar sides not connected. */
+			continue;
+		}
+		for (unsigned int k = 0; k < 3; ++k) { /* Add side to group */
+			add_to_group(adj, i * 3, offset++, j * 3 + k);
+		}
+	}
+	if (edge == CITY) {
+		return;
+	}
+	/* 
+	 * Additionally, fields can be connected to the roads to their
+	 * immedieate clockwise and anticlockwise.
+	*/
+	unsigned int j = (i + 1) % 4; /* Clockwise */
+	if (t.edges[j] == ROAD) {
+		add_to_group(adj, i * 3, offset++, j * 3);
+	}
+
+	j = (i - 1) % 4; /* Anticlockwise */
+	if (t.edges[j] == ROAD) {
+		add_to_group(adj, i * 3, offset++, 3 * (j + 1) - 1);
+	}
+}
+
+void init_adj(const struct tile t, int adj[12*12])
+{
+	memset(adj, 0, sizeof(int) * 12 * 12);
+	for (unsigned int i = 0; i < 12; ++i) {
+		adj[i * 12] = i + 1; /* nonzero value (assume leader). */
+	}
+	/* TODO: Refactor into loops elements into functions. */
+	/* NOTE: The algorithm assumes fields and cities are connected
+	 * before roads, in order to handle the case where a field shares
+	 * a connection (a side of) a road.
+	*/
+	for (unsigned int i = 0; i < 4; ++i) { /* Connect roads and fields */
+		const enum edge edge = t.edges[i];
+		if (adj[(i * 3) * 12] == 0) { /* Already in a group. */
+			continue;
+		}
+		if (edge != CITY && edge != FIELD) {
+			continue;
+		}
+		connect_field_city(adj, i, t);
+	}
+	for (unsigned int i = 0; i < 4; ++i) { /* connect roads. */
+		const enum edge edge = t.edges[i];
+		if (edge != ROAD) {
+			continue;
+		}
+		connect_road(adj, i, t);
+	}
+}

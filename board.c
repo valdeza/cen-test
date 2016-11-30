@@ -88,7 +88,7 @@ static struct board add_placeable_slot(struct board b, struct slot s)
 	struct slot *spots = b.slot_spots;
 	size_t i = get_insertion_index(spots, b.empty_slot_count, s);
 	if (i < b.empty_slot_count) { /* Make room for the element (Sorted insert). */
-		memmove(&spots[i + 1], &spots[i], sizeof(s) * b.empty_slot_count - i);
+		memmove(&spots[i+1], &spots[i], sizeof(s)*b.empty_slot_count-i);
 	}
 	spots[i] = s;
 	b.empty_slot_count++;
@@ -142,16 +142,18 @@ static enum game_error_code invalid_move(struct board b, struct move m,
 		return E_TILE_NOT_PLACEABLE; /* Slot not placeable. */
 	}
 	list_adjacent_slots(m.slot, adjs);
+	struct tile t = rotate_tile(m.tile, m.rotation);
 	for (unsigned int i = 0; i < 4; ++i) { /* Need wrapping */
 		if (adjs[i] == NULL) { /* Ignore if not on board. */
 			continue;
 		}
 		/* The (i + 2) % 4 math here is a bit evil, but it works. */
-		enum edge pair = b.tiles[get_index_from_slot(*adjs[i])].edges[(i+2)%4];
+		enum edge pair =
+			b.tiles[get_index_from_slot(*adjs[i])].edges[(i+2)%4];
 		if (pair == EMPTY) {
 			continue; /* Empty tiles match with everything. */
 		}
-		if (pair != m.tile.edges[i]) { /* Corresponding don't match. */
+		if (pair != t.edges[i]) { /* Corresponding don't match. */
 			return E_TILE_EDGE_CONFLICT;
 		}
 	}
@@ -197,6 +199,16 @@ char *print_board(struct board b, char res[BOARD_LEN])
 	return res;
 }
 
+enum game_error_code
+test_move_board(struct board *b, struct move m, struct slot **adjs)
+{
+	enum game_error_code rc;
+	if ((rc = invalid_move(*b, m, adjs))) {
+		return rc;
+	}
+	return OK;
+}
+
 /** Tries to play the given move on the given board, returning a status code.
  *
  * @postcondition Board is updated if given move is valid.
@@ -206,12 +218,12 @@ enum game_error_code
 play_move_board(struct board *b, struct move m, struct slot **adjs)
 {
 	enum game_error_code rc;
-	if ((rc = invalid_move(*b, m, adjs))) {
-		return rc;
+	if ((rc = test_move_board(b, m, adjs)) == OK) {
+		b->tiles[get_index_from_slot(m.slot)] =
+			rotate_tile(m.tile, m.rotation);
+		*b = update_slot_spots(*b, m.slot);
 	}
-	b->tiles[get_index_from_slot(m.slot)] = rotate_tile(m.tile, m.rotation);
-	*b = update_slot_spots(*b, m.slot);
-	return OK;
+	return rc;
 }
 
 #ifdef TEST
@@ -287,7 +299,8 @@ int main(void)
 		adjs[i] = &adj[i];
 	}
 	play_and_check_move(&b,
-			make_move(tiles[3], make_slot(mid, mid), 0), adjs);
+			make_move(tiles[3], make_slot(mid, mid), 0, -1, -1),
+			adjs);
 	printf("%s\n", print_board(b, board_buffer));
 
 	printf("\nAnd now what slots are placeable?\n");
@@ -298,7 +311,8 @@ int main(void)
 		adjs[i] = &adj[i];
 	}
 	play_and_check_move(&b,make_move(tiles[2],
-				make_slot(mid, mid + 1), 0), adjs);
+			make_slot(mid, mid + 1), 0, -1, -1),
+			adjs);
 	printf("%s\n", print_board(b, board_buffer));
 	print_placeable_slots(b);
 
@@ -307,7 +321,8 @@ int main(void)
 		adjs[i] = &adj[i];
 	}
 	play_and_check_move(&b,
-			make_move(tiles[3], make_slot(mid, mid + 1), 0), adjs);
+			make_move(tiles[3], make_slot(mid, mid + 1), 0, -1, -1),
+			adjs);
 	printf("%s\n", print_board(b, board_buffer));
 	print_placeable_slots(b);
 
