@@ -370,39 +370,6 @@ void print_adj(struct tile t, int *adj)
 	}
 }
 
-static void generate_available_moves(struct game *g, int player,
-		struct tile t, struct move *pmoves, size_t *pmoves_len)
-{
-	struct move m;
-	size_t num_moves = 0;
-	size_t max_possible_moves = *pmoves_len;
-
-	m.tile = t;
-	printf("DEBUG: empty_slot_count: %u\n", g->board.empty_slot_count);
-	for (size_t i = 0; i < g->board.empty_slot_count; i++){
-		m.slot = g->board.slot_spots[i];
-		for (int j = 0; j < 4; ++j) {
-			m.rotation = j;
-			for (int k = -1; k < 13; ++k) {
-				m.tcorner = k;
-				for (int l = -1; l < 13; ++l) {
-					m.ccorner = l;
-					if (is_move_valid(g, m, player)) {
-						continue;
-					}
-					pmoves[num_moves++] = m;
-					if (num_moves == max_possible_moves) {
-						*pmoves_len = num_moves;
-						return;
-					}
-				}
-			}
-		}
-	}
-	*pmoves_len = num_moves;
-	return;
-}
-
 int main(void)
 {
 	int adj[144];
@@ -417,7 +384,7 @@ int main(void)
 	struct game g;
 	make_game(&g);
 	int mid = (AXIS - 1) / 2;
-	struct move m = make_move(t, make_slot(mid, mid), 0, 0, -1);
+	struct move m = make_move(t, make_slot(mid, mid), 0, 6, -1);
 	if (play_move(&g, m, 0)) {
 		printf("Success!\n");
 	}

@@ -64,7 +64,8 @@ def challengeStart(sockObj, buf):
 	#Server: NEW CHALLENGE <cid> YOU WILL PLAY <rounds> MATCHES
 	message, buf = better_recv(sockObj, buf)
 	print message
-	return buf
+        challenges = int(str.split(messages, " ")[6])
+	return buf, challenges
 	
 def challengeOver(sockObj, buf):
 	#Server: END OF CHALLENGES
@@ -79,7 +80,8 @@ def roundStart(sockObj, buf):
 	#Server: BEGIN ROUND <rid> OF <rounds>
 	message, buf = better_recv(sockObj, buf)
 	print message
-	return buf
+        rounds = int(str.split(message, " ")[4])
+	return buf, rounds
 	
 def roundOver(sockObj, buf):
 	#Server: END ROUND <rid> OF <rounds>
@@ -90,25 +92,31 @@ def roundOver(sockObj, buf):
 	return buf	
 
 # ***** MATCH PROTOCOL *****	
-def matchStart(sockObj, buf):
+def matchStart(sockObj, buf, clientSocks):
 	#Server: YOUR OPPONENT IS PLAYER <pid>
 	message, buf = better_recv(sockObj, buf)
 	print message
 
 	#Server: STARTING TILE IS <tile> AT <x> <y> <orientation>
 	message, buf = better_recv(sockObj, buf)
-	# tile = string.split(message, " ")[3]
-	# translate_tile_network_to_native(tile)
+	tile = int(str.split(message, " ")[3])
+	translate_tile_network_to_native(tile)
 	print message
 
 	#Server: THE REMAINING <number_tiles> TILES ARE [ <tiles> ]
 	message, buf = better_recv(sockObj, buf)
+        numtiles = int(str.split(message, " ")[2])
+        for x in (0, numtiles):
+            for y in clientSockets:
+                clientSock.send(translate_tile_network_to_native(
+                    str.split(message, " ")[x + 6])
+                )
 	print message
 
 	#Server: MATCH BEGINS IN <time_plan> SECONDS
 	message, buf = better_recv(sockObj, buf)
 	print message
-	return buf
+	return buf, numtiles
 	
 def matchOver(sockObj, buf):
 	#Server: GAME <gid> OVER PLAYER <pid> <score> PLAYER <pid> <score>
@@ -118,81 +126,156 @@ def matchOver(sockObj, buf):
 	#Server: GAME <gid> OVER PLAYER <pid> <score> PLAYER <pid> <score>
 	message, buf = better_recv(sockObj, buf)
 	print message
-	return buf	
+        return buf	
+
+def send_move(socket, tile, x, y, rotation, meeple):
+    chosen_socket.send("GAME " + str(recieved_gameid)
+            + " MOVE " + str(move_number) + " PLACE " + str(tile)
+            + " AT " + x + " " + y + " " + rotation + "\r\n")
+
+def get_other_player_move(sockObj, buf, player):
+    message, buf = better_recv(sockObj, buf)
+    gameid = str.split(message, " ")[1]
+    movenum = str.split(message, " ")[3]
+    rplayer = str.split(message, " ")[5]
+    if (rplayer != player):
+        message, buf = better_recv(sockObj, buf)
+        gameid = str.split(message, " ")[1]
+        movenum = str.split(message, " ")[3]
+        rplayer = str.split(message, " ")[5]
+    tile = str.split(message, " ")[7]
+    x = str.split(message, " ")[9]
+    y = str.split(message, " ")[10]
+    rot = str.split(message, " ")[11]
+    meeple = str.split(message, " ")[12]
+    pos = ''
+    if (meeple != "NONE"):
+        pos = str.split(message, " ")[13]
+    return gameid, movenum, player, tile, x, y, rot, meeple, pos, buf
 
 # ***** MOVE PROTOCOL *****	
-def move(sockObj, buf):
-	#Sent to active player
-	#Server: MAKE YOUR MOVE IN GAME <gid> WITHIN <time_move> SECOND: MOVE <#> PLACE <tile>
-	# or
-	#Server: MAKE YOUR MOVE IN GAME <gid> WITHIN <time_move> SECONDS: MOVE <#> PLACE <tile>
-	message, buf = better_recv(sockObj, buf)
-	print message
+def move(sockObj, buf, clientSockets, IdList, first):
+    byteMe = bytearray([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
 
-	recieved_gameid = string.split(message, " ")[5]
-	# print "game id: " + recieved_gameid
-	recieved_tile = string.split(message, " ")[12]
-	translate_tile_network_to_native(recieved_tile)
-    
+    #Sent to active player
+    #Server: MAKE YOUR MOVE IN GAME <gid> WITHIN <time_move> SECOND: MOVE <#> PLACE <tile>
+    # or
+    #Server: MAKE YOUR MOVE IN GAME <gid> WITHIN <time_move> SECONDS: MOVE <#> PLACE <tile>
+    if (first == 1): # First move special case.
+        message, buf = better_recv(sockObj, buf)
+        recieved_gameid = string.split(message, " ")[5]
+        if recieved_gameid not in IdList:
+            IdList.append(recieved_gameid)
+        chosen_socket = clientSockets[IdList.index(recieved_gameid)]
+        recieved_movenum = string.split(message, " ")[10]
+        recieved_tile = string.split(message, " ")[12]
+        translated_tile = translate_tile_network_to_native(recieved_tile)
+        move_time = int(string.split(message, " ")[7])
 
-	move_number = 1;
-	tile = translate_tile_native_to_network(recieved_tile);
-	move_info = 1 #move_information()
-	#Sent only by the active player
-	#Client: GAME <gid> MOVE <#> PLACE <tile> AT <x> <y> <orientation> NONE 
-	# or 
-	#Client: GAME <gid> MOVE <#> PLACE <tile> AT <x> <y> <orientation> CROCODILE
-	# or 
-	#Client: GAME <gid> MOVE <#> PLACE <tile> AT <x> <y> <orientation> TIGER <zone>
-	# or 
-	#Client: GAME <gid> MOVE <#> PLACE <tile> UNPLACEABLE PASS
-	# or 
-	#Client: GAME <gid> MOVE <#> PLACE <tile> UNPLACEABLE RETRIEVE TIGER AT <x> <y>
-	# or 
-	#Client: GAME <gid> MOVE <#> PLACE <tile> UNPLACEABLE ADD ANOTHER TIGER TO <x> <y>
-	sockObj.send("GAME " + str(recieved_gameid) + " MOVE " + str(move_number)
-			+ " PLACE " + str(tile) + " AT " + str(move_info) + "\r\n")
-    move_number = move_number + 1
-	#Sent to both players
-	#Server: GAME <gid> MOVE <#> PLAYER <pid> <move> 
-	# or
-	#Server: GAME <gid> MOVE <#> PLAYER <pid> FORFEITED: <flag>
-	# <flag>s include: ILLEGAL TILE PLACEMENT, ILLEGAL MEEPLE PLACEMENT, INVALID MEEPLE PLACMENT, TIMEOUT, ILLEGAL MESSAGE RECEIVED 
-	message, buf = better_recv(sockObj, buf)
-	print message
-    
-	#See above
-	message, buf = better_recv(sockObj, buf)
-	print message
-	return buf
+        byteMe[0] = 0x01 # I'm first
+        byteMe[1] = int(round(move_time * 0.85, 1))
+        chosen_socket.send(byteMe)
+        byteMe[0] = 0x00 # I'm Second
+        clientSockets[1].send(byteMe)
+        for x in translated_tile:
+            byteMe[x] = translated_tile[x]
 
-Host = ""                     # Make a command line option.
-Port = 50001 
+        chosen_socket.send(byteMe)
+        recieved_tile = bytearray(chosen_socket.recv(17))
+        native_tile = bytearray(recieved_tile[0], recieved_tile[1],
+                recieved_tile[2], recieved_tile[3], recieved_tile[4],
+                recieved_tile[5])
+
+        tile = translate_tile_native_to_network(native_tile);
+        x = str(int(recieved_tile[6]) - 76)
+        y = str(int(recieved_tile[7]) - 76)
+        rotation = str(((4 - int(recieved_tile[8])) % 4) * 90)
+        meeple = 'NONE'
+        send_move(sockObj, tile, x, y, rotation, meeple)
+        first = 0
+        return first, buf
+
+    if recieved_gameid not in IdList:
+        IdList.append(recieved_gameid)
+
+    chosen_socket = clientSockets[IdList.index(recieved_gameid)]
+
+    #Sent only by the active player
+    #Client: GAME <gid> MOVE <#> PLACE <tile> AT <x> <y> <orientation> NONE 
+    # or 
+    #Client: GAME <gid> MOVE <#> PLACE <tile> AT <x> <y> <orientation> CROCODILE
+    # or 
+    #Client: GAME <gid> MOVE <#> PLACE <tile> AT <x> <y> <orientation> TIGER <zone>
+    # or 
+    #Client: GAME <gid> MOVE <#> PLACE <tile> UNPLACEABLE PASS
+    # or 
+    #Client: GAME <gid> MOVE <#> PLACE <tile> UNPLACEABLE RETRIEVE TIGER AT <x> <y>
+    # or 
+    #Client: GAME <gid> MOVE <#> PLACE <tile> UNPLACEABLE ADD ANOTHER TIGER TO <x> <y>
+    # Not first move general case.
+
+    gameid, movenum, player, tile, x, y, rot, meeple, pos, buf = \
+        get_other_player_move(sockObj, buf, player)
+
+    message, buf = better_recv(sockObj, buf)
+    recieved_tile = string.split(message, " ")[12]
+
+    byteMe[0] = 0x00 # Game continuing 
+    native_tile = translate_tile_network_to_native(recieved_tile)
+    native_tile_prev = translate_tile_network_to_native(tile)
+    for x in native_tile:
+        byteMe[x + 1] = native_tile[x]
+    for x in native_tile_prev:
+        byteMe[x + 1 + 6] = native_tile_prev[x]
+
+    byteMe[13] = str(int(x) + 76)
+    byteMe[14] = str(int(y) + 76)
+    byteMe[15] = str((4 - int(rot / 90)) % 4)
+    if meeple == 'NONE':
+        byteMe[16] = byteMe[17] = str(-1)
+    chosen_socket.send(byteMe)
+
+    native_tile = bytearray(chosen_socket.recv(17))
+    network_tile = translate_tile_native_to_network(native_tile)
+    x = str(int(native_tile[6]) - 76)
+    y = str(int(native_tile[7]) - 76)
+    rotation = str(((4 - int(recieved_tile[8])) % 4) * 90)
+    meeple = 'NONE'
+    send_move(sockObj, network_tile, x, y, rotation, meeple)
+    return buf
+
+Host = '10.228.7.36'                    # Make a command line option.
+Port = 4444
 Port2 = 50002                # This too
-TournamentPassword = "derp"   # Mhmm
-Username = "herpderp"         # Mhmm
-Password = "derp"             # Mhmm
+TournamentPassword = "TIGERZONE"   # Mhmm
+#Username = "herpderp"         # Mhmm
+#Password = "derp"             # Mhmm
+Username = "TEAML"         # Mhmm
+Password = "IAML"             # Mhmm
 
 listener = socket.socket( ) 	# default opts
-listener.bind((Host, Port2))
+listener.bind(('localhost', Port2))
 listener.listen(2)
 client1, addr = listener.accept()
 client2, addr = listener.accept()
+clients = [client1, client2]
 
 s = socket.socket( )
 s.connect((Host, Port))
 
-
 buf = ''
-
 buf = authentication(s, TournamentPassword, Username, Password, buf)
-buf = challengeStart(s, buf)
-buf = roundStart(s, buf)
-buf = matchStart(s, buf)
-buf = move(s, buf)
-buf = matchOver(s, buf)
-buf = roundOver(s, buf)
+buf, matches = challengeStart(s, buf)
+for a in range (0, matches):
+    buf, rounds = roundStart(s, buf)
+    for b in range (0, rounds):
+        buf, numtiles = matchStart(s, buf, clients)
+        first = 1
+        IdList = []
+        for c in range (0, numtiles):
+            buf = move(s, buf, clients, IdList, first)
+        buf = matchOver(s, buf)
+    buf = roundOver(s, buf)
 buf = challengeOver(s, buf)
 buf = tournamentOver(s, buf)
-
-

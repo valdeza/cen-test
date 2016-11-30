@@ -108,7 +108,7 @@ static int get_deck(int sockfd, struct tile *deck, size_t clen, size_t dlen)
 }
 
 #define REMOTE_HOST "127.0.0.1" /* TODO: Get a command line variable. */
-#define REMOTE_PORT 5000 /* TODO: Factor into command line variable. */
+#define REMOTE_PORT 50002 /* TODO: Factor into command line variable. */
 
 static struct game *init_game(int socket)
 {
@@ -145,17 +145,14 @@ int main(void)
 	int first; uint64_t move_clock;
 	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; // game_over? + tile + move
 
-	get_clock_and_order(sockfd, &first, &move_clock);
-	printf("Clock: %llu\n", move_clock);
-	if (first) {
-		printf("I'm first!\n");
-	} else {
-		printf("I'm second!\n");
-	}
+	struct move potential[100];
+	size_t potentials = 100;
 	while (1) { /* Play game. */
 		struct game *g = init_game(sockfd); /*TODO: Refactor? */
+		get_clock_and_order(sockfd, &first, &move_clock);
+		struct move mp = make_move(g->tile_deck[0], 
+				make_slot((AXIS-1)/2, (AXIS-1)/2), 0, -1, -1);
 		while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
-			int gfirst = first;
 			printf("Recieved: "); print_buffer(buf, sizeof(buf));
 			if (buf[0] != 0) { /* Game over. */
 				game_over(buf);
@@ -164,22 +161,22 @@ int main(void)
 			struct tile t = deserialize_tile(&buf[1]);
 			unsigned char b[100];
 			printf("Tile: \n%s\n", print_tile(t, b));
-			if (gfirst) { /* No previous move. */
-				gfirst = 0;
-			} else {
-				struct move prev = deserialize_move(&buf[7]);
-				printf("Prev move | x: %d y: %d: "
-					"rotation: %d \n%s\n",
-					prev.slot.x, prev.slot.y, prev.rotation,
-					print_tile(prev.tile, b));
-				play_move(g, prev, 1);
-				printf("DEBUG: us: %zu them: %zu\n",
-						g->scores[0], g->scores[1]);
+			struct move prev = deserialize_move(&buf[7]);
+			printf("Prev move | x: %d y: %d: "
+				"rotation: %d \n%s\n",
+				prev.slot.x, prev.slot.y, prev.rotation,
+				print_tile(prev.tile, b));
+			play_move(g, prev, 1);
+			printf("DEBUG: us: %zu them: %zu\n",
+					g->scores[0], g->scores[1]);
+			size_t potentials = 100;
+			generate_available_moves(g, 0,
+					t, &potential, &potentials);
+			struct move m;
+			if (potentials > 0) { /* We can place a tile. */
+				m = potential[0]; /* Pick first. */
+			} else { /* PASS */
 			}
-			/* A.I. HERE */
-			int mid = (AXIS - 1) / 2;
-			struct move m = make_move(t,make_slot(mid,mid),0,-1,-1);
-			/* End A.I. */
 			play_move(g, m, 0);
 			serialize_move(m, buf);
 			write(sockfd, buf, sizeof(buf));

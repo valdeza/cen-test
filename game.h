@@ -42,5 +42,6 @@ int play_move(struct game *g, struct move m, int player);
 int is_move_valid(struct game *g, struct move m, int player);
 bool is_tile_deck_empty(struct game *g);
 struct tile deal_tile(struct game *g);
-
+void generate_available_moves(struct game *g, int player, \
+		struct tile t, struct move *pmoves, size_t *pmoves_len);
 #endif
