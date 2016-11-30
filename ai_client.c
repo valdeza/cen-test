@@ -152,6 +152,9 @@ int main(void)
 	} else {
 		printf("I'm second!\n");
 	}
+
+	struct moves potential[100];
+	size_t potentials = 100;
 	while (1) { /* Play game. */
 		struct game *g = init_game(sockfd); /*TODO: Refactor? */
 		while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
@@ -176,10 +179,13 @@ int main(void)
 				printf("DEBUG: us: %zu them: %zu\n",
 						g->scores[0], g->scores[1]);
 			}
-			/* A.I. HERE */
-			int mid = (AXIS - 1) / 2;
-			struct move m = make_move(t,make_slot(mid,mid),0,-1,-1);
-			/* End A.I. */
+			size_t potentials = 100;
+			generate_available_moves(g, 0,
+					m.tile, &potential, &potentials);
+			if (potentials > 0) { /* We can place a tile. */
+				m = potential[0]; /* Pick first. */
+			} else { /* PASS */
+			}
 			play_move(g, m, 0);
 			serialize_move(m, buf);
 			write(sockfd, buf, sizeof(buf));
