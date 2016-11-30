@@ -1,5 +1,11 @@
 from bidict import bidict
 
+#: Our native client's starting position (38, 38).
+#: We will use this to offset positioning.
+NATIVE_ORIGIN_XY = 38
+
+
+
 # TODO Constants on our native client
 EDGE_EMPTY = 0
 EDGE_CITY = 1
@@ -407,6 +413,17 @@ def translate_placement_tiger_to_meeple(strTile, intTiger):
 
     return DICT_TILE_TIGER_MEEPLE[strTile[:-1]][intTiger-1]
 
+def translate_coord_network_to_native(x, y):
+    """Given network coordinates, returns our native coordinates as tuple."""
+    return (x+NATIVE_ORIGIN_XY, y+NATIVE_ORIGIN_XY)
+
+def translate_coord_native_to_network(x, y):
+    """
+    Given our native coordinates,
+    returns coordinates normalised for the network as tuple
+    """
+    return (x-NATIVE_ORIGIN_XY, y-NATIVE_ORIGIN_XY)
+
 def main():
     # TODO Unit tests for all the things:
     # - Cursory sweep to see if all tiles exist in dictionaries.
@@ -420,5 +437,7 @@ def main():
     print translate_placement_meeple_to_tiger([2, 2, 2, 2, 2, 2], 5)
     print translate_placement_tiger_to_meeple("JJJJX", 5)
     print translate_placement_tiger_to_meeple("JJJJX", 9)
+    print translate_coord_native_to_network(0, 0)
+    print translate_coord_network_to_native(0, 0)
 
 main()
