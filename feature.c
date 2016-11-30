@@ -198,6 +198,9 @@ static int test_corner_feature(int is_tiger, int player,
 	int adjs[12 * 12];
 	init_adj(m.tile, adjs);
 	int check;
+	if (m.tcorner < 0 && m.ccorner < 0) {
+		return 0;
+	}
 	if (is_tiger) {
 		check = m.tcorner;
 	} else {
@@ -214,10 +217,10 @@ static int test_corner_feature(int is_tiger, int player,
 		if (!opp) {
 			continue;
 		}
-		if (m.tcorner && opp->tigers[player]) {
+		if ((m.tcorner >= 0) && opp->tigers[player]) {
 			return 1;
 		}
-		if (m.ccorner && opp->crocodiles[player]) {
+		if ((m.ccorner >= 0) && opp->crocodiles[player]) {
 			return 1;
 		}
 	}
@@ -229,13 +232,14 @@ int test_meeple(struct move m, int player, struct feature **f)
 	if (m.tcorner < 0 && m.ccorner < 0) {
 		return 0;
 	}
-	if (m.tcorner > 0 && m.ccorner > 0) {
+	if (m.tcorner >= 0 && m.ccorner >= 0) {
 		return 1;
 	}
-	if (m.tcorner > 0) {
+	if (m.tcorner >= 0) {
 		return test_corner_feature(1, player, m, f);
+	} else {
+		return test_corner_feature(0, player, m, f);
 	}
-	return test_corner_feature(0, player, m, f);
 }
 
 int play_move_feature(struct move m, struct slot **neighbors,
@@ -352,12 +356,14 @@ int play_meeple(struct move m, int player, struct feature **f)
 	}
 	struct feature *feat = f[get_index(m.slot.x, m.slot.y,
 			m.tcorner/3, m.tcorner%3)];
-	if (m.tcorner > 0) {
+	if (m.tcorner >= 0) {
 		feat->tigers[player]++;
 	}
+	/* TODO: Not right!
 	if (m.ccorner > 0) {
 		feat->crocodiles[player]++;
 	}
+	*/
 	return 0;
 }
 
@@ -431,12 +437,12 @@ int main(void)
 	make_game(&g);
 	int mid = (AXIS - 1) / 2;
 	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
-	struct move m = make_move(t, make_slot(mid, mid), 0, 3, -1);
+	struct move m = make_move(t, make_slot(mid, mid), 0, 0, -1);
 	play_move(&g, m, 0);
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
 	t = make_tile((enum edge[5]){FIELD, FIELD, CITY, FIELD, FIELD}, SHIELD);
-	m = make_move(t, make_slot(mid + 1, mid), 0, 11, -1);
+	m = make_move(t, make_slot(mid, mid + 1), 0, 6, -1);
 	if (play_move(&g, m, 0)) {
 		printf("Success!\n");
 	}

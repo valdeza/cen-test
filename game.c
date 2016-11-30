@@ -132,7 +132,6 @@ void calculate_scores(struct game *g)
 	struct feature **scratch = malloc(sizeof(*scratch) * g->features_used);
 	size_t len = TILE_COUNT * TILE_COUNT * 4 * 3;
 	update_scores(g->scores, scratch, g->features, &len);
-	printf("DEBUG: %zu %zu\n", g->scores[0], g->scores[1]);
 	free(scratch);
 }
 
