@@ -31,7 +31,7 @@ struct game {
 	size_t tiles_used;
 	size_t scores[PLAYER_COUNT];
 	size_t meeples[PLAYER_COUNT];
-	struct feature *features[AXIS * AXIS * 3 * 4];
+	struct feature *features[AXIS * AXIS * 4 * 3];
 	size_t features_used;
 };
 

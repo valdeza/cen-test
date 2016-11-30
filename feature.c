@@ -204,12 +204,13 @@ static int test_corner_feature(int is_tiger, int player,
 		check = m.ccorner;
 	}
 	if (adjs[check * 12] == 0) {
-		check = adjs[check * 12 + 1] - 1; /* Get leader. */
+		check = adjs[check * 12 + 1]; /* Get leader. */
 	}
 	for (int i = 0; adjs[check * 12 + i] != 0; ++i) {
+		const int a = adjs[check * 12 + i] - 1;
 		struct feature *opp = f[get_index(
-			m.slot.x+ opp_side[i/3][0], m.slot.y+ opp_side[i/3][1],
-			opp_cnrs[i] / 3, opp_cnrs[i] % 3)];
+			m.slot.x+ opp_side[a/3][0], m.slot.y+ opp_side[a/3][1],
+			opp_cnrs[a] / 3, opp_cnrs[a] % 3)];
 		if (!opp) {
 			continue;
 		}
@@ -384,6 +385,7 @@ void print_adj(struct tile t, int *adj)
 	}
 }
 
+#if 0
 int main(void)
 {
 	int adj[144];
@@ -402,8 +404,42 @@ int main(void)
 	play_move(&g, m, 0);
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
+	t = rotate_tile(t, 2);
 	m = make_move(t, make_slot(mid + 1, mid), 0, 11, -1);
+	if (play_move(&g, m, 0)) {
+		printf("Success!\n");
+	}
+	calculate_scores(&g);
+	printf("%zu %zu\n", g.scores[0], g.scores[1]);
+
+	free_game(&g);
+	return 0;
+}
+#endif
+int main(void)
+{
+	int adj[144];
+	struct tile t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
+	init_adj(t, adj); print_adj(t, adj);
+	t = make_tile((enum edge[5]){CITY, CITY, CITY, CITY, CITY}, SHIELD);
+	init_adj(t, adj); print_adj(t, adj);
+	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, ROAD, ROAD}, NONE);
+	init_adj(t, adj); print_adj(t, adj);
+
+	printf("\n\n Trying game\n");
+	struct game g;
+	make_game(&g);
+	int mid = (AXIS - 1) / 2;
+	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
+	struct move m = make_move(t, make_slot(mid, mid), 0, 3, -1);
 	play_move(&g, m, 0);
+	calculate_scores(&g);
+	printf("%zu %zu\n", g.scores[0], g.scores[1]);
+	t = make_tile((enum edge[5]){FIELD, FIELD, CITY, FIELD, FIELD}, SHIELD);
+	m = make_move(t, make_slot(mid + 1, mid), 0, 11, -1);
+	if (play_move(&g, m, 0)) {
+		printf("Success!\n");
+	}
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
 
