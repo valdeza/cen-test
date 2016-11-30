@@ -198,9 +198,6 @@ static int test_corner_feature(int is_tiger, int player,
 	int adjs[12 * 12];
 	init_adj(m.tile, adjs);
 	int check;
-	if (m.tcorner < 0 && m.ccorner < 0) {
-		return 0;
-	}
 	if (is_tiger) {
 		check = m.tcorner;
 	} else {
@@ -211,16 +208,17 @@ static int test_corner_feature(int is_tiger, int player,
 	}
 	for (int i = 0; adjs[check * 12 + i] != 0; ++i) {
 		const int a = adjs[check * 12 + i] - 1;
+		assert(m.ccorner < 12);
 		struct feature *opp = f[get_index(
 			m.slot.x+ opp_side[a/3][0], m.slot.y+ opp_side[a/3][1],
 			opp_cnrs[a] / 3, opp_cnrs[a] % 3)];
 		if (!opp) {
 			continue;
 		}
-		if ((m.tcorner >= 0) && opp->tigers[player]) {
+		if ((m.tcorner >= 0) && (opp->tigers[player] > 0)) {
 			return 1;
 		}
-		if ((m.ccorner >= 0) && opp->crocodiles[player]) {
+		if ((m.ccorner >= 0) && (opp->crocodiles[player] > 0)) {
 			return 1;
 		}
 	}
@@ -236,12 +234,14 @@ int test_meeple(struct move m, int player, struct feature **f)
 		return 1;
 	}
 	if (m.tcorner >= 0) {
-		if ((m.tcorner > 11  || m.ccorner > 11)
-				&& m.tile.attribute != MONASTERY) {
+		if (m.tcorner > 11 && m.tile.attribute != MONASTERY) {
 			return 1;
 		}
 		return test_corner_feature(1, player, m, f);
 	} else {
+		if (m.ccorner > 11 && m.tile.attribute != MONASTERY) {
+			return 1;
+		}
 		return test_corner_feature(0, player, m, f);
 	}
 }
@@ -326,31 +326,6 @@ int play_move_feature(struct move m, struct slot **neighbors,
 	printf("Count: %zu\n", *features_used);
 	return 0;
 }
-
-#if 0
-int test_meeple(struct move m, int player, struct feature **f)
-{
-	if (m.tcorner > 0) {
-		struct feature *feat =
-			f[get_index(m.slot.x, m.slot.y,
-					m.tcorner / 3, m.tcorner % 3)];
-		assert(feat != NULL);
-		if (feat->tigers[player]) {
-			return 1; /* Invalid move */
-		}
-	}
-	if (m.ccorner > 0) {
-		struct feature *feat =
-			f[get_index(m.slot.x, m.slot.y,
-					m.ccorner / 3, m.ccorner % 3)];
-		assert(feat != NULL);
-		if (feat->crocodiles[player]) {
-			return 1; /* Invalid move */
-		}
-	}
-	return 0;
-}
-#endif
 
 int play_meeple(struct move m, int player, struct feature **f)
 {
@@ -442,7 +417,7 @@ int main(void)
 	struct game g;
 	make_game(&g);
 	int mid = (AXIS - 1) / 2;
-	struct move m = make_move(t, make_slot(mid, mid), 0, 3, 0);
+	struct move m = make_move(t, make_slot(mid, mid), 0, 0, -1);
 	if (play_move(&g, m, 0)) {
 		printf("Success!\n");
 	}
@@ -462,6 +437,7 @@ int main(void)
 	printf("slot_count: %u\n", g.board.empty_slot_count);
 	struct move moves[1000];
 	size_t max_moves = 1000;
+	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
 	generate_available_moves(&g, 0, t, &moves, &max_moves);
 	for (size_t i = 0; i < max_moves; ++i) {
 		printf("x: %d y: %d rotation: %d tcorner: %d\n",
