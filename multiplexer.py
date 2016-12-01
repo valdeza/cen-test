@@ -64,7 +64,7 @@ def challengeStart(sockObj, buf):
 	#Server: NEW CHALLENGE <cid> YOU WILL PLAY <rounds> MATCHES
 	message, buf = better_recv(sockObj, buf)
 	print message
-        challenges = int(str.split(messages, " ")[6])
+        challenges = int(str.split(message, " ")[6])
 	return buf, challenges
 	
 def challengeOver(sockObj, buf):
@@ -99,7 +99,7 @@ def matchStart(sockObj, buf, clientSocks):
 
 	#Server: STARTING TILE IS <tile> AT <x> <y> <orientation>
 	message, buf = better_recv(sockObj, buf)
-	tile = int(str.split(message, " ")[3])
+	tile = str.split(message, " ")[3]
 	translate_tile_network_to_native(tile)
 	print message
 
@@ -245,12 +245,10 @@ def move(sockObj, buf, clientSockets, IdList, first):
     send_move(sockObj, network_tile, x, y, rotation, meeple)
     return buf
 
-Host = '10.228.7.36'                    # Make a command line option.
+Host = '192.168.1.19'                    # Make a command line option.
 Port = 4444
 Port2 = 50002                # This too
 TournamentPassword = "TIGERZONE"   # Mhmm
-#Username = "herpderp"         # Mhmm
-#Password = "derp"             # Mhmm
 Username = "TEAML"         # Mhmm
 Password = "IAML"             # Mhmm
 
