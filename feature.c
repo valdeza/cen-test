@@ -1,19 +1,17 @@
 #include "feature.h"
 
 /* Refactor to use a vector of features. */
-static struct feature *create_feature(enum edge type, struct slot s)
+static struct feature *create_feature(enum edge type)
 {
 	struct feature *f = malloc(sizeof(*f));
 	if (!f) {
 		return NULL;
 	}
-	f->weighted_size = f->neighbor_count = 0;
+	f->weighted_size = f->neighbor_count = f->slot_count = 0;
 	for (int i = 0; i < PLAYER_COUNT; ++i) {
 		f->tigers[i] = f->crocodiles[i] = 0;
 	}
 	f->type = type;
-	f->slot_count = 1;
-	f->open_slots[0] = s;
 	return f;
 }
 
@@ -246,46 +244,59 @@ int test_meeple(struct move m, int player, struct feature **f)
 	}
 }
 
+static void insert_unless_exists(struct feature *f, struct slot s)
+{
+	size_t i;
+	for (i = 0; i < f->slot_count; ++i) {
+		if (compare_slot_positions(s, f->open_slots[i]) > 0) {
+			break;
+		} else if (compare_slot_positions(s, f->open_slots[i]) == 0) {
+			return;
+		}
+	}
+	memcpy(&f->open_slots[i+1], &f->open_slots[i],
+			sizeof(f->open_slots[0]) * (f->slot_count - i));
+	f->open_slots[i] = s;
+	f->slot_count++;
+}
+
 int play_move_feature(struct move m, struct slot **neighbors,
 		struct feature **f, size_t *features_used)
 {
 	int adj[12 * 12];
+	int opp_corners[12] = {8, 7, 6, 11, 10, 9, 2, 1, 0, 5, 4, 3};
+	int opp_side[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
 	init_adj(m.tile, adj);
+
 	for (size_t i = 0; i < 12; ++i) { /* Connect corners to placed tiles. */
 		const struct slot *n = neighbors[i / 3];
 		if (n == NULL) { /* Neighbor off board. */
 			continue;
 		}
-		struct feature *companion_feature =
-			f[get_index(n->x, n->y, (i/3+2)%4, 2-(i%3))];
-		if (companion_feature == NULL) {
-			continue;
-		}
-		const struct feature *dupe = companion_feature;
+		/* Grab the opposing corner to this one.
+		 * Opposing in this case means the corner which this corner
+		 * is potentially connected to.
+		*/
+		const int opp_cnr = opp_corners[i];
+		struct feature *opp_feat = /* opp_feature shares connection. */
+			f[get_index(n->x, n->y, opp_cnr / 3, opp_cnr % 3)];
+		assert(opp_feat != NULL);
 
 		size_t lead = i; /* Base case, we're the group leader. */
 		if (adj[i * 12] == 0) { /* Not group leader, switch to it. */
 			lead = adj[i * 12 + 1];
 		}
-		for (size_t j = 0; adj[lead * 12 + j] != 0; j++) {
-			const int a = adj[lead * 12 + j] - 1;
-			size_t alt_ind = get_index(m.slot.x, m.slot.y, a/3,a%3);
-			if (f[alt_ind]!=NULL && f[alt_ind]!=companion_feature) {
-				merge_features(&f[alt_ind], &companion_feature);
-			}
-			for (size_t k = 0; adj[lead * 12 + k] != 0; ++k) {
-				const int b = adj[lead * 12 + k] - 1;
-				size_t ind2 =
-					get_index(m.slot.x, m.slot.y, b/3, b%3);
-				if (f[ind2] == dupe) {
-					f[ind2] = companion_feature;
-				}
-			}
-			f[alt_ind] = companion_feature;
+
+		struct feature *lead_feat =
+			f[get_index(m.slot.x, m.slot.y, lead / 3, lead % 3)];
+		if (lead_feat == NULL) { /* Set the feature. */
+			f[lead] = opp_feat;
+		} else {
+			merge_features(&f[lead], &opp_feat);
 		}
 	}
 	for (size_t i = 0; i < 12; ++i) { /* Assign to unassigned corners */
-		if (adj[i * 12] == 0) {
+		if (adj[i * 12] == 0) { /* Only want leaders. */
 			continue;
 		}
 		const size_t index = get_index(m.slot.x, m.slot.y, i/3, i%3);
@@ -293,37 +304,21 @@ int play_move_feature(struct move m, struct slot **neighbors,
 			continue;
 		}
 		/* TODO When creating feature add open slot opposite. */
-		int adjs[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
-		if (!(f[index] = create_feature(m.tile.edges[i / 3],
-			make_slot(m.slot.x + adjs[i/4][0], 
-				  m.slot.y + adjs[i/4][1])))) {
+		if (!(f[index] = create_feature(m.tile.edges[i/3]))) {
 			return 1;
-		}
-		for (size_t j = 0; adj[12 * i + j] != 0; ++j) {
-			size_t a = adj[12 * i + j] - 1;
-			size_t ip= get_index(m.slot.x,m.slot.y,a/3,a%3);
-			f[ip] = f[index];
 		}
 		*features_used += 1;
 	}
-	for (size_t i = 0; i < 12; ++i) {/* add adjencies & tile 2 each group */
-		const size_t index = get_index(m.slot.x, m.slot.y, i/3, i%3);
-		assert(f[index] != NULL); /* DEBUG */
-		if (adj[i * 12] == 0) { /* Skip group members. */
+	for (size_t i = 0; i < 12; ++i) { /* Copy to group members. */
+		if (adj[12 * i] == 0) { /* Only grab leaders. */
 			continue;
 		}
-		add_tile_feature(f[index], m.tile);
-		for (size_t j = 0; j < 12; ++j) { /* Add adjacenct graphs */
-			if (j == i || adj[j * 12] == 0) {
-				continue;
-			}
-			const size_t indexp =
-				get_index(m.slot.x, m.slot.y, j/3, j%3);
-			add_adjacency(f[index], indexp);
-			add_adjacency(f[indexp], index);
+		struct feat *leadf = f[get_index(m.slot.x, m.slot.y, i/3, i%3)];
+		for (size_t j = 0; adj[i * 12 + j] != 0; ++j) {
+			const int a = adj[i * 12 + j];
+			f[get_index(m.slot.x, m.slot.y, a/3, a%3)] = leadf;
 		}
 	}
-	printf("Count: %zu\n", *features_used);
 	return 0;
 }
 
@@ -373,7 +368,8 @@ void print_adj(struct tile t, int *adj)
 int main(void)
 {
 	int adj[144];
-	struct tile t = make_tile((enum edge[5]){ROAD, ROAD, ROAD, ROAD, ROAD}, NONE);
+	struct tile t =
+		make_tile((enum edge[5]){ROAD, ROAD, ROAD, ROAD, ROAD}, NONE);
 	init_adj(t, adj); print_adj(t, adj);
 	t = make_tile((enum edge[5]){CITY, CITY, CITY, CITY, CITY}, SHIELD);
 	init_adj(t, adj); print_adj(t, adj);
@@ -383,13 +379,18 @@ int main(void)
 	printf("\n\n Trying game\n");
 	struct game g;
 	make_game(&g);
-	int mid = (AXIS - 1) / 2;
+
+	const int mid = (AXIS - 1) / 2;
+	struct move moves[1000];
+	size_t max_moves = 1000;
+
 	struct move m = make_move(t, make_slot(mid, mid), 0, 6, -1);
 	if (play_move(&g, m, 0)) {
 		printf("Success!\n");
 	}
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
+#if 0
 	m = make_move(rotate_tile(t, 1), make_slot(mid + 1, mid), 0, 0, 0);
 	if (play_move(&g, m, 0)) {
 		printf("Success!\n");
@@ -402,9 +403,8 @@ int main(void)
 		printf("Success!\n");
 	}
 	printf("slot_count: %u\n", g.board.empty_slot_count);
-	struct move moves[1000];
-	size_t max_moves = 1000;
 	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
+#endif
 	generate_available_moves(&g, 0, t, &moves, &max_moves);
 	for (size_t i = 0; i < max_moves; ++i) {
 		printf("x: %d y: %d rotation: %d tcorner: %d\n",

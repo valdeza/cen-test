@@ -4,7 +4,7 @@
  * The slot is recorded with x and y values for graphic representation.
  * The array used for storing all slots is an AXIS*AXIS length array.
  */
-static inline size_t get_index_from_slot(struct slot s)
+size_t get_index_from_slot(struct slot s)
 {
 	return AXIS * s.x + s.y;
 }
@@ -17,7 +17,7 @@ static inline bool is_slot_in_boundary(struct slot s)
 	return (s.x < AXIS && s.y < AXIS);
 }
 
-static void list_adjacent_slots(struct slot s, struct slot **adjs)
+void list_adjacent_slots(struct slot s, struct slot **adjs)
 {
 	/*			  up	 right	 bottom	   left */
 	int n[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
@@ -87,7 +87,7 @@ static struct board add_placeable_slot(struct board b, struct slot s)
 {
 	struct slot *spots = b.slot_spots;
 	size_t i = get_insertion_index(spots, b.empty_slot_count, s);
-	if (i < b.empty_slot_count) { /* Make room for the element (Sorted insert). */
+	if (i < b.empty_slot_count) { /* Sorted insert. */
 		memmove(&spots[i+1], &spots[i], sizeof(s)*b.empty_slot_count-i);
 	}
 	spots[i] = s;
@@ -135,12 +135,14 @@ static struct board update_slot_spots(struct board b, struct slot s)
  * @returns 0 (OK) if a legal valid move, non-zero otherwise.
  * @see move.h:enum game_error_code
  */
-static enum game_error_code invalid_move(struct board b, struct move m,
-		struct slot **adjs)
+static enum game_error_code invalid_move(struct board b, struct move m)
 {
 	if (!is_slot_placeable(b, m.slot)) {
 		return E_TILE_NOT_PLACEABLE; /* Slot not placeable. */
 	}
+
+	struct slot adj[4];
+	struct slot *adjs[4] = {&adj[0], &adj[1], &adj[2], &adj[3]};
 	list_adjacent_slots(m.slot, adjs);
 	struct tile t = rotate_tile(m.tile, m.rotation);
 	for (unsigned int i = 0; i < 4; ++i) { /* Need wrapping */
@@ -199,11 +201,10 @@ char *print_board(struct board b, char res[BOARD_LEN])
 	return res;
 }
 
-enum game_error_code
-test_move_board(struct board *b, struct move m, struct slot **adjs)
+enum game_error_code test_move_board(struct board *b, struct move m)
 {
 	enum game_error_code rc;
-	if ((rc = invalid_move(*b, m, adjs))) {
+	if ((rc = invalid_move(*b, m))) {
 		return rc;
 	}
 	return OK;
@@ -215,10 +216,10 @@ test_move_board(struct board *b, struct move m, struct slot **adjs)
  * @returns 0 (OK) on success, otherwise a respective <code>game_error_code</code>
  */
 enum game_error_code
-play_move_board(struct board *b, struct move m, struct slot **adjs)
+play_move_board(struct board *b, struct move m)
 {
 	enum game_error_code rc;
-	if ((rc = test_move_board(b, m, adjs)) == OK) {
+	if ((rc = test_move_board(b, m)) == OK) {
 		b->tiles[get_index_from_slot(m.slot)] =
 			rotate_tile(m.tile, m.rotation);
 		*b = update_slot_spots(*b, m.slot);
@@ -240,7 +241,7 @@ static void print_placeable_slots(struct board b)
 static void play_and_check_move(struct board *b,struct move m,struct slot **adj)
 {
 	enum game_error_code rc;
-	if ((rc = play_move_board(b, m, adj))) {
+	if ((rc = play_move_board(b, m))) {
 		printf("Invalid move! %d\n", rc);
 	} else {
 		printf("Good move!\n");
