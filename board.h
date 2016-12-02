@@ -28,6 +28,8 @@ size_t get_index_from_slot(struct slot s);
 
 void list_adjacent_slots(struct slot s, struct slot **adjs);
 
+void list_adjacent_tiles(struct board *b, struct slot **ss, struct tile **ts);
+
 /**	Creates a board struct.
 *	@return The instantiated board.
 */
