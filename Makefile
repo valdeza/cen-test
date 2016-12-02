@@ -24,7 +24,7 @@ slotDriver: slotDriver.c slot.o
 
 tileDriver: tileDriver.c tile.o
 
-gameDriver: gameDriver.c game.o board.o slot.o tile.o move.o rng.o
+gameDriver: gameDriver.c game.o board.o slot.o tile.o move.o feature.o rng.o
 	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 server: server.c game.o rng.o tile.o board.o slot.o serialization.o feature.o

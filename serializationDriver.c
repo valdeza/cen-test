@@ -59,7 +59,7 @@ printf("Expected result for edge is\n");
   int y = 3;
   struct slot slotX = make_slot(x, y);
   int rotation = 2;
-  struct move setMove = make_move(setTile, slotX, rotation);
+  struct move setMove = make_move(setTile, slotX, rotation, -1, -1);
   printf("Expected result: 0\n");
   printf("Actual result: %i\n", *serialize_move(setMove, buf));
   assert(*serialize_move(setMove, buf) == 100);

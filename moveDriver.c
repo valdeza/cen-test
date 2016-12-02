@@ -1,3 +1,5 @@
+/* TODO Test tcorner, ccorner */
+
 #include <stdlib.h>
 
 #include <assert.h>
@@ -20,7 +22,7 @@ int main(){
   int y = 3;
   struct slot slotX = make_slot(x, y);
   int rotation = 2;
-  struct move setMove = make_move(setTile, slotX, rotation);
+  struct move setMove = make_move(setTile, slotX, rotation, -1, -1);
   printf("Expected result is\n");
   printf("edges[0]: %i \t", edges[0]);
   printf("edges[1]: %i \t", edges[1]);

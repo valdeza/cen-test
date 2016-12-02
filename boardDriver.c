@@ -20,7 +20,7 @@ int main(){
   enum attribute attribute = SHIELD;  //1
   struct tile setTile = make_tile(edges, attribute);
   int rotation = 2;
-  struct move setMove = make_move(setTile, setSlot, rotation);
+  struct move setMove = make_move(setTile, setSlot, rotation, -1, -1);
 
   enum edge edges2[5];
   edges2[0] = CITY;     //2
@@ -29,7 +29,7 @@ int main(){
   edges2[3] = FIELD;      //2
   edges2[4] = FIELD;      //2
   struct tile setEmptyTile = make_tile(edges2, attribute);
-  struct move setEmptyMove = make_move(setTile, setSlot, rotation);
+  struct move setEmptyMove = make_move(setTile, setSlot, rotation, -1, -1);
 
   //Test function make_board
   {
@@ -67,7 +67,12 @@ int main(){
  {
     printf("Test function play_move_board\n");
     struct board *pointToBoard = &setBoard;
-    int a = play_move_board(pointToBoard, setMove);
+    struct slot adj[4];
+    struct slot *adjs[4];
+    for (size_t i = 0; i < 4; ++i) {
+      adjs[i] = &adj[i];
+    }
+    int a = play_move_board(pointToBoard, setMove, adjs);
     printf("Expected result is: 1\n");
     printf("Actual result is : %i\n", a);
     assert(a == 1);

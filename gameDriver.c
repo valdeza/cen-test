@@ -24,16 +24,13 @@ int main(){
   //Test make_game function
   struct game games;
   make_game(&games);
-  printf("Excepted result for graphs_used: 0\n");
-  printf("Actual result for graphs_used: %i\n", games.graphs_used);
-  printf("Excepted result for curr_tile_deck_idx: 0\n");
-  printf("Actual result for curr_tile_deck_idx: %i\n", games.curr_tile_deck_idx);
+  printf("Excepted result for tiles_used: 0\n");
+  printf("Actual result for tiles_used: %i\n", games.tiles_used);
   printf("Excepted result for scores[0]: 0\n");
   printf("Actual result for scores[0]: %i\n", games.scores[0]);
   printf("Excepted result for scores[1]: 0\n");
   printf("Actual result for scores[1]: %i\n", games.scores[1]);
-  assert(0 == games.graphs_used);
-  assert(0 == games.curr_tile_deck_idx);
+  assert(0 == games.tiles_used);
   assert(0 == games.scores[0]);
   assert(0 == games.scores[1]);
 
@@ -70,7 +67,7 @@ int main(){
   int y = 3;
   struct slot slotX = make_slot(x, y);
   int rotation = 2;
-  struct move setMove = make_move(setTile, slotX, rotation);
+  struct move setMove = make_move(setTile, slotX, rotation, -1, -1);
   int player = 2;
   printf("Excepted result for play_move: 1\n");// invalid move
   printf("Actual result for play_move: %i\n", play_move(&games, setMove, player));
@@ -89,7 +86,7 @@ int main(){
   games.tile_deck[0] = tile1;
   struct tile tile2 = make_tile(edges, attribute);
   games.tile_deck[1] = tile2;
-  games.curr_tile_deck_idx = 0;
+  games.tiles_used = 0;
   struct tile currentTile = deal_tile(&games);
   assert(currentTile.edges[0] == edges2[0]);
   assert(currentTile.edges[1] == edges2[1]);
