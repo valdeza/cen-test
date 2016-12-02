@@ -132,19 +132,19 @@ void update_scores(size_t *scores, struct feature **scratch,
 		size_t score = 0;
 		struct feature *f = scratch[i];
 		switch(f->type) {
-		case ROAD:
+		case GAMETRAIL:
 			score = f->weighted_size;
 			break;
-		case CITY:
+		case LAKE:
 			if (f->slot_count == 0) { // Closed
 				score = 2 * f->weighted_size;
 			} else {
 				score = f->weighted_size;
 			}
 			break;
-		case FIELD:
+		case JUNGLE:
 			for (size_t j = 0; j < f->neighbor_count; ++j) {
-				if (a[f->neighbors[i]]->type == CITY) {
+				if (a[f->neighbors[i]]->type == LAKE) {
 					score++;
 				}
 			}
@@ -368,12 +368,11 @@ void print_adj(struct tile t, int *adj)
 int main(void)
 {
 	int adj[144];
-	struct tile t =
-		make_tile((enum edge[5]){ROAD, ROAD, ROAD, ROAD, ROAD}, NONE);
+	struct tile t = make_tile((enum edge[5]){GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL}, NONE);
 	init_adj(t, adj); print_adj(t, adj);
-	t = make_tile((enum edge[5]){CITY, CITY, CITY, CITY, CITY}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, LAKE, LAKE, LAKE, LAKE}, SHIELD);
 	init_adj(t, adj); print_adj(t, adj);
-	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, SHIELD);
 	init_adj(t, adj); print_adj(t, adj);
 
 	printf("\n\n Trying game\n");
@@ -403,7 +402,7 @@ int main(void)
 		printf("Success!\n");
 	}
 	printf("slot_count: %u\n", g.board.empty_slot_count);
-	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, SHIELD);
 #endif
 	generate_available_moves(&g, 0, t, &moves, &max_moves);
 	for (size_t i = 0; i < max_moves; ++i) {
@@ -419,23 +418,23 @@ int main(void)
 int main(void)
 {
 	int adj[144];
-	struct tile t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
+	struct tile t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, SHIELD);
 	init_adj(t, adj); print_adj(t, adj);
-	t = make_tile((enum edge[5]){CITY, CITY, CITY, CITY, CITY}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, LAKE, LAKE, LAKE, LAKE}, SHIELD);
 	init_adj(t, adj); print_adj(t, adj);
-	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, ROAD, ROAD}, NONE);
+	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, GAMETRAIL, GAMETRAIL}, NONE);
 	init_adj(t, adj); print_adj(t, adj);
 
 	printf("\n\n Trying game\n");
 	struct game g;
 	make_game(&g);
 	int mid = (AXIS - 1) / 2;
-	t = make_tile((enum edge[5]){CITY, FIELD, FIELD, FIELD, FIELD}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, SHIELD);
 	struct move m = make_move(t, make_slot(mid, mid), 0, 0, -1);
 	play_move(&g, m, 0);
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
-	t = make_tile((enum edge[5]){FIELD, FIELD, CITY, FIELD, FIELD}, SHIELD);
+	t = make_tile((enum edge[5]){JUNGLE, JUNGLE, LAKE, JUNGLE, JUNGLE}, SHIELD);
 	m = make_move(t, make_slot(mid, mid + 1), 0, 6, -1);
 	if (play_move(&g, m, 0)) {
 		printf("Success!\n");

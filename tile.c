@@ -107,7 +107,7 @@ static void connect_field_city(int adj[12*12], unsigned int i, struct tile t)
 		/* All of this edge's other corners are in our group. */
 		add_to_group(adj, i * 3, offset++, i * 3 + k);
 	}
-	if (edge == CITY && center_edge != CITY) {
+	if (edge == LAKE && center_edge != LAKE) {
 		return; /* Cities are only connected by center city */
 	}
 	for (unsigned int j = i + 1; j < 4; ++j) {
@@ -118,7 +118,7 @@ static void connect_field_city(int adj[12*12], unsigned int i, struct tile t)
 			add_to_group(adj, i * 3, offset++, j * 3 + k);
 		}
 	}
-	if (edge == CITY) {
+	if (edge == LAKE) {
 		return;
 	}
 	/* 
@@ -126,12 +126,12 @@ static void connect_field_city(int adj[12*12], unsigned int i, struct tile t)
 	 * immedieate clockwise and anticlockwise.
 	*/
 	unsigned int j = (i + 1) % 4; /* Clockwise */
-	if (t.edges[j] == ROAD) {
+	if (t.edges[j] == GAMETRAIL) {
 		add_to_group(adj, i * 3, offset++, j * 3);
 	}
 
 	j = (i - 1) % 4; /* Anticlockwise */
-	if (t.edges[j] == ROAD) {
+	if (t.edges[j] == GAMETRAIL) {
 		add_to_group(adj, i * 3, offset++, 3 * (j + 1) - 1);
 	}
 }
@@ -151,14 +151,14 @@ void init_adj(const struct tile t, int adj[12*12])
 		if (adj[(i * 3) * 12] == 0) { /* Already in a group. */
 			continue;
 		}
-		if (edge != CITY && edge != FIELD) {
+		if (edge != LAKE && edge != JUNGLE) {
 			continue;
 		}
 		connect_field_city(adj, i, t);
 	}
 	for (unsigned int i = 0; i < 4; ++i) { /* connect roads. */
 		const enum edge edge = t.edges[i];
-		if (edge != ROAD) {
+		if (edge != GAMETRAIL) {
 			continue;
 		}
 		connect_road(adj, i, t);

@@ -254,10 +254,10 @@ int main(void)
 	char board_buffer[BOARD_LEN];
 	enum edge edges[5][5] = {
 		{ EMPTY, EMPTY, EMPTY, EMPTY, EMPTY },
-		{ ROAD, ROAD, ROAD, ROAD, ROAD },
-		{ FIELD, FIELD, FIELD, FIELD, FIELD },
-		{ CITY, CITY, CITY, CITY, CITY },
-		{ CITY, FIELD, ROAD, CITY, ROAD }
+		{ GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL },
+		{ JUNGLE, JUNGLE, JUNGLE, JUNGLE, JUNGLE },
+		{ LAKE, LAKE, LAKE, LAKE, LAKE },
+		{ LAKE, JUNGLE, GAMETRAIL, LAKE, GAMETRAIL }
 	};
 	struct tile tiles[5] = {
 		make_tile(edges[0], NONE),
