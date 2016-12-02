@@ -14,8 +14,8 @@ client: client.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
 		slot.o serialization.o feature.o -lm
 
 aiclient: ai_client.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
-	$(CC) $(CFLAGS) -o ai_client ai_client.c game.o rng.o tile.o move.o board.o \
-		slot.o serialization.o feature.o -lm
+	$(CC) $(CFLAGS) -o ai_client ai_client.c game.o rng.o tile.o move.o \
+		board.o slot.o serialization.o feature.o -lm
 
 game: game.c game.h rng.o tile.o board.o slot.o feature.o 
 	$(CC) $(CFLAGS) -DTEST -o test_game game.c rng.o tile.o board.o slot.o \

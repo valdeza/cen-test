@@ -107,9 +107,6 @@ static int get_deck(int sockfd, struct tile *deck, size_t clen, size_t dlen)
 	return 0;
 }
 
-#define REMOTE_HOST "127.0.0.1" /* TODO: Get a command line variable. */
-#define REMOTE_PORT 50002 /* TODO: Factor into command line variable. */
-
 static struct game *init_game(int socket)
 {
 	/* TODO: Error handling? */
@@ -133,10 +130,14 @@ void game_over(char *buf)
 	return;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
 	int sockfd;
-	if ((sockfd = connect_game(REMOTE_HOST, REMOTE_PORT)) < 0) {
+	int port = atoi(argv[2]);
+	if (argc != 3) {
+		printf("Usage: %s <host> <port>\n", argv[0]);
+	}
+	if ((sockfd = connect_game(argv[1], port)) < 0) {
 		printf("Error: %s\n", strerror(errno));
 		return 1;
 	}

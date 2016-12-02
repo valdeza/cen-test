@@ -177,7 +177,7 @@ int is_move_valid(struct game *g, struct move m, int player)
 	for (size_t i = 0; i < 4; ++i) {
 		adjs[i] = &neighbors[i];
 	}
-	if ((rc = test_move_board(&g->board, m, adjs))) {
+	if ((rc = test_move_board(&g->board, m))) {
 		return rc;
 	}
 	if ((rc = test_meeple(m, player, g->features))) {
@@ -190,15 +190,14 @@ int is_move_valid(struct game *g, struct move m, int player)
 int play_move(struct game *g, struct move m, int player)
 {
 	int rc;
-	struct slot neighbors[4];
-	struct slot *adjs[4];
-	for (size_t i = 0; i < 4; ++i) {
-		adjs[i] = &neighbors[i];
-	}
+	struct slot adj[4];
+	struct slot *adjs[4] = {&adj[0], &adj[1], &adj[2], &adj[3]};
+	list_adjacent_slots(m.slot, adjs);
+
 	if ((rc = is_move_valid(g, m, player))) {
 		return rc;
 	}
-	play_move_board(&g->board, m, adjs);
+	play_move_board(&g->board, m);
 	play_move_feature(m, adjs, g->features, &g->features_used);
 	play_meeple(m, player, g->features);
 	if (m.tcorner > 0) {
@@ -238,8 +237,7 @@ void generate_available_moves(struct game *g, int player,
 		m.slot = g->board.slot_spots[i];
 		for (int j = 0; j < 4; ++j) {
 			m.rotation = j;
-			m.tcorner = m.ccorner = -1;
-#if 0
+			//m.tcorner = m.ccorner = -1;
 			/* TODO: Get working  */
 			for (int k = -1; k < 13; ++k) {
 				m.tcorner = k;
@@ -255,7 +253,6 @@ void generate_available_moves(struct game *g, int player,
 					}
 				}
 			}
-#endif
 			if (is_move_valid(g, m, player)) {
 				continue;
 			}

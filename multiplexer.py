@@ -1,6 +1,7 @@
-import sys
+import argparse
 import socket
 import string
+import sys
 from network_translation import *
 
 # class move_information(object):
@@ -79,7 +80,6 @@ def challengeOver(sockObj, buf):
 def roundStart(sockObj, buf):
 	#Server: BEGIN ROUND <rid> OF <rounds>
 	message, buf = better_recv(sockObj, buf)
-	print message
         rounds = int(str.split(message, " ")[4])
 	return buf, rounds
 	
@@ -95,20 +95,20 @@ def roundOver(sockObj, buf):
 def matchStart(sockObj, buf, clientSocks):
 	#Server: YOUR OPPONENT IS PLAYER <pid>
 	message, buf = better_recv(sockObj, buf)
-	print message
 
 	#Server: STARTING TILE IS <tile> AT <x> <y> <orientation>
 	message, buf = better_recv(sockObj, buf)
 	tile = str.split(message, " ")[3]
-	translate_tile_network_to_native(tile)
 	print message
+
+	translate_tile_network_to_native(tile)
 
 	#Server: THE REMAINING <number_tiles> TILES ARE [ <tiles> ]
 	message, buf = better_recv(sockObj, buf)
         numtiles = int(str.split(message, " ")[2])
-        for x in (0, numtiles):
-            for y in clientSockets:
-                clientSock.send(translate_tile_network_to_native(
+        for x in (0, numtiles - 1):
+            for y in clientSocks:
+                y.send(translate_tile_network_to_native(
                     str.split(message, " ")[x + 6])
                 )
 	print message
@@ -245,12 +245,21 @@ def move(sockObj, buf, clientSockets, IdList, first):
     send_move(sockObj, network_tile, x, y, rotation, meeple)
     return buf
 
-Host = '192.168.1.19'                    # Make a command line option.
-Port = 4444
-Port2 = 50002                # This too
+parser = argparse.ArgumentParser(description='Multiplexer')
+parser.add_argument('host_arg', type = str, help='Host')
+parser.add_argument('remote_port_arg', type = int, help='Host Port')
+parser.add_argument('local_port_arg', type = int, help='Local Port')
+parser.add_argument('teamName', type = str, help='Local Port')
+args = parser.parse_args()
+
+#Host = '192.168.1.19'             # Make a command line option.
+Host = args.host_arg
+Port = args.remote_port_arg
+Port2 = args.local_port_arg
+TeamName = args.teamName
 TournamentPassword = "TIGERZONE"   # Mhmm
-Username = "TEAML"         # Mhmm
-Password = "IAML"             # Mhmm
+Username = "TEAM" + TeamName       # Mhmm
+Password = "IAM" + TeamName        # Mhmm
 
 listener = socket.socket( ) 	# default opts
 listener.bind(('localhost', Port2))
@@ -267,6 +276,8 @@ buf = authentication(s, TournamentPassword, Username, Password, buf)
 buf, matches = challengeStart(s, buf)
 for a in range (0, matches):
     buf, rounds = roundStart(s, buf)
+    #if (rounds % 2 + 1):
+    #    rounds -= 1
     for b in range (0, rounds):
         buf, numtiles = matchStart(s, buf, clients)
         first = 1

@@ -142,7 +142,6 @@ void init_adj(const struct tile t, int adj[12*12])
 	for (unsigned int i = 0; i < 12; ++i) {
 		adj[i * 12] = i + 1; /* nonzero value (assume leader). */
 	}
-	/* TODO: Refactor into loops elements into functions. */
 	/* NOTE: The algorithm assumes fields and cities are connected
 	 * before roads, in order to handle the case where a field shares
 	 * a connection (a side of) a road.
