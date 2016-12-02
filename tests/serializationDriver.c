@@ -11,11 +11,11 @@ int main(){
   printf("Test function serialize_tile\n");
   enum edge edges[5];
   edges[0] = EMPTY;     //0
-  edges[1] = CITY;      //1
-  edges[2] = FIELD;     //2
-  edges[3] = ROAD;      //3
-  edges[4] = CITY;      //1
-  enum attribute attributes = SHIELD;  //1
+  edges[1] = LAKE;      //1
+  edges[2] = JUNGLE;    //2
+  edges[3] = GAMETRAIL; //3
+  edges[4] = LAKE;      //1
+  enum attribute attributes = PREY; //1
   struct tile setTile = make_tile(edges, attributes);
   uint8_t buf[100];
   for(int i = 0; i < 100; i++){

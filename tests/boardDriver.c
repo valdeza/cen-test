@@ -12,22 +12,22 @@ int main(){
   struct board setBoard = make_board();
 
   enum edge edges[5];
-  edges[0] = CITY;     //1
-  edges[1] = CITY;      //1
-  edges[2] = CITY;     //1
-  edges[3] = ROAD;      //3
-  edges[4] = CITY;      //1
-  enum attribute attribute = SHIELD;  //1
+  edges[0] = LAKE;      //1
+  edges[1] = LAKE;      //1
+  edges[2] = LAKE;      //1
+  edges[3] = GAMETRAIL; //3
+  edges[4] = LAKE;      //1
+  enum attribute attribute = PREY; //1
   struct tile setTile = make_tile(edges, attribute);
   int rotation = 2;
   struct move setMove = make_move(setTile, setSlot, rotation, -1, -1);
 
   enum edge edges2[5];
-  edges2[0] = CITY;     //2
-  edges2[1] = FIELD;      //2
-  edges2[2] = FIELD;     //2
-  edges2[3] = FIELD;      //2
-  edges2[4] = FIELD;      //2
+  edges2[0] = LAKE;   //1
+  edges2[1] = JUNGLE; //2
+  edges2[2] = JUNGLE; //2
+  edges2[3] = JUNGLE; //2
+  edges2[4] = JUNGLE; //2
   struct tile setEmptyTile = make_tile(edges2, attribute);
   struct move setEmptyMove = make_move(setTile, setSlot, rotation, -1, -1);
 

@@ -11,12 +11,12 @@ int main(){
   printf("Test function make_move\n");
   enum edge edges[5];
   edges[0] = EMPTY;     //0
-  edges[1] = CITY;      //1
-  edges[2] = FIELD;     //2
-  edges[3] = ROAD;      //3
-  edges[4] = CITY;      //1
+  edges[1] = LAKE;      //1
+  edges[2] = JUNGLE;    //2
+  edges[3] = GAMETRAIL; //3
+  edges[4] = LAKE;      //1
 
-  enum attribute attribute = SHIELD;  //1
+  enum attribute attribute = PREY; //1
   struct tile setTile = make_tile(edges, attribute);
   int x = 2;
   int y = 3;

@@ -181,7 +181,7 @@ static void add_adjacency(struct feature *a, size_t ind)
 
 static void add_tile_feature(struct feature *f, struct tile t)
 {
-	if (t.attribute == SHIELD) {
+	if (t.attribute == PREY) {
 		f->weighted_size += 1;
 	}
 	f->weighted_size += 1;
@@ -232,12 +232,12 @@ int test_meeple(struct move m, int player, struct feature **f)
 		return 1;
 	}
 	if (m.tcorner >= 0) {
-		if (m.tcorner > 11 && m.tile.attribute != MONASTERY) {
+		if (m.tcorner > 11 && m.tile.attribute != DEN) {
 			return 1;
 		}
 		return test_corner_feature(1, player, m, f);
 	} else {
-		if (m.ccorner > 11 && m.tile.attribute != MONASTERY) {
+		if (m.ccorner > 11 && m.tile.attribute != DEN) {
 			return 1;
 		}
 		return test_corner_feature(0, player, m, f);
@@ -370,9 +370,9 @@ int main(void)
 	int adj[144];
 	struct tile t = make_tile((enum edge[5]){GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL}, NONE);
 	init_adj(t, adj); print_adj(t, adj);
-	t = make_tile((enum edge[5]){LAKE, LAKE, LAKE, LAKE, LAKE}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, LAKE, LAKE, LAKE, LAKE}, PREY);
 	init_adj(t, adj); print_adj(t, adj);
-	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, PREY);
 	init_adj(t, adj); print_adj(t, adj);
 
 	printf("\n\n Trying game\n");
@@ -402,7 +402,7 @@ int main(void)
 		printf("Success!\n");
 	}
 	printf("slot_count: %u\n", g.board.empty_slot_count);
-	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, PREY);
 #endif
 	generate_available_moves(&g, 0, t, &moves, &max_moves);
 	for (size_t i = 0; i < max_moves; ++i) {
@@ -418,9 +418,9 @@ int main(void)
 int main(void)
 {
 	int adj[144];
-	struct tile t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, SHIELD);
+	struct tile t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, PREY);
 	init_adj(t, adj); print_adj(t, adj);
-	t = make_tile((enum edge[5]){LAKE, LAKE, LAKE, LAKE, LAKE}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, LAKE, LAKE, LAKE, LAKE}, PREY);
 	init_adj(t, adj); print_adj(t, adj);
 	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, GAMETRAIL, GAMETRAIL}, NONE);
 	init_adj(t, adj); print_adj(t, adj);
@@ -429,12 +429,12 @@ int main(void)
 	struct game g;
 	make_game(&g);
 	int mid = (AXIS - 1) / 2;
-	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, SHIELD);
+	t = make_tile((enum edge[5]){LAKE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, PREY);
 	struct move m = make_move(t, make_slot(mid, mid), 0, 0, -1);
 	play_move(&g, m, 0);
 	calculate_scores(&g);
 	printf("%zu %zu\n", g.scores[0], g.scores[1]);
-	t = make_tile((enum edge[5]){JUNGLE, JUNGLE, LAKE, JUNGLE, JUNGLE}, SHIELD);
+	t = make_tile((enum edge[5]){JUNGLE, JUNGLE, LAKE, JUNGLE, JUNGLE}, PREY);
 	m = make_move(t, make_slot(mid, mid + 1), 0, 6, -1);
 	if (play_move(&g, m, 0)) {
 		printf("Success!\n");

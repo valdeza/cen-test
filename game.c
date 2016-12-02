@@ -30,7 +30,7 @@ static void shuffle_tiles(struct tile *a, size_t top)
 }
 
 /** Creates all tiles, unshuffled.
- * @remarks //TODO// SHIELD's represent prey animals.
+ * @remarks //TODO// Implement distinct prey animals
  * 	Need update to distinct prey animals.
  * 	Reminder comments present for which animal is present.
  * 	Remember that animals are at lake edges.
@@ -50,11 +50,11 @@ static void init_deck(struct tile deck[TILE_COUNT])
 
 	for (int i = 0; i < 4; ++i)
 		deck[ind++] = make_tile((enum edge[5])
-			{JUNGLE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, MONASTERY);
+			{JUNGLE, JUNGLE, JUNGLE, JUNGLE, JUNGLE}, DEN);
 
 	for (int i = 0; i < 2; ++i)
 		deck[ind++] = make_tile((enum edge[5])
-			{JUNGLE, JUNGLE, GAMETRAIL, JUNGLE, JUNGLE}, MONASTERY);
+			{JUNGLE, JUNGLE, GAMETRAIL, JUNGLE, JUNGLE}, DEN);
 
 		deck[ind++] = make_tile((enum edge[5])
 			{GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL}, NONE);
@@ -103,14 +103,14 @@ static void init_deck(struct tile deck[TILE_COUNT])
 
 	for (int i = 0; i < 2; ++i)
 		deck[ind++] = make_tile((enum edge[5])
-			{GAMETRAIL, LAKE, JUNGLE, GAMETRAIL, GAMETRAIL}, SHIELD); // Boar
+			{GAMETRAIL, LAKE, JUNGLE, GAMETRAIL, GAMETRAIL}, PREY); // Boar
 
 		deck[ind++] = make_tile((enum edge[5])
 			{JUNGLE, LAKE, GAMETRAIL, GAMETRAIL, GAMETRAIL}, NONE);
 
 	for (int i = 0; i < 2; ++i)
 		deck[ind++] = make_tile((enum edge[5])
-			{JUNGLE, LAKE, GAMETRAIL, GAMETRAIL, GAMETRAIL}, SHIELD); // Buffalo
+			{JUNGLE, LAKE, GAMETRAIL, GAMETRAIL, GAMETRAIL}, PREY); // Buffalo
 
 	for (int i = 0; i < 2; ++i)
 		deck[ind++] = make_tile((enum edge[5])
@@ -118,7 +118,7 @@ static void init_deck(struct tile deck[TILE_COUNT])
 
 	for (int i = 0; i < 2; ++i)
 		deck[ind++] = make_tile((enum edge[5])
-			{GAMETRAIL, LAKE, GAMETRAIL, JUNGLE, GAMETRAIL}, SHIELD); // Deer
+			{GAMETRAIL, LAKE, GAMETRAIL, JUNGLE, GAMETRAIL}, PREY); // Deer
 
 		deck[ind++] = make_tile((enum edge[5])
 			{GAMETRAIL, LAKE, LAKE, LAKE, LAKE}, NONE);
@@ -128,7 +128,7 @@ static void init_deck(struct tile deck[TILE_COUNT])
 
 	for (int i = 0; i < 2; ++i)
 		deck[ind++] = make_tile((enum edge[5])
-			{GAMETRAIL, LAKE, GAMETRAIL, GAMETRAIL, GAMETRAIL}, SHIELD); // Boar
+			{GAMETRAIL, LAKE, GAMETRAIL, GAMETRAIL, GAMETRAIL}, PREY); // Boar
 
 	for (int i = 0; i < 3; ++i)
 		deck[ind++] = make_tile((enum edge[5])
@@ -136,18 +136,18 @@ static void init_deck(struct tile deck[TILE_COUNT])
 
 	for (int i = 0; i < 2; ++i)
 		deck[ind++] = make_tile((enum edge[5])
-			{GAMETRAIL, LAKE, LAKE, GAMETRAIL, LAKE}, SHIELD); // Buffalo
+			{GAMETRAIL, LAKE, LAKE, GAMETRAIL, LAKE}, PREY); // Buffalo
 
 		deck[ind++] = make_tile((enum edge[5])
 			{LAKE, JUNGLE, GAMETRAIL, JUNGLE, GAMETRAIL}, NONE);
 
 	for (int i = 0; i < 2; ++i)
 		deck[ind++] = make_tile((enum edge[5])
-			{LAKE, JUNGLE, GAMETRAIL, JUNGLE, GAMETRAIL}, SHIELD); // Deer
+			{LAKE, JUNGLE, GAMETRAIL, JUNGLE, GAMETRAIL}, PREY); // Deer
 
 	for (int i = 0; i < 2; ++i)
 		deck[ind++] = make_tile((enum edge[5])
-			{GAMETRAIL, LAKE, LAKE, LAKE, LAKE}, SHIELD); // Crocodile
+			{GAMETRAIL, LAKE, LAKE, LAKE, LAKE}, PREY); // Crocodile
 
 	assert(ind == TILE_COUNT);
 	return;

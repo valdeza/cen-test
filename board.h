@@ -47,8 +47,7 @@ char *print_board(struct board b, char res[BOARD_LEN]);
 *	@param adjs Pointer to array of slots adjacent to the slot where the move is taking place.
 * @return Error code indicating whether or not the move was valid. 0 if valid, non-zero if not valid.
 */
-enum game_error_code \
-	play_move_board(struct board *b, struct move m, struct slot **adjs);
+enum game_error_code play_move_board(struct board *b, struct move m);
 
 /**	Check the input move for validity.
 *	@see move, slot, game_error_code
@@ -57,6 +56,5 @@ enum game_error_code \
 *	@param adjs Pointer to array of slots adjacent to the slot where the move is taking place.
 * @return Error code indicating whether or not the move was valid. 0 if valid, non-zero if not valid.
 */
-enum game_error_code \
-	test_move_board(struct board *b, struct move m, struct slot **adjs);
+enum game_error_code test_move_board(struct board *b, struct move m);
 #endif

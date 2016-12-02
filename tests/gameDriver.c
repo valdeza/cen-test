@@ -9,12 +9,12 @@ int main(){
  /* int graph[100] = {2};
   board setBoard = make_board();
   enum edge edges[5];
-  edges[0] = CITY;     //1
-  edges[1] = CITY;      //1
-  edges[2] = CITY;     //1
-  edges[3] = ROAD;      //3
-  edges[4] = CITY;      //1
-  enum attribute attribute = SHIELD;  //1
+  edges[0] = LAKE;      //1
+  edges[1] = LAKE;      //1
+  edges[2] = LAKE;      //1
+  edges[3] = GAMETRAIL; //3
+  edges[4] = LAKE;      //1
+  enum attribute attribute = PREY; //1
   tile setTile = make_tile(edges, attribute);
 
 
@@ -40,12 +40,12 @@ int main(){
 
   //Test function set_game_deck
   enum edge edges[5];
-  edges[0] = CITY;     //1
-  edges[1] = CITY;      //1
-  edges[2] = CITY;     //1
-  edges[3] = ROAD;      //3
-  edges[4] = CITY;      //1
-  enum attribute attribute = SHIELD;  //1
+  edges[0] = LAKE;      //1
+  edges[1] = LAKE;      //1
+  edges[2] = LAKE;      //1
+  edges[3] = GAMETRAIL; //3
+  edges[4] = LAKE;      //1
+  enum attribute attribute = PREY; //1
   struct tile tileArray[TILE_COUNT];
   for(int i = 0; i < TILE_COUNT; i++){
     tileArray[i] = make_tile(edges, attribute);
@@ -76,12 +76,12 @@ int main(){
 
   //Test deal_tile function
   enum edge edges2[5];
-  edges2[0] = ROAD;     //3
-  edges2[1] = ROAD;      //3
-  edges2[2] = ROAD;     //3
-  edges2[3] = ROAD;      //3
-  edges2[4] = ROAD;      //3
-  attribute = SHIELD;  //3
+  edges2[0] = GAMETRAIL; //3
+  edges2[1] = GAMETRAIL; //3
+  edges2[2] = GAMETRAIL; //3
+  edges2[3] = GAMETRAIL; //3
+  edges2[4] = GAMETRAIL; //3
+  attribute = PREY; //3
   struct tile tile1 = make_tile(edges2, attribute);
   games.tile_deck[0] = tile1;
   struct tile tile2 = make_tile(edges, attribute);

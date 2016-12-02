@@ -15,11 +15,8 @@
 /**	Enumeration representing the non-feature tile attributes. */
 enum attribute {
 	NONE = 0, /**< No attribute */
-	BUFFALO = 1, /**< A buffalo */
+	PREY = 1, /**< A prey animal */
 	DEN = 2, /**< A den */
-	CROCODILE = 3, /**< A crocodile */
-	DEER = 4, /**< A deer */
-	BOAR = 5 /**< A boar */
 };
 
 /** Represents a tile

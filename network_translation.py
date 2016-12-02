@@ -12,10 +12,10 @@ EDGE_CITY = 1
 EDGE_FIELD = 2
 EDGE_ROAD = 3
 
-# TODO Shields need to be refactored into distinct prey animals.
+# TODO Prey need to be refactored into distinct prey animals.
 ATTRIB_NONE = 0
-ATTRIB_SHIELD = 1
-ATTRIB_MONASTERY = 2
+ATTRIB_PREY = 1
+ATTRIB_DEN = 2
 
 BIDICT_ROT_NATIVE_TGZ = bidict({
     0: 0,
@@ -33,11 +33,11 @@ BIDICT_TILE_STR_ABYTE = bidict({
     ),
     "JJJJX" : (
         EDGE_FIELD, EDGE_FIELD, EDGE_FIELD, EDGE_FIELD, EDGE_FIELD,
-        ATTRIB_MONASTERY
+        ATTRIB_DEN
     ),
     "JJTJX" : (
         EDGE_FIELD, EDGE_FIELD, EDGE_ROAD, EDGE_FIELD, EDGE_FIELD,
-        ATTRIB_MONASTERY
+        ATTRIB_DEN
     ),
     "TTTT-" : (
         EDGE_ROAD, EDGE_ROAD, EDGE_ROAD, EDGE_ROAD, EDGE_ROAD,
@@ -89,7 +89,7 @@ BIDICT_TILE_STR_ABYTE = bidict({
     ),
     "TLJTP" : (
         EDGE_ROAD, EDGE_CITY, EDGE_FIELD, EDGE_ROAD, EDGE_ROAD,
-        ATTRIB_SHIELD # Boar
+        ATTRIB_PREY # Boar
     ),
     "JLTT-" : (
         EDGE_FIELD, EDGE_CITY, EDGE_ROAD, EDGE_ROAD, EDGE_ROAD,
@@ -97,7 +97,7 @@ BIDICT_TILE_STR_ABYTE = bidict({
     ),
     "JLTTB" : (
         EDGE_FIELD, EDGE_CITY, EDGE_ROAD, EDGE_ROAD, EDGE_ROAD,
-        ATTRIB_SHIELD # Buffalo
+        ATTRIB_PREY # Buffalo
     ),
     "TLTJ-" : (
         EDGE_ROAD, EDGE_CITY, EDGE_ROAD, EDGE_FIELD, EDGE_ROAD,
@@ -105,7 +105,7 @@ BIDICT_TILE_STR_ABYTE = bidict({
     ),
     "TLTJD" : (
         EDGE_ROAD, EDGE_CITY, EDGE_ROAD, EDGE_FIELD, EDGE_ROAD,
-        ATTRIB_SHIELD # Deer
+        ATTRIB_PREY # Deer
     ),
     "TLLL-" : (
         EDGE_ROAD, EDGE_CITY, EDGE_CITY, EDGE_CITY, EDGE_CITY,
@@ -117,7 +117,7 @@ BIDICT_TILE_STR_ABYTE = bidict({
     ),
     "TLTTP" : (
         EDGE_ROAD, EDGE_CITY, EDGE_ROAD, EDGE_ROAD, EDGE_ROAD,
-        ATTRIB_SHIELD # Boar
+        ATTRIB_PREY # Boar
     ),
     "TLLT-" : (
         EDGE_ROAD, EDGE_CITY, EDGE_CITY, EDGE_ROAD, EDGE_CITY,
@@ -125,7 +125,7 @@ BIDICT_TILE_STR_ABYTE = bidict({
     ),
     "TLLTB" : (
         EDGE_ROAD, EDGE_CITY, EDGE_CITY, EDGE_ROAD, EDGE_CITY,
-        ATTRIB_SHIELD # Buffalo
+        ATTRIB_PREY # Buffalo
     ),
     "LJTJ-" : (
         EDGE_CITY, EDGE_FIELD, EDGE_ROAD, EDGE_FIELD, EDGE_ROAD,
@@ -133,11 +133,11 @@ BIDICT_TILE_STR_ABYTE = bidict({
     ),
     "LJTJD" : (
         EDGE_CITY, EDGE_FIELD, EDGE_ROAD, EDGE_FIELD, EDGE_ROAD,
-        ATTRIB_SHIELD # Deer
+        ATTRIB_PREY # Deer
     ),
     "TLLLC" : (
         EDGE_ROAD, EDGE_CITY, EDGE_CITY, EDGE_CITY, EDGE_CITY,
-        ATTRIB_SHIELD # Crocodile
+        ATTRIB_PREY # Crocodile
     )
 })
 
