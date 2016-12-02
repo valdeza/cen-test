@@ -2,14 +2,14 @@ CFLAGS=-std=c99 -g -march=native -flto -Wall -Wextra -pedantic -O0
 
 .PHONY: all tests clean
 
-all: test_game test_board server client feature aiclient tests
+all: test_game test_board test_feature server client ai_client tests
 
 clean-all: clean
 	$(MAKE) -C tests clean
 
 clean:
 	rm *.o
-	rm client server
+	rm client server ai_client
 	rm test_game test_board test_feature
 
 tests:
@@ -23,7 +23,7 @@ client: client.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
 	$(CC) $(CFLAGS) -o client client.c game.o rng.o tile.o move.o board.o \
 		slot.o serialization.o feature.o -lm
 
-aiclient: ai_client.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
+ai_client: ai_client.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
 	$(CC) $(CFLAGS) -o ai_client ai_client.c game.o rng.o tile.o move.o \
 		board.o slot.o serialization.o feature.o -lm
 
@@ -34,7 +34,7 @@ test_game: game.c game.h rng.o tile.o board.o slot.o feature.o
 test_board: board.c board.h tile.o slot.o move.o
 	$(CC) $(CFLAGS) -DTEST -o test_board board.c tile.o slot.o move.o
 
-feature: feature.c feature.h tile.o slot.o move.o edge.h rng.o board.o
+test_feature: feature.c feature.h tile.o slot.o move.o edge.h rng.o board.o
 	$(CC) $(CFLAGS) -DTEST -o test_feature feature.c tile.o slot.o move.o \
 		game.o rng.o board.o -lm
 

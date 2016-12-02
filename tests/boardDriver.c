@@ -67,12 +67,7 @@ int main(){
  {
     printf("Test function play_move_board\n");
     struct board *pointToBoard = &setBoard;
-    struct slot adj[4];
-    struct slot *adjs[4];
-    for (size_t i = 0; i < 4; ++i) {
-      adjs[i] = &adj[i];
-    }
-    int a = play_move_board(pointToBoard, setMove, adjs);
+    int a = play_move_board(pointToBoard, setMove);
     printf("Expected result is: 1\n");
     printf("Actual result is : %i\n", a);
     assert(a == 1);
