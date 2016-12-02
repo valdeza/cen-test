@@ -1,0 +1,74 @@
+\hypertarget{structgame}{}\section{game Struct Reference}
+\label{structgame}\index{game@{game}}
+
+
+{\ttfamily \#include $<$game.\+h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structgame_a9d3643a21132d20682823fa077528f05}{}\label{structgame_a9d3643a21132d20682823fa077528f05} 
+struct \hyperlink{structboard}{board} {\bfseries board}
+\item 
+struct \hyperlink{structtile}{tile} \hyperlink{structgame_ace0a9bc6809946175359836addeea842}{tile\+\_\+deck} \mbox{[}T\+I\+L\+E\+\_\+\+C\+O\+U\+NT\mbox{]}
+\item 
+size\+\_\+t \hyperlink{structgame_a3ba14fb93302c82593ca2865b69718cb}{tiles\+\_\+used}
+\item 
+size\+\_\+t \hyperlink{structgame_a727e232254a3086b4086da0fbf16ea00}{scores} \mbox{[}P\+L\+A\+Y\+E\+R\+\_\+\+C\+O\+U\+NT\mbox{]}
+\item 
+size\+\_\+t \hyperlink{structgame_a8f23c0f5156ea251a207383a01da063d}{meeples} \mbox{[}P\+L\+A\+Y\+E\+R\+\_\+\+C\+O\+U\+NT\mbox{]}
+\item 
+struct \hyperlink{structfeature}{feature} $\ast$ \hyperlink{structgame_a7503b1d02295092f74671a8fca9b80e1}{features} \mbox{[}A\+X\+IS $\ast$A\+X\+IS $\ast$4 $\ast$3\mbox{]}
+\item 
+size\+\_\+t \hyperlink{structgame_a5f38a6f289ba78fbdf22f092433ae522}{features\+\_\+used}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Holds all information on the game state. \begin{DoxySeeAlso}{See also}
+\hyperlink{structboard}{board}, \hyperlink{structfeature}{feature} 
+\end{DoxySeeAlso}
+
+
+\subsection{Field Documentation}
+\hypertarget{structgame_a7503b1d02295092f74671a8fca9b80e1}{}\label{structgame_a7503b1d02295092f74671a8fca9b80e1} 
+\index{game@{game}!features@{features}}
+\index{features@{features}!game@{game}}
+\subsubsection{\texorpdfstring{features}{features}}
+{\footnotesize\ttfamily struct \hyperlink{structfeature}{feature}$\ast$ features\mbox{[}A\+X\+IS $\ast$A\+X\+IS $\ast$4 $\ast$3\mbox{]}}
+
+$<$ The number of tigers each player holds. \hypertarget{structgame_a5f38a6f289ba78fbdf22f092433ae522}{}\label{structgame_a5f38a6f289ba78fbdf22f092433ae522} 
+\index{game@{game}!features\+\_\+used@{features\+\_\+used}}
+\index{features\+\_\+used@{features\+\_\+used}!game@{game}}
+\subsubsection{\texorpdfstring{features\+\_\+used}{features\_used}}
+{\footnotesize\ttfamily size\+\_\+t features\+\_\+used}
+
+$<$ Mapping of each space on the board to the feature occupying that space. \hypertarget{structgame_a8f23c0f5156ea251a207383a01da063d}{}\label{structgame_a8f23c0f5156ea251a207383a01da063d} 
+\index{game@{game}!meeples@{meeples}}
+\index{meeples@{meeples}!game@{game}}
+\subsubsection{\texorpdfstring{meeples}{meeples}}
+{\footnotesize\ttfamily size\+\_\+t meeples\mbox{[}P\+L\+A\+Y\+E\+R\+\_\+\+C\+O\+U\+NT\mbox{]}}
+
+$<$ Holds the players\textquotesingle{} scores. \hypertarget{structgame_a727e232254a3086b4086da0fbf16ea00}{}\label{structgame_a727e232254a3086b4086da0fbf16ea00} 
+\index{game@{game}!scores@{scores}}
+\index{scores@{scores}!game@{game}}
+\subsubsection{\texorpdfstring{scores}{scores}}
+{\footnotesize\ttfamily size\+\_\+t scores\mbox{[}P\+L\+A\+Y\+E\+R\+\_\+\+C\+O\+U\+NT\mbox{]}}
+
+$<$ The number of tiles used during the game. \hypertarget{structgame_ace0a9bc6809946175359836addeea842}{}\label{structgame_ace0a9bc6809946175359836addeea842} 
+\index{game@{game}!tile\+\_\+deck@{tile\+\_\+deck}}
+\index{tile\+\_\+deck@{tile\+\_\+deck}!game@{game}}
+\subsubsection{\texorpdfstring{tile\+\_\+deck}{tile\_deck}}
+{\footnotesize\ttfamily struct \hyperlink{structtile}{tile} tile\+\_\+deck\mbox{[}T\+I\+L\+E\+\_\+\+C\+O\+U\+NT\mbox{]}}
+
+$<$ The board on which the game is played and tiles are placed. \hypertarget{structgame_a3ba14fb93302c82593ca2865b69718cb}{}\label{structgame_a3ba14fb93302c82593ca2865b69718cb} 
+\index{game@{game}!tiles\+\_\+used@{tiles\+\_\+used}}
+\index{tiles\+\_\+used@{tiles\+\_\+used}!game@{game}}
+\subsubsection{\texorpdfstring{tiles\+\_\+used}{tiles\_used}}
+{\footnotesize\ttfamily size\+\_\+t tiles\+\_\+used}
+
+$<$ All tiles to be played in the game. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{game_8h}{game.\+h}\end{DoxyCompactItemize}

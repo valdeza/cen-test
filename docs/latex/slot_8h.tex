@@ -1,0 +1,72 @@
+\hypertarget{slot_8h}{}\section{slot.\+h File Reference}
+\label{slot_8h}\index{slot.\+h@{slot.\+h}}
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structslot}{slot}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structslot}{slot} \hyperlink{slot_8h_af7606e8e30c230933e2827c6afb768e7}{make\+\_\+slot} (unsigned int x, unsigned int y)
+\item 
+int \hyperlink{slot_8h_a3622f4baa2b968eae227eb70747a2fe7}{compare\+\_\+slot\+\_\+positions} (struct \hyperlink{structslot}{slot} a, struct \hyperlink{structslot}{slot} b)
+\item 
+struct \hyperlink{structslot}{slot} $\ast$ \hyperlink{slot_8h_a89b21cb4eb3417d32e8af49de9cc2d67}{get\+\_\+adjacent\+\_\+slots} (struct \hyperlink{structslot}{slot} $\ast$adj, struct \hyperlink{structslot}{slot} s)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{slot_8h_a3622f4baa2b968eae227eb70747a2fe7}{}\label{slot_8h_a3622f4baa2b968eae227eb70747a2fe7} 
+\index{slot.\+h@{slot.\+h}!compare\+\_\+slot\+\_\+positions@{compare\+\_\+slot\+\_\+positions}}
+\index{compare\+\_\+slot\+\_\+positions@{compare\+\_\+slot\+\_\+positions}!slot.\+h@{slot.\+h}}
+\subsubsection{\texorpdfstring{compare\+\_\+slot\+\_\+positions()}{compare\_slot\_positions()}}
+{\footnotesize\ttfamily int compare\+\_\+slot\+\_\+positions (\begin{DoxyParamCaption}\item[{struct \hyperlink{structslot}{slot}}]{a,  }\item[{struct \hyperlink{structslot}{slot}}]{b }\end{DoxyParamCaption})}
+
+Compare the positions (x,y coordinates) of two, adjacent slots. 
+\begin{DoxyParams}{Parameters}
+{\em a} & First slot. \\
+\hline
+{\em b} & Second slot. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+negative value if {\itshape a} is to the left of or above {\itshape b}, 0 if {\itshape a} and {\itshape b} are the same slot, or a positive value if {\itshape a} is to the right of or above {\itshape b}.
+\end{DoxyReturn}
+Returns the relative position of {\itshape a} to {\itshape b}; x position takes precedence over y position. If {\itshape a} comes before {\itshape b}, -\/1 is returned. If {\itshape a} is the same position as {\itshape b}, 0 is returned. If {\itshape a} comes after {\itshape b}, 1 is returned. \hypertarget{slot_8h_a89b21cb4eb3417d32e8af49de9cc2d67}{}\label{slot_8h_a89b21cb4eb3417d32e8af49de9cc2d67} 
+\index{slot.\+h@{slot.\+h}!get\+\_\+adjacent\+\_\+slots@{get\+\_\+adjacent\+\_\+slots}}
+\index{get\+\_\+adjacent\+\_\+slots@{get\+\_\+adjacent\+\_\+slots}!slot.\+h@{slot.\+h}}
+\subsubsection{\texorpdfstring{get\+\_\+adjacent\+\_\+slots()}{get\_adjacent\_slots()}}
+{\footnotesize\ttfamily struct \hyperlink{structslot}{slot}$\ast$ get\+\_\+adjacent\+\_\+slots (\begin{DoxyParamCaption}\item[{struct \hyperlink{structslot}{slot} $\ast$}]{adj,  }\item[{struct \hyperlink{structslot}{slot}}]{s }\end{DoxyParamCaption})}
+
+Get all slots adjacent to the input slot. 
+\begin{DoxyParams}{Parameters}
+{\em adj} & slot pointer to hold the adjacent slots. \\
+\hline
+{\em s} & The slot for which the the adjacent slots are found. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An array of the 4 slots adjacent to the input slot. 0 for above, 1 for right, 2 for below, 3 for left.
+\end{DoxyReturn}
+Fetches the slots adjacent to the given slot and stores them into {\itshape adj} in the order of top, right, bottom, left.
+
+\begin{DoxyReturn}{Returns}
+{\itshape adj}  {\itshape adj} is an array of at least length 4 to store all adjacent slots. 
+\end{DoxyReturn}
+\hypertarget{slot_8h_af7606e8e30c230933e2827c6afb768e7}{}\label{slot_8h_af7606e8e30c230933e2827c6afb768e7} 
+\index{slot.\+h@{slot.\+h}!make\+\_\+slot@{make\+\_\+slot}}
+\index{make\+\_\+slot@{make\+\_\+slot}!slot.\+h@{slot.\+h}}
+\subsubsection{\texorpdfstring{make\+\_\+slot()}{make\_slot()}}
+{\footnotesize\ttfamily struct \hyperlink{structslot}{slot} make\+\_\+slot (\begin{DoxyParamCaption}\item[{unsigned int}]{x,  }\item[{unsigned int}]{y }\end{DoxyParamCaption})}
+
+Make a slot struct. 
+\begin{DoxyParams}{Parameters}
+{\em x} & The x coordinate \\
+\hline
+{\em y} & The y coordinate. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The created slot struct. 
+\end{DoxyReturn}

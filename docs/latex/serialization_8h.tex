@@ -1,0 +1,106 @@
+\hypertarget{serialization_8h}{}\section{serialization.\+h File Reference}
+\label{serialization_8h}\index{serialization.\+h@{serialization.\+h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}edge.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}tile.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}move.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}limits.\+h\char`\"{}}\newline
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{serialization_8h_ac970ebf2dd4dc04b5c498609baf6df27}{}\label{serialization_8h_ac970ebf2dd4dc04b5c498609baf6df27} 
+\#define {\bfseries T\+I\+L\+E\+\_\+\+SZ}~6		/$\ast$ 1 byte per \hyperlink{edge_8h_a4ef43ff5c6d42dacbc8ffd9c8cfdc189}{edge} + ceneter + \hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21d}{attribute} $\ast$/
+\item 
+\hypertarget{serialization_8h_a980895674b9c0e2e8e3bf1919834b0c1}{}\label{serialization_8h_a980895674b9c0e2e8e3bf1919834b0c1} 
+\#define {\bfseries M\+O\+V\+E\+\_\+\+SZ}~T\+I\+L\+E\+\_\+\+SZ + 5	/$\ast$ +1 for x, y, rotation, tiger \& crocodile $\ast$/
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+uint8\+\_\+t $\ast$ \hyperlink{serialization_8h_a7c47bbca9564e5b9d94e032918c316c1}{serialize\+\_\+tile} (struct \hyperlink{structtile}{tile} t, uint8\+\_\+t $\ast$buf)
+\item 
+struct \hyperlink{structtile}{tile} \hyperlink{serialization_8h_a31109af5fd277ad2ed2d971235bcd7bb}{deserialize\+\_\+tile} (uint8\+\_\+t buf\mbox{[}T\+I\+L\+E\+\_\+\+SZ\mbox{]})
+\item 
+uint8\+\_\+t $\ast$ \hyperlink{serialization_8h_ae8f1835fdac32d3241aeb43b0a2133a0}{serialize\+\_\+move} (struct \hyperlink{structmove}{move} m, uint8\+\_\+t $\ast$buf)
+\item 
+struct \hyperlink{structmove}{move} \hyperlink{serialization_8h_a9bae28c09768e9210e48f91df8b3983a}{deserialize\+\_\+move} (uint8\+\_\+t buf\mbox{[}M\+O\+V\+E\+\_\+\+SZ\mbox{]})
+\item 
+void \hyperlink{serialization_8h_a7c744e6ace0cd64c53271322d54fa799}{print\+\_\+buffer} (uint8\+\_\+t $\ast$buf, size\+\_\+t len)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{serialization_8h_a9bae28c09768e9210e48f91df8b3983a}{}\label{serialization_8h_a9bae28c09768e9210e48f91df8b3983a} 
+\index{serialization.\+h@{serialization.\+h}!deserialize\+\_\+move@{deserialize\+\_\+move}}
+\index{deserialize\+\_\+move@{deserialize\+\_\+move}!serialization.\+h@{serialization.\+h}}
+\subsubsection{\texorpdfstring{deserialize\+\_\+move()}{deserialize\_move()}}
+{\footnotesize\ttfamily struct \hyperlink{structmove}{move} deserialize\+\_\+move (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{buf\mbox{[}\+M\+O\+V\+E\+\_\+\+S\+Z\mbox{]} }\end{DoxyParamCaption})}
+
+Convert serialized move received over network transfer into regular move struct. 
+\begin{DoxyParams}{Parameters}
+{\em buf} & The buffer which holds the serialized move. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+move struct. 
+\end{DoxyReturn}
+\hypertarget{serialization_8h_a31109af5fd277ad2ed2d971235bcd7bb}{}\label{serialization_8h_a31109af5fd277ad2ed2d971235bcd7bb} 
+\index{serialization.\+h@{serialization.\+h}!deserialize\+\_\+tile@{deserialize\+\_\+tile}}
+\index{deserialize\+\_\+tile@{deserialize\+\_\+tile}!serialization.\+h@{serialization.\+h}}
+\subsubsection{\texorpdfstring{deserialize\+\_\+tile()}{deserialize\_tile()}}
+{\footnotesize\ttfamily struct \hyperlink{structtile}{tile} deserialize\+\_\+tile (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{buf\mbox{[}\+T\+I\+L\+E\+\_\+\+S\+Z\mbox{]} }\end{DoxyParamCaption})}
+
+Convert serialized tile received over network transfer into regular tile struct. 
+\begin{DoxyParams}{Parameters}
+{\em buf} & The buffer which holds the serialized tile. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+tile struct. 
+\end{DoxyReturn}
+\hypertarget{serialization_8h_a7c744e6ace0cd64c53271322d54fa799}{}\label{serialization_8h_a7c744e6ace0cd64c53271322d54fa799} 
+\index{serialization.\+h@{serialization.\+h}!print\+\_\+buffer@{print\+\_\+buffer}}
+\index{print\+\_\+buffer@{print\+\_\+buffer}!serialization.\+h@{serialization.\+h}}
+\subsubsection{\texorpdfstring{print\+\_\+buffer()}{print\_buffer()}}
+{\footnotesize\ttfamily void print\+\_\+buffer (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{buf,  }\item[{size\+\_\+t}]{len }\end{DoxyParamCaption})}
+
+Print a buffer containing a byte array used for network transfer 
+\begin{DoxyParams}{Parameters}
+{\em buf} & The buffer to be printed. \\
+\hline
+{\em len} & The length of the buffer. \\
+\hline
+\end{DoxyParams}
+\hypertarget{serialization_8h_ae8f1835fdac32d3241aeb43b0a2133a0}{}\label{serialization_8h_ae8f1835fdac32d3241aeb43b0a2133a0} 
+\index{serialization.\+h@{serialization.\+h}!serialize\+\_\+move@{serialize\+\_\+move}}
+\index{serialize\+\_\+move@{serialize\+\_\+move}!serialization.\+h@{serialization.\+h}}
+\subsubsection{\texorpdfstring{serialize\+\_\+move()}{serialize\_move()}}
+{\footnotesize\ttfamily uint8\+\_\+t$\ast$ serialize\+\_\+move (\begin{DoxyParamCaption}\item[{struct \hyperlink{structmove}{move}}]{m,  }\item[{uint8\+\_\+t $\ast$}]{buf }\end{DoxyParamCaption})}
+
+Convert move struct into byte array for network transfer. 
+\begin{DoxyParams}{Parameters}
+{\em m} & The move to be serialized. \\
+\hline
+{\em buf} & The buffer which holds the serialized move. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A reference to the buffer containing the serialized tile. 
+\end{DoxyReturn}
+\hypertarget{serialization_8h_a7c47bbca9564e5b9d94e032918c316c1}{}\label{serialization_8h_a7c47bbca9564e5b9d94e032918c316c1} 
+\index{serialization.\+h@{serialization.\+h}!serialize\+\_\+tile@{serialize\+\_\+tile}}
+\index{serialize\+\_\+tile@{serialize\+\_\+tile}!serialization.\+h@{serialization.\+h}}
+\subsubsection{\texorpdfstring{serialize\+\_\+tile()}{serialize\_tile()}}
+{\footnotesize\ttfamily uint8\+\_\+t$\ast$ serialize\+\_\+tile (\begin{DoxyParamCaption}\item[{struct \hyperlink{structtile}{tile}}]{t,  }\item[{uint8\+\_\+t $\ast$}]{buf }\end{DoxyParamCaption})}
+
+Convert tile struct into byte array for network transfer 
+\begin{DoxyParams}{Parameters}
+{\em t} & The tile to be serialized. \\
+\hline
+{\em buf} & The buffer which holds the serialized tile. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A reference to the buffer containing the serialized tile. 
+\end{DoxyReturn}

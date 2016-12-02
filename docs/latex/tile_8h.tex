@@ -1,0 +1,175 @@
+\hypertarget{tile_8h}{}\section{tile.\+h File Reference}
+\label{tile_8h}\index{tile.\+h@{tile.\+h}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}edge.\+h\char`\"{}}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structtile}{tile}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{tile_8h_a05d9d9b694044dd1207ec7940fad2ac0}{}\label{tile_8h_a05d9d9b694044dd1207ec7940fad2ac0} 
+\#define {\bfseries T\+I\+L\+E\+\_\+\+L\+I\+N\+E\+\_\+\+L\+EN}~4
+\item 
+\hypertarget{tile_8h_ad6a1d1f79c77a0d8fbeb1ca198064694}{}\label{tile_8h_ad6a1d1f79c77a0d8fbeb1ca198064694} 
+\#define {\bfseries T\+I\+L\+E\+\_\+\+L\+I\+N\+ES}~3
+\item 
+\hypertarget{tile_8h_abcef8203a5d63d217f2eee1303fb4b16}{}\label{tile_8h_abcef8203a5d63d217f2eee1303fb4b16} 
+\#define {\bfseries T\+I\+L\+E\+\_\+\+L\+EN}~T\+I\+L\+E\+\_\+\+L\+I\+N\+E\+\_\+\+L\+EN $\ast$ T\+I\+L\+E\+\_\+\+L\+I\+N\+ES + 1 /$\ast$ Null terminator $\ast$/
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21d}{attribute} \{ \newline
+\hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21dac157bdf0b85a40d2619cbc8bc1ae5fe2}{N\+O\+NE} = 0, 
+\hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21dacf6127f21e5f8886eba18746b66aaa9a}{B\+U\+F\+F\+A\+LO} = 1, 
+\hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21da6d94894825f83a1d5099ac9f7dae65a1}{D\+EN} = 2, 
+\hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21dacdc0be410a77abe9d1b374efb51acd96}{C\+R\+O\+C\+O\+D\+I\+LE} = 3, 
+\newline
+\hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21daf88dbac386aeff6ab8a3ce77f8e7dd5e}{D\+E\+ER} = 4, 
+\hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21da19b22f937cc1c29d19cd4bb1dcdaa177}{B\+O\+AR} = 5
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{tile_8h_a709cffc197e05a3c795d446f4952a84c}{is\+\_\+tile\+\_\+equal} (struct \hyperlink{structtile}{tile} a, struct \hyperlink{structtile}{tile} b)
+\item 
+struct \hyperlink{structtile}{tile} \hyperlink{tile_8h_a75b64753b0b6c510e26322b916c75e21}{make\+\_\+tile} (const enum \hyperlink{edge_8h_a4ef43ff5c6d42dacbc8ffd9c8cfdc189}{edge} edges\mbox{[}5\mbox{]}, enum \hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21d}{attribute} a)
+\item 
+struct \hyperlink{structtile}{tile} \hyperlink{tile_8h_a91f6fbdca470dd2783b9f61985c5c265}{rotate\+\_\+tile} (const struct \hyperlink{structtile}{tile} old, const int rotation)
+\item 
+char $\ast$ \hyperlink{tile_8h_a087367fcfbe8b6fa8dbed414705dccca}{print\+\_\+tile} (struct \hyperlink{structtile}{tile} t, char b\mbox{[}T\+I\+L\+E\+\_\+\+L\+EN\mbox{]})
+\item 
+void \hyperlink{tile_8h_a022be190f325686893b53422f55be6ee}{init\+\_\+adj} (const struct \hyperlink{structtile}{tile} t, int adj\mbox{[}12 $\ast$12\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{tile_8h_a8f0c280065ea816a46055979fae1d21d}{}\label{tile_8h_a8f0c280065ea816a46055979fae1d21d} 
+\index{tile.\+h@{tile.\+h}!attribute@{attribute}}
+\index{attribute@{attribute}!tile.\+h@{tile.\+h}}
+\subsubsection{\texorpdfstring{attribute}{attribute}}
+{\footnotesize\ttfamily enum \hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21d}{attribute}}
+
+Enumeration representing the non-\/feature tile attributes. \begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{N\+O\+NE@{N\+O\+NE}!tile.\+h@{tile.\+h}}\index{tile.\+h@{tile.\+h}!N\+O\+NE@{N\+O\+NE}}}\hypertarget{tile_8h_a8f0c280065ea816a46055979fae1d21dac157bdf0b85a40d2619cbc8bc1ae5fe2}{}\label{tile_8h_a8f0c280065ea816a46055979fae1d21dac157bdf0b85a40d2619cbc8bc1ae5fe2} 
+N\+O\+NE&No attribute \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{B\+U\+F\+F\+A\+LO@{B\+U\+F\+F\+A\+LO}!tile.\+h@{tile.\+h}}\index{tile.\+h@{tile.\+h}!B\+U\+F\+F\+A\+LO@{B\+U\+F\+F\+A\+LO}}}\hypertarget{tile_8h_a8f0c280065ea816a46055979fae1d21dacf6127f21e5f8886eba18746b66aaa9a}{}\label{tile_8h_a8f0c280065ea816a46055979fae1d21dacf6127f21e5f8886eba18746b66aaa9a} 
+B\+U\+F\+F\+A\+LO&A buffalo \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{D\+EN@{D\+EN}!tile.\+h@{tile.\+h}}\index{tile.\+h@{tile.\+h}!D\+EN@{D\+EN}}}\hypertarget{tile_8h_a8f0c280065ea816a46055979fae1d21da6d94894825f83a1d5099ac9f7dae65a1}{}\label{tile_8h_a8f0c280065ea816a46055979fae1d21da6d94894825f83a1d5099ac9f7dae65a1} 
+D\+EN&A den \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{C\+R\+O\+C\+O\+D\+I\+LE@{C\+R\+O\+C\+O\+D\+I\+LE}!tile.\+h@{tile.\+h}}\index{tile.\+h@{tile.\+h}!C\+R\+O\+C\+O\+D\+I\+LE@{C\+R\+O\+C\+O\+D\+I\+LE}}}\hypertarget{tile_8h_a8f0c280065ea816a46055979fae1d21dacdc0be410a77abe9d1b374efb51acd96}{}\label{tile_8h_a8f0c280065ea816a46055979fae1d21dacdc0be410a77abe9d1b374efb51acd96} 
+C\+R\+O\+C\+O\+D\+I\+LE&A crocodile \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{D\+E\+ER@{D\+E\+ER}!tile.\+h@{tile.\+h}}\index{tile.\+h@{tile.\+h}!D\+E\+ER@{D\+E\+ER}}}\hypertarget{tile_8h_a8f0c280065ea816a46055979fae1d21daf88dbac386aeff6ab8a3ce77f8e7dd5e}{}\label{tile_8h_a8f0c280065ea816a46055979fae1d21daf88dbac386aeff6ab8a3ce77f8e7dd5e} 
+D\+E\+ER&A deer \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{B\+O\+AR@{B\+O\+AR}!tile.\+h@{tile.\+h}}\index{tile.\+h@{tile.\+h}!B\+O\+AR@{B\+O\+AR}}}\hypertarget{tile_8h_a8f0c280065ea816a46055979fae1d21da19b22f937cc1c29d19cd4bb1dcdaa177}{}\label{tile_8h_a8f0c280065ea816a46055979fae1d21da19b22f937cc1c29d19cd4bb1dcdaa177} 
+B\+O\+AR&A boar \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\hypertarget{tile_8h_a022be190f325686893b53422f55be6ee}{}\label{tile_8h_a022be190f325686893b53422f55be6ee} 
+\index{tile.\+h@{tile.\+h}!init\+\_\+adj@{init\+\_\+adj}}
+\index{init\+\_\+adj@{init\+\_\+adj}!tile.\+h@{tile.\+h}}
+\subsubsection{\texorpdfstring{init\+\_\+adj()}{init\_adj()}}
+{\footnotesize\ttfamily void init\+\_\+adj (\begin{DoxyParamCaption}\item[{const struct \hyperlink{structtile}{tile}}]{t,  }\item[{int}]{adj\mbox{[}12 $\ast$12\mbox{]} }\end{DoxyParamCaption})}
+
+Initialize the tile\textquotesingle{}s adjacency matrix. 
+\begin{DoxyParams}{Parameters}
+{\em t} & Tile for which the adjacency matrix will be created. \\
+\hline
+{\em adj} & The adjaceny matrix. \\
+\hline
+\end{DoxyParams}
+\hypertarget{tile_8h_a709cffc197e05a3c795d446f4952a84c}{}\label{tile_8h_a709cffc197e05a3c795d446f4952a84c} 
+\index{tile.\+h@{tile.\+h}!is\+\_\+tile\+\_\+equal@{is\+\_\+tile\+\_\+equal}}
+\index{is\+\_\+tile\+\_\+equal@{is\+\_\+tile\+\_\+equal}!tile.\+h@{tile.\+h}}
+\subsubsection{\texorpdfstring{is\+\_\+tile\+\_\+equal()}{is\_tile\_equal()}}
+{\footnotesize\ttfamily bool is\+\_\+tile\+\_\+equal (\begin{DoxyParamCaption}\item[{struct \hyperlink{structtile}{tile}}]{a,  }\item[{struct \hyperlink{structtile}{tile}}]{b }\end{DoxyParamCaption})}
+
+Compare two tiles, and see if they are the same type. 
+\begin{DoxyParams}{Parameters}
+{\em a} & First tile. \\
+\hline
+{\em b} & Second tile. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True the tiles are the same, and false if they are different. 
+\end{DoxyReturn}
+\hypertarget{tile_8h_a75b64753b0b6c510e26322b916c75e21}{}\label{tile_8h_a75b64753b0b6c510e26322b916c75e21} 
+\index{tile.\+h@{tile.\+h}!make\+\_\+tile@{make\+\_\+tile}}
+\index{make\+\_\+tile@{make\+\_\+tile}!tile.\+h@{tile.\+h}}
+\subsubsection{\texorpdfstring{make\+\_\+tile()}{make\_tile()}}
+{\footnotesize\ttfamily struct \hyperlink{structtile}{tile} make\+\_\+tile (\begin{DoxyParamCaption}\item[{const enum \hyperlink{edge_8h_a4ef43ff5c6d42dacbc8ffd9c8cfdc189}{edge}}]{edges\mbox{[}5\mbox{]},  }\item[{enum \hyperlink{tile_8h_a8f0c280065ea816a46055979fae1d21d}{attribute}}]{a }\end{DoxyParamCaption})}
+
+Create a tile struct. 
+\begin{DoxyParams}{Parameters}
+{\em edges} & The features on the tile. \\
+\hline
+{\em a} & The attribute on the tile. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A tile struct. 
+\end{DoxyReturn}
+\hypertarget{tile_8h_a087367fcfbe8b6fa8dbed414705dccca}{}\label{tile_8h_a087367fcfbe8b6fa8dbed414705dccca} 
+\index{tile.\+h@{tile.\+h}!print\+\_\+tile@{print\+\_\+tile}}
+\index{print\+\_\+tile@{print\+\_\+tile}!tile.\+h@{tile.\+h}}
+\subsubsection{\texorpdfstring{print\+\_\+tile()}{print\_tile()}}
+{\footnotesize\ttfamily char$\ast$ print\+\_\+tile (\begin{DoxyParamCaption}\item[{struct \hyperlink{structtile}{tile}}]{t,  }\item[{char}]{b\mbox{[}\+T\+I\+L\+E\+\_\+\+L\+E\+N\mbox{]} }\end{DoxyParamCaption})}
+
+Fill an array with the character representation of a tile. 
+\begin{DoxyParams}{Parameters}
+{\em t} & The tile to be printed. \\
+\hline
+{\em b} & Array to hold the character representation of a tile. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Array holding the character representation of a tile. 
+\end{DoxyReturn}
+\hypertarget{tile_8h_a91f6fbdca470dd2783b9f61985c5c265}{}\label{tile_8h_a91f6fbdca470dd2783b9f61985c5c265} 
+\index{tile.\+h@{tile.\+h}!rotate\+\_\+tile@{rotate\+\_\+tile}}
+\index{rotate\+\_\+tile@{rotate\+\_\+tile}!tile.\+h@{tile.\+h}}
+\subsubsection{\texorpdfstring{rotate\+\_\+tile()}{rotate\_tile()}}
+{\footnotesize\ttfamily struct \hyperlink{structtile}{tile} rotate\+\_\+tile (\begin{DoxyParamCaption}\item[{const struct \hyperlink{structtile}{tile}}]{old,  }\item[{const int}]{rotation }\end{DoxyParamCaption})}
+
+Rotate a tile clockwise by a certain number of 90 degree increments, swapping entries in the edges array as needed. 
+\begin{DoxyParams}{Parameters}
+{\em old} & The tile to be rotated. \\
+\hline
+{\em rotation} & The number of 90 degree clockwise rotations to perform \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Rotated tile struct.
+\end{DoxyReturn}
+
+\begin{DoxyParams}{Parameters}
+{\em old} & Tile to rotate \\
+\hline
+{\em int} & Number of clockwise 90 degree rotations to perform \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Rotated tile 
+\end{DoxyReturn}

@@ -1,0 +1,189 @@
+\hypertarget{game_8h}{}\section{game.\+h File Reference}
+\label{game_8h}\index{game.\+h@{game.\+h}}
+{\ttfamily \#include $<$sys/time.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$stddef.\+h$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$pthread.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}limits.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}tile.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}board.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}feature.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}rngs/mt19937-\/64.\+h\char`\"{}}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structgame}{game}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{game_8h_a78c99ffd76a7bb3c8c74db76207e9ab4}{}\label{game_8h_a78c99ffd76a7bb3c8c74db76207e9ab4} 
+\#define {\bfseries \+\_\+\+X\+O\+P\+E\+N\+\_\+\+S\+O\+U\+R\+CE}~500
+\item 
+\hypertarget{game_8h_a861a5b771a0c36aaf384e29c12d945e0}{}\label{game_8h_a861a5b771a0c36aaf384e29c12d945e0} 
+\#define {\bfseries M\+E\+E\+P\+L\+E\+\_\+\+C\+O\+U\+NT}~7
+\item 
+\hypertarget{game_8h_a32891a27e1e7f56c9722edef5c2c7eba}{}\label{game_8h_a32891a27e1e7f56c9722edef5c2c7eba} 
+\#define {\bfseries P\+L\+A\+Y\+E\+R\+\_\+\+C\+O\+U\+NT}~2
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{game_8h_a9a1d9bac4f47e02f125c87e1e233fdd7}{calculate\+\_\+scores} (struct \hyperlink{structgame}{game} $\ast$g)
+\item 
+void \hyperlink{game_8h_a9627f2c2cf6180a60e8ac736c2c78d0c}{make\+\_\+game} (struct \hyperlink{structgame}{game} $\ast$g)
+\item 
+void \hyperlink{game_8h_a9c6436c54b8d60adbf3d9c0471dd8072}{free\+\_\+game} (struct \hyperlink{structgame}{game} $\ast$g)
+\item 
+void \hyperlink{game_8h_ae22b3a90e54c7a8fc0a6e104eff87381}{set\+\_\+game\+\_\+deck} (struct \hyperlink{structgame}{game} $\ast$g, struct \hyperlink{structtile}{tile} $\ast$deck)
+\item 
+int \hyperlink{game_8h_a40654055aa93af9f7d9c79e5cf310dc1}{play\+\_\+move} (struct \hyperlink{structgame}{game} $\ast$g, struct \hyperlink{structmove}{move} m, int player)
+\item 
+int \hyperlink{game_8h_a3679474a985dcc76b2d7e5f6b41f4b7e}{is\+\_\+move\+\_\+valid} (struct \hyperlink{structgame}{game} $\ast$g, struct \hyperlink{structmove}{move} m, int player)
+\item 
+bool \hyperlink{game_8h_ae794cf2bc7e85e130c91dfde7b3ebcd7}{is\+\_\+tile\+\_\+deck\+\_\+empty} (struct \hyperlink{structgame}{game} $\ast$g)
+\item 
+struct \hyperlink{structtile}{tile} \hyperlink{game_8h_a642c57bca0f579cfb94c9eabe579f426}{deal\+\_\+tile} (struct \hyperlink{structgame}{game} $\ast$g)
+\item 
+void \hyperlink{game_8h_a7cbede755102a500d0e2378dced20714}{generate\+\_\+available\+\_\+moves} (struct \hyperlink{structgame}{game} $\ast$g, int player, struct \hyperlink{structtile}{tile} t, struct \hyperlink{structmove}{move} $\ast$pmoves, size\+\_\+t $\ast$pmoves\+\_\+len)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{game_8h_a9a1d9bac4f47e02f125c87e1e233fdd7}{}\label{game_8h_a9a1d9bac4f47e02f125c87e1e233fdd7} 
+\index{game.\+h@{game.\+h}!calculate\+\_\+scores@{calculate\+\_\+scores}}
+\index{calculate\+\_\+scores@{calculate\+\_\+scores}!game.\+h@{game.\+h}}
+\subsubsection{\texorpdfstring{calculate\+\_\+scores()}{calculate\_scores()}}
+{\footnotesize\ttfamily void calculate\+\_\+scores (\begin{DoxyParamCaption}\item[{struct \hyperlink{structgame}{game} $\ast$}]{g }\end{DoxyParamCaption})}
+
+Calculate and update the scores of each player. 
+\begin{DoxyParams}{Parameters}
+{\em g} & The game state struct. \\
+\hline
+\end{DoxyParams}
+\hypertarget{game_8h_a642c57bca0f579cfb94c9eabe579f426}{}\label{game_8h_a642c57bca0f579cfb94c9eabe579f426} 
+\index{game.\+h@{game.\+h}!deal\+\_\+tile@{deal\+\_\+tile}}
+\index{deal\+\_\+tile@{deal\+\_\+tile}!game.\+h@{game.\+h}}
+\subsubsection{\texorpdfstring{deal\+\_\+tile()}{deal\_tile()}}
+{\footnotesize\ttfamily struct \hyperlink{structtile}{tile} deal\+\_\+tile (\begin{DoxyParamCaption}\item[{struct \hyperlink{structgame}{game} $\ast$}]{g }\end{DoxyParamCaption})}
+
+Draw a tile from the {\itshape tile\+\_\+deck}. 
+\begin{DoxyParams}{Parameters}
+{\em g} & The game struct. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The drawn tile.
+\end{DoxyReturn}
+Returns the next tile from the given game\textquotesingle{}s tile\+\_\+deck \hypertarget{game_8h_a9c6436c54b8d60adbf3d9c0471dd8072}{}\label{game_8h_a9c6436c54b8d60adbf3d9c0471dd8072} 
+\index{game.\+h@{game.\+h}!free\+\_\+game@{free\+\_\+game}}
+\index{free\+\_\+game@{free\+\_\+game}!game.\+h@{game.\+h}}
+\subsubsection{\texorpdfstring{free\+\_\+game()}{free\_game()}}
+{\footnotesize\ttfamily void free\+\_\+game (\begin{DoxyParamCaption}\item[{struct \hyperlink{structgame}{game} $\ast$}]{g }\end{DoxyParamCaption})}
+
+Free up space taken by game. 
+\begin{DoxyParams}{Parameters}
+{\em g} & The game state struct. \\
+\hline
+\end{DoxyParams}
+\hypertarget{game_8h_a7cbede755102a500d0e2378dced20714}{}\label{game_8h_a7cbede755102a500d0e2378dced20714} 
+\index{game.\+h@{game.\+h}!generate\+\_\+available\+\_\+moves@{generate\+\_\+available\+\_\+moves}}
+\index{generate\+\_\+available\+\_\+moves@{generate\+\_\+available\+\_\+moves}!game.\+h@{game.\+h}}
+\subsubsection{\texorpdfstring{generate\+\_\+available\+\_\+moves()}{generate\_available\_moves()}}
+{\footnotesize\ttfamily void generate\+\_\+available\+\_\+moves (\begin{DoxyParamCaption}\item[{struct \hyperlink{structgame}{game} $\ast$}]{g,  }\item[{int}]{player,  }\item[{struct \hyperlink{structtile}{tile}}]{t,  }\item[{struct \hyperlink{structmove}{move} $\ast$}]{pmoves,  }\item[{size\+\_\+t $\ast$}]{pmoves\+\_\+len }\end{DoxyParamCaption})}
+
+For the given tile, find all possible moves given the game\textquotesingle{}s current state. 
+\begin{DoxyParams}{Parameters}
+{\em g} & The game struct. \\
+\hline
+{\em player} & The currently active player. \\
+\hline
+{\em t} & The tile to be played. \\
+\hline
+{\em pmoves} & Array to be filled with all possible moves. \\
+\hline
+{\em pmoves\+\_\+len} & The maximum number of moves that can be made. \\
+\hline
+\end{DoxyParams}
+\hypertarget{game_8h_a3679474a985dcc76b2d7e5f6b41f4b7e}{}\label{game_8h_a3679474a985dcc76b2d7e5f6b41f4b7e} 
+\index{game.\+h@{game.\+h}!is\+\_\+move\+\_\+valid@{is\+\_\+move\+\_\+valid}}
+\index{is\+\_\+move\+\_\+valid@{is\+\_\+move\+\_\+valid}!game.\+h@{game.\+h}}
+\subsubsection{\texorpdfstring{is\+\_\+move\+\_\+valid()}{is\_move\_valid()}}
+{\footnotesize\ttfamily int is\+\_\+move\+\_\+valid (\begin{DoxyParamCaption}\item[{struct \hyperlink{structgame}{game} $\ast$}]{g,  }\item[{struct \hyperlink{structmove}{move}}]{m,  }\item[{int}]{player }\end{DoxyParamCaption})}
+
+Check if the current move is valid. 
+\begin{DoxyParams}{Parameters}
+{\em g} & The game struct. \\
+\hline
+{\em m} & The move to be played. \\
+\hline
+{\em player} & The player making the move. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if the move is valid, game\+\_\+error\+\_\+code error code if the move is invalid. 
+\end{DoxyReturn}
+\hypertarget{game_8h_ae794cf2bc7e85e130c91dfde7b3ebcd7}{}\label{game_8h_ae794cf2bc7e85e130c91dfde7b3ebcd7} 
+\index{game.\+h@{game.\+h}!is\+\_\+tile\+\_\+deck\+\_\+empty@{is\+\_\+tile\+\_\+deck\+\_\+empty}}
+\index{is\+\_\+tile\+\_\+deck\+\_\+empty@{is\+\_\+tile\+\_\+deck\+\_\+empty}!game.\+h@{game.\+h}}
+\subsubsection{\texorpdfstring{is\+\_\+tile\+\_\+deck\+\_\+empty()}{is\_tile\_deck\_empty()}}
+{\footnotesize\ttfamily bool is\+\_\+tile\+\_\+deck\+\_\+empty (\begin{DoxyParamCaption}\item[{struct \hyperlink{structgame}{game} $\ast$}]{g }\end{DoxyParamCaption})}
+
+Check if the {\itshape tile\+\_\+deck} is empty. 
+\begin{DoxyParams}{Parameters}
+{\em g} & The game struct \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+T\+R\+UE if the {\itshape tile\+\_\+deck} is empty, F\+A\+L\+SE if it is not.
+\end{DoxyReturn}
+Returns whether the number of tiles dealt for the given game exceeds {\itshape T\+I\+L\+E\+\_\+\+C\+O\+U\+NT}.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{game_8h}{game.\+h}\+: T\+I\+L\+E\+\_\+\+C\+O\+U\+NT 
+\end{DoxySeeAlso}
+\hypertarget{game_8h_a9627f2c2cf6180a60e8ac736c2c78d0c}{}\label{game_8h_a9627f2c2cf6180a60e8ac736c2c78d0c} 
+\index{game.\+h@{game.\+h}!make\+\_\+game@{make\+\_\+game}}
+\index{make\+\_\+game@{make\+\_\+game}!game.\+h@{game.\+h}}
+\subsubsection{\texorpdfstring{make\+\_\+game()}{make\_game()}}
+{\footnotesize\ttfamily void make\+\_\+game (\begin{DoxyParamCaption}\item[{struct \hyperlink{structgame}{game} $\ast$}]{g }\end{DoxyParamCaption})}
+
+Create the game. 
+\begin{DoxyParams}{Parameters}
+{\em g} & The game state struct.\\
+\hline
+\end{DoxyParams}
+Initialises the given game. \hypertarget{game_8h_a40654055aa93af9f7d9c79e5cf310dc1}{}\label{game_8h_a40654055aa93af9f7d9c79e5cf310dc1} 
+\index{game.\+h@{game.\+h}!play\+\_\+move@{play\+\_\+move}}
+\index{play\+\_\+move@{play\+\_\+move}!game.\+h@{game.\+h}}
+\subsubsection{\texorpdfstring{play\+\_\+move()}{play\_move()}}
+{\footnotesize\ttfamily int play\+\_\+move (\begin{DoxyParamCaption}\item[{struct \hyperlink{structgame}{game} $\ast$}]{g,  }\item[{struct \hyperlink{structmove}{move}}]{m,  }\item[{int}]{player }\end{DoxyParamCaption})}
+
+Play the current move for the currently active player. 
+\begin{DoxyParams}{Parameters}
+{\em g} & The game struct. \\
+\hline
+{\em m} & The move to be played. \\
+\hline
+{\em player} & The player making the move. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if the move was able to be played, game\+\_\+error\+\_\+code error code if the move is invalid.
+\end{DoxyReturn}
+Tries to play the given move by the player on the given game. \hypertarget{game_8h_ae22b3a90e54c7a8fc0a6e104eff87381}{}\label{game_8h_ae22b3a90e54c7a8fc0a6e104eff87381} 
+\index{game.\+h@{game.\+h}!set\+\_\+game\+\_\+deck@{set\+\_\+game\+\_\+deck}}
+\index{set\+\_\+game\+\_\+deck@{set\+\_\+game\+\_\+deck}!game.\+h@{game.\+h}}
+\subsubsection{\texorpdfstring{set\+\_\+game\+\_\+deck()}{set\_game\_deck()}}
+{\footnotesize\ttfamily void set\+\_\+game\+\_\+deck (\begin{DoxyParamCaption}\item[{struct \hyperlink{structgame}{game} $\ast$}]{g,  }\item[{struct \hyperlink{structtile}{tile} $\ast$}]{deck }\end{DoxyParamCaption})}
+
+Writes the given deck into the given game\textquotesingle{}s tile\+\_\+deck by deep copy. 
+\begin{DoxyParams}{Parameters}
+{\em g} & The game struct. \\
+\hline
+{\em deck} & The tile deck array to be written.\\
+\hline
+\end{DoxyParams}
+Writes the given deck into the given game\textquotesingle{}s tile\+\_\+deck by deep copy. 

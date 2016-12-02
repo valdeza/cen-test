@@ -1,0 +1,56 @@
+\hypertarget{move_8h}{}\section{move.\+h File Reference}
+\label{move_8h}\index{move.\+h@{move.\+h}}
+{\ttfamily \#include \char`\"{}tile.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}slot.\+h\char`\"{}}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structmove}{move}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{move_8h_a83268621e18b249919bda7f1f6a25afd}{game\+\_\+error\+\_\+code} \{ {\bfseries OK} = 0, 
+{\bfseries E\+\_\+\+T\+I\+L\+E\+\_\+\+N\+O\+T\+\_\+\+P\+L\+A\+C\+E\+A\+B\+LE} = 1, 
+{\bfseries E\+\_\+\+T\+I\+L\+E\+\_\+\+E\+D\+G\+E\+\_\+\+C\+O\+N\+F\+L\+I\+CT} = 2
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structmove}{move} \hyperlink{move_8h_a428e923face7ee8c158455126aac2470}{make\+\_\+move} (struct \hyperlink{structtile}{tile} t, struct \hyperlink{structslot}{slot} s, int rotation, int tcorner, int ccorner)
+\end{DoxyCompactItemize}
+
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{move_8h_a83268621e18b249919bda7f1f6a25afd}{}\label{move_8h_a83268621e18b249919bda7f1f6a25afd} 
+\index{move.\+h@{move.\+h}!game\+\_\+error\+\_\+code@{game\+\_\+error\+\_\+code}}
+\index{game\+\_\+error\+\_\+code@{game\+\_\+error\+\_\+code}!move.\+h@{move.\+h}}
+\subsubsection{\texorpdfstring{game\+\_\+error\+\_\+code}{game\_error\_code}}
+{\footnotesize\ttfamily enum \hyperlink{move_8h_a83268621e18b249919bda7f1f6a25afd}{game\+\_\+error\+\_\+code}}
+
+Error code enumeration. 
+
+\subsection{Function Documentation}
+\hypertarget{move_8h_a428e923face7ee8c158455126aac2470}{}\label{move_8h_a428e923face7ee8c158455126aac2470} 
+\index{move.\+h@{move.\+h}!make\+\_\+move@{make\+\_\+move}}
+\index{make\+\_\+move@{make\+\_\+move}!move.\+h@{move.\+h}}
+\subsubsection{\texorpdfstring{make\+\_\+move()}{make\_move()}}
+{\footnotesize\ttfamily struct \hyperlink{structmove}{move} make\+\_\+move (\begin{DoxyParamCaption}\item[{struct \hyperlink{structtile}{tile}}]{t,  }\item[{struct \hyperlink{structslot}{slot}}]{s,  }\item[{int}]{rotation,  }\item[{int}]{tcorner,  }\item[{int}]{ccorner }\end{DoxyParamCaption})}
+
+Creates and returns move struct. 
+\begin{DoxyParams}{Parameters}
+{\em t} & The tile to be placed. \\
+\hline
+{\em s} & The spot in which the tile will be placed. \\
+\hline
+{\em rotation} & The rotation state of the tile. \\
+\hline
+{\em tcorner} & The location of a tiger to be placed on the tile. \\
+\hline
+{\em ccorner} & The location of a crocodile to be placed on the tile. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The created move struct. 
+\end{DoxyReturn}

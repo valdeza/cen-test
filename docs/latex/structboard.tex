@@ -1,0 +1,55 @@
+\hypertarget{structboard}{}\section{board Struct Reference}
+\label{structboard}\index{board@{board}}
+
+
+{\ttfamily \#include $<$board.\+h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structtile}{tile} \hyperlink{structboard_a9a07d9c64ba17e22959b01a882af8f5a}{tiles} \mbox{[}A\+X\+IS $\ast$A\+X\+IS\mbox{]}
+\item 
+struct \hyperlink{structslot}{slot} \hyperlink{structboard_a0976bf1c9ed67dc54c53cd5e2bc004eb}{slot\+\_\+spots} \mbox{[}A\+X\+IS $\ast$A\+X\+IS\mbox{]}
+\item 
+unsigned int \hyperlink{structboard_a7bf16d3c2cc54954ec3d5b52c0012733}{empty\+\_\+slot\+\_\+count}
+\item 
+char \hyperlink{structboard_a2f3b2c9fbf94f113f8d0ca82f5e7c2a2}{column\+\_\+terminators} \mbox{[}A\+X\+IS\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Represents the playing board. \begin{DoxySeeAlso}{See also}
+\hyperlink{structtile}{tile}, \hyperlink{structslot}{slot} 
+\end{DoxySeeAlso}
+
+
+\subsection{Field Documentation}
+\hypertarget{structboard_a2f3b2c9fbf94f113f8d0ca82f5e7c2a2}{}\label{structboard_a2f3b2c9fbf94f113f8d0ca82f5e7c2a2} 
+\index{board@{board}!column\+\_\+terminators@{column\+\_\+terminators}}
+\index{column\+\_\+terminators@{column\+\_\+terminators}!board@{board}}
+\subsubsection{\texorpdfstring{column\+\_\+terminators}{column\_terminators}}
+{\footnotesize\ttfamily char column\+\_\+terminators\mbox{[}A\+X\+IS\mbox{]}}
+
+Represents the end of each column, for board printing. \hypertarget{structboard_a7bf16d3c2cc54954ec3d5b52c0012733}{}\label{structboard_a7bf16d3c2cc54954ec3d5b52c0012733} 
+\index{board@{board}!empty\+\_\+slot\+\_\+count@{empty\+\_\+slot\+\_\+count}}
+\index{empty\+\_\+slot\+\_\+count@{empty\+\_\+slot\+\_\+count}!board@{board}}
+\subsubsection{\texorpdfstring{empty\+\_\+slot\+\_\+count}{empty\_slot\_count}}
+{\footnotesize\ttfamily unsigned int empty\+\_\+slot\+\_\+count}
+
+The number of available slots on the board. \hypertarget{structboard_a0976bf1c9ed67dc54c53cd5e2bc004eb}{}\label{structboard_a0976bf1c9ed67dc54c53cd5e2bc004eb} 
+\index{board@{board}!slot\+\_\+spots@{slot\+\_\+spots}}
+\index{slot\+\_\+spots@{slot\+\_\+spots}!board@{board}}
+\subsubsection{\texorpdfstring{slot\+\_\+spots}{slot\_spots}}
+{\footnotesize\ttfamily struct \hyperlink{structslot}{slot} slot\+\_\+spots\mbox{[}A\+X\+IS $\ast$A\+X\+IS\mbox{]}}
+
+Array for holding all the slots on the board. \hypertarget{structboard_a9a07d9c64ba17e22959b01a882af8f5a}{}\label{structboard_a9a07d9c64ba17e22959b01a882af8f5a} 
+\index{board@{board}!tiles@{tiles}}
+\index{tiles@{tiles}!board@{board}}
+\subsubsection{\texorpdfstring{tiles}{tiles}}
+{\footnotesize\ttfamily struct \hyperlink{structtile}{tile} tiles\mbox{[}A\+X\+IS $\ast$A\+X\+IS\mbox{]}}
+
+Array for holding all the tiles placed on the board. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{board_8h}{board.\+h}\end{DoxyCompactItemize}

@@ -1,0 +1,74 @@
+\hypertarget{structfeature}{}\section{feature Struct Reference}
+\label{structfeature}\index{feature@{feature}}
+
+
+{\ttfamily \#include $<$feature.\+h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structfeature_a328665c5ee8f686f58b4e20c1c463316}{}\label{structfeature_a328665c5ee8f686f58b4e20c1c463316} 
+size\+\_\+t {\bfseries weighted\+\_\+size}
+\item 
+size\+\_\+t \hyperlink{structfeature_abd6f925fd40b726ddc078f75b30e8293}{tigers} \mbox{[}P\+L\+A\+Y\+E\+R\+\_\+\+C\+O\+U\+NT\mbox{]}
+\item 
+size\+\_\+t \hyperlink{structfeature_abc5d2874ef95d2e502eb4fb128115dcf}{crocodiles} \mbox{[}P\+L\+A\+Y\+E\+R\+\_\+\+C\+O\+U\+NT\mbox{]}
+\item 
+size\+\_\+t \hyperlink{structfeature_ad6c6e307f1420fd819b273c34dd3a0c5}{neighbors} \mbox{[}100\mbox{]}
+\item 
+size\+\_\+t \hyperlink{structfeature_ae67a31fdc2a52a5556442abed084e6b9}{neighbor\+\_\+count}
+\item 
+\hypertarget{structfeature_a56b7dfe5a93ee62c68f3cb88ea004de1}{}\label{structfeature_a56b7dfe5a93ee62c68f3cb88ea004de1} 
+struct \hyperlink{structslot}{slot} {\bfseries open\+\_\+slots} \mbox{[}100\mbox{]}
+\item 
+size\+\_\+t \hyperlink{structfeature_a9e3d5a312665954040dbc946161deaef}{slot\+\_\+count}
+\item 
+enum \hyperlink{edge_8h_a4ef43ff5c6d42dacbc8ffd9c8cfdc189}{edge} \hyperlink{structfeature_a4d7c1f2b809931ecd2a6c56a4ab11a3f}{type}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Representation of any feature (e.\+g. lake, jungle, or gametrail) 
+
+\subsection{Field Documentation}
+\hypertarget{structfeature_abc5d2874ef95d2e502eb4fb128115dcf}{}\label{structfeature_abc5d2874ef95d2e502eb4fb128115dcf} 
+\index{feature@{feature}!crocodiles@{crocodiles}}
+\index{crocodiles@{crocodiles}!feature@{feature}}
+\subsubsection{\texorpdfstring{crocodiles}{crocodiles}}
+{\footnotesize\ttfamily size\+\_\+t crocodiles\mbox{[}P\+L\+A\+Y\+E\+R\+\_\+\+C\+O\+U\+NT\mbox{]}}
+
+$<$ Array representing the number of tigers each player has on the feature. \hypertarget{structfeature_ae67a31fdc2a52a5556442abed084e6b9}{}\label{structfeature_ae67a31fdc2a52a5556442abed084e6b9} 
+\index{feature@{feature}!neighbor\+\_\+count@{neighbor\+\_\+count}}
+\index{neighbor\+\_\+count@{neighbor\+\_\+count}!feature@{feature}}
+\subsubsection{\texorpdfstring{neighbor\+\_\+count}{neighbor\_count}}
+{\footnotesize\ttfamily size\+\_\+t neighbor\+\_\+count}
+
+$<$ Array of indices into the features array on the game object. Shows what features are adjacent to this one. The number of features that are adjacent to this feature. \hypertarget{structfeature_ad6c6e307f1420fd819b273c34dd3a0c5}{}\label{structfeature_ad6c6e307f1420fd819b273c34dd3a0c5} 
+\index{feature@{feature}!neighbors@{neighbors}}
+\index{neighbors@{neighbors}!feature@{feature}}
+\subsubsection{\texorpdfstring{neighbors}{neighbors}}
+{\footnotesize\ttfamily size\+\_\+t neighbors\mbox{[}100\mbox{]}}
+
+$<$ Array representing the number of crocodiles each player has on the feature. \hypertarget{structfeature_a9e3d5a312665954040dbc946161deaef}{}\label{structfeature_a9e3d5a312665954040dbc946161deaef} 
+\index{feature@{feature}!slot\+\_\+count@{slot\+\_\+count}}
+\index{slot\+\_\+count@{slot\+\_\+count}!feature@{feature}}
+\subsubsection{\texorpdfstring{slot\+\_\+count}{slot\_count}}
+{\footnotesize\ttfamily size\+\_\+t slot\+\_\+count}
+
+$<$ Array of open slots around the feature. \hypertarget{structfeature_abd6f925fd40b726ddc078f75b30e8293}{}\label{structfeature_abd6f925fd40b726ddc078f75b30e8293} 
+\index{feature@{feature}!tigers@{tigers}}
+\index{tigers@{tigers}!feature@{feature}}
+\subsubsection{\texorpdfstring{tigers}{tigers}}
+{\footnotesize\ttfamily size\+\_\+t tigers\mbox{[}P\+L\+A\+Y\+E\+R\+\_\+\+C\+O\+U\+NT\mbox{]}}
+
+$<$ The number of tiles the feature crosses, weighted for different score affectors (i.\+e. animals). \hypertarget{structfeature_a4d7c1f2b809931ecd2a6c56a4ab11a3f}{}\label{structfeature_a4d7c1f2b809931ecd2a6c56a4ab11a3f} 
+\index{feature@{feature}!type@{type}}
+\index{type@{type}!feature@{feature}}
+\subsubsection{\texorpdfstring{type}{type}}
+{\footnotesize\ttfamily enum \hyperlink{edge_8h_a4ef43ff5c6d42dacbc8ffd9c8cfdc189}{edge} type}
+
+$<$ Number of open slots around the feature. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{feature_8h}{feature.\+h}\end{DoxyCompactItemize}

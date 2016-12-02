@@ -1,0 +1,101 @@
+\hypertarget{feature_8h}{}\section{feature.\+h File Reference}
+\label{feature_8h}\index{feature.\+h@{feature.\+h}}
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}limits.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}edge.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}slot.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}tile.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}move.\+h\char`\"{}}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structfeature}{feature}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{feature_8h_a94b5b98ec3db90014282c606a624bac9}{play\+\_\+move\+\_\+feature} (struct \hyperlink{structmove}{move} m, struct \hyperlink{structslot}{slot} $\ast$$\ast$neighbors, struct \hyperlink{structfeature}{feature} $\ast$$\ast$f, size\+\_\+t $\ast$features\+\_\+used)
+\item 
+int \hyperlink{feature_8h_a84394c69c85af524ead93decc60eb81f}{test\+\_\+meeple} (struct \hyperlink{structmove}{move} m, int player, struct \hyperlink{structfeature}{feature} $\ast$$\ast$f)
+\item 
+int \hyperlink{feature_8h_a31b3754c88112d15a6e7d75768042561}{play\+\_\+meeple} (struct \hyperlink{structmove}{move} m, int player, struct \hyperlink{structfeature}{feature} $\ast$$\ast$f)
+\item 
+void \hyperlink{feature_8h_a08cb537425be56537106382e99997361}{update\+\_\+scores} (size\+\_\+t $\ast$scores, struct \hyperlink{structfeature}{feature} $\ast$$\ast$scratch, struct \hyperlink{structfeature}{feature} $\ast$$\ast$a, size\+\_\+t $\ast$alen)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{feature_8h_a31b3754c88112d15a6e7d75768042561}{}\label{feature_8h_a31b3754c88112d15a6e7d75768042561} 
+\index{feature.\+h@{feature.\+h}!play\+\_\+meeple@{play\+\_\+meeple}}
+\index{play\+\_\+meeple@{play\+\_\+meeple}!feature.\+h@{feature.\+h}}
+\subsubsection{\texorpdfstring{play\+\_\+meeple()}{play\_meeple()}}
+{\footnotesize\ttfamily int play\+\_\+meeple (\begin{DoxyParamCaption}\item[{struct \hyperlink{structmove}{move}}]{m,  }\item[{int}]{player,  }\item[{struct \hyperlink{structfeature}{feature} $\ast$$\ast$}]{f }\end{DoxyParamCaption})}
+
+Place tiger for current move. 
+\begin{DoxyParams}{Parameters}
+{\em m} & The current move being made. \\
+\hline
+{\em player} & The player making the move. 0 = player 1, 1 = player 2 \\
+\hline
+{\em f} & Array of all features existing in the game. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if the tiger was successfully placed. 1 if the placement was invalid. 
+\end{DoxyReturn}
+\hypertarget{feature_8h_a94b5b98ec3db90014282c606a624bac9}{}\label{feature_8h_a94b5b98ec3db90014282c606a624bac9} 
+\index{feature.\+h@{feature.\+h}!play\+\_\+move\+\_\+feature@{play\+\_\+move\+\_\+feature}}
+\index{play\+\_\+move\+\_\+feature@{play\+\_\+move\+\_\+feature}!feature.\+h@{feature.\+h}}
+\subsubsection{\texorpdfstring{play\+\_\+move\+\_\+feature()}{play\_move\_feature()}}
+{\footnotesize\ttfamily int play\+\_\+move\+\_\+feature (\begin{DoxyParamCaption}\item[{struct \hyperlink{structmove}{move}}]{m,  }\item[{struct \hyperlink{structslot}{slot} $\ast$$\ast$}]{neighbors,  }\item[{struct \hyperlink{structfeature}{feature} $\ast$$\ast$}]{f,  }\item[{size\+\_\+t $\ast$}]{features\+\_\+used }\end{DoxyParamCaption})}
+
+Link feature to adjacent feature appropriately upon playing a move. 
+\begin{DoxyParams}{Parameters}
+{\em m} & Move played. \\
+\hline
+{\em neighbors} & Pointer to array of adjacent features. \\
+\hline
+{\em f} & Array of all features existing in the game. \\
+\hline
+{\em features\+\_\+used} & Number of features existing in the game. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if the function successfully ran, 1 if there was an allocation failure. 
+\end{DoxyReturn}
+\hypertarget{feature_8h_a84394c69c85af524ead93decc60eb81f}{}\label{feature_8h_a84394c69c85af524ead93decc60eb81f} 
+\index{feature.\+h@{feature.\+h}!test\+\_\+meeple@{test\+\_\+meeple}}
+\index{test\+\_\+meeple@{test\+\_\+meeple}!feature.\+h@{feature.\+h}}
+\subsubsection{\texorpdfstring{test\+\_\+meeple()}{test\_meeple()}}
+{\footnotesize\ttfamily int test\+\_\+meeple (\begin{DoxyParamCaption}\item[{struct \hyperlink{structmove}{move}}]{m,  }\item[{int}]{player,  }\item[{struct \hyperlink{structfeature}{feature} $\ast$$\ast$}]{f }\end{DoxyParamCaption})}
+
+Ensure that tiger placement is valid. 
+\begin{DoxyParams}{Parameters}
+{\em m} & The current move being made. \\
+\hline
+{\em player} & The player making the move. 0 = player 1, 1 = player 2 \\
+\hline
+{\em f} & Array of all features existing in the game. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if the tiger placement is valid. 1 if the placement is invalid. 
+\end{DoxyReturn}
+\hypertarget{feature_8h_a08cb537425be56537106382e99997361}{}\label{feature_8h_a08cb537425be56537106382e99997361} 
+\index{feature.\+h@{feature.\+h}!update\+\_\+scores@{update\+\_\+scores}}
+\index{update\+\_\+scores@{update\+\_\+scores}!feature.\+h@{feature.\+h}}
+\subsubsection{\texorpdfstring{update\+\_\+scores()}{update\_scores()}}
+{\footnotesize\ttfamily void update\+\_\+scores (\begin{DoxyParamCaption}\item[{size\+\_\+t $\ast$}]{scores,  }\item[{struct \hyperlink{structfeature}{feature} $\ast$$\ast$}]{scratch,  }\item[{struct \hyperlink{structfeature}{feature} $\ast$$\ast$}]{a,  }\item[{size\+\_\+t $\ast$}]{alen }\end{DoxyParamCaption})}
+
+Update the scores of each player. 
+\begin{DoxyParams}{Parameters}
+{\em scores} & Array with player scores. \\
+\hline
+{\em scratch} & Array for holding the list of features \\
+\hline
+{\em a} & Array of all features in game mapped to board coordinates. \\
+\hline
+{\em alen} & Length of array {\itshape a}. \\
+\hline
+\end{DoxyParams}

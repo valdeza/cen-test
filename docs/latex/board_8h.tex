@@ -1,0 +1,108 @@
+\hypertarget{board_8h}{}\section{board.\+h File Reference}
+\label{board_8h}\index{board.\+h@{board.\+h}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}edge.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}tile.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}slot.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}move.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}limits.\+h\char`\"{}}\newline
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structboard}{board}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{board_8h_ad3ea7b7c4d550696dba236378c6bbf1a}{}\label{board_8h_ad3ea7b7c4d550696dba236378c6bbf1a} 
+\#define {\bfseries B\+O\+A\+R\+D\+\_\+\+L\+EN}~A\+X\+IS $\ast$ A\+X\+IS $\ast$ (T\+I\+L\+E\+\_\+\+L\+EN -\/ 1) + 1
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structboard}{board} \hyperlink{board_8h_a65ef0c254555033db01dd90343361b88}{make\+\_\+board} (void)
+\item 
+char $\ast$ \hyperlink{board_8h_a604f89af61a87eef90a5a8af83647176}{print\+\_\+board} (struct \hyperlink{structboard}{board} b, char res\mbox{[}B\+O\+A\+R\+D\+\_\+\+L\+EN\mbox{]})
+\item 
+enum \hyperlink{move_8h_a83268621e18b249919bda7f1f6a25afd}{game\+\_\+error\+\_\+code} \hyperlink{board_8h_a8761554d84049624f2136da4fbcde07c}{play\+\_\+move\+\_\+board} (struct \hyperlink{structboard}{board} $\ast$b, struct \hyperlink{structmove}{move} m, struct \hyperlink{structslot}{slot} $\ast$$\ast$adjs)
+\item 
+enum \hyperlink{move_8h_a83268621e18b249919bda7f1f6a25afd}{game\+\_\+error\+\_\+code} \hyperlink{board_8h_af71207791916b51a605b9961227caabf}{test\+\_\+move\+\_\+board} (struct \hyperlink{structboard}{board} $\ast$b, struct \hyperlink{structmove}{move} m, struct \hyperlink{structslot}{slot} $\ast$$\ast$adjs)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{board_8h_a65ef0c254555033db01dd90343361b88}{}\label{board_8h_a65ef0c254555033db01dd90343361b88} 
+\index{board.\+h@{board.\+h}!make\+\_\+board@{make\+\_\+board}}
+\index{make\+\_\+board@{make\+\_\+board}!board.\+h@{board.\+h}}
+\subsubsection{\texorpdfstring{make\+\_\+board()}{make\_board()}}
+{\footnotesize\ttfamily struct \hyperlink{structboard}{board} make\+\_\+board (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+Creates a board struct. \begin{DoxyReturn}{Returns}
+The instantiated board.
+\end{DoxyReturn}
+Returns an initialised board with an empty slot in the very centre. \hypertarget{board_8h_a8761554d84049624f2136da4fbcde07c}{}\label{board_8h_a8761554d84049624f2136da4fbcde07c} 
+\index{board.\+h@{board.\+h}!play\+\_\+move\+\_\+board@{play\+\_\+move\+\_\+board}}
+\index{play\+\_\+move\+\_\+board@{play\+\_\+move\+\_\+board}!board.\+h@{board.\+h}}
+\subsubsection{\texorpdfstring{play\+\_\+move\+\_\+board()}{play\_move\_board()}}
+{\footnotesize\ttfamily enum \hyperlink{move_8h_a83268621e18b249919bda7f1f6a25afd}{game\+\_\+error\+\_\+code} play\+\_\+move\+\_\+board (\begin{DoxyParamCaption}\item[{struct \hyperlink{structboard}{board} $\ast$}]{b,  }\item[{struct \hyperlink{structmove}{move}}]{m,  }\item[{struct \hyperlink{structslot}{slot} $\ast$$\ast$}]{adjs }\end{DoxyParamCaption})}
+
+Check the input move, and play if valid. \begin{DoxySeeAlso}{See also}
+\hyperlink{structmove}{move}, \hyperlink{structslot}{slot}, \hyperlink{move_8h_a83268621e18b249919bda7f1f6a25afd}{game\+\_\+error\+\_\+code} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em b} & Pointer to the board on which the move is played. \\
+\hline
+{\em m} & The move to be played. \\
+\hline
+{\em adjs} & Pointer to array of slots adjacent to the slot where the move is taking place. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Error code indicating whether or not the move was valid. 0 if valid, non-\/zero if not valid.
+\end{DoxyReturn}
+Tries to play the given move on the given board, returning a status code.
+
+Board is updated if given move is valid. \begin{DoxyReturn}{Returns}
+0 (OK) on success, otherwise a respective {\ttfamily game\+\_\+error\+\_\+code} 
+\end{DoxyReturn}
+\hypertarget{board_8h_a604f89af61a87eef90a5a8af83647176}{}\label{board_8h_a604f89af61a87eef90a5a8af83647176} 
+\index{board.\+h@{board.\+h}!print\+\_\+board@{print\+\_\+board}}
+\index{print\+\_\+board@{print\+\_\+board}!board.\+h@{board.\+h}}
+\subsubsection{\texorpdfstring{print\+\_\+board()}{print\_board()}}
+{\footnotesize\ttfamily char$\ast$ print\+\_\+board (\begin{DoxyParamCaption}\item[{struct \hyperlink{structboard}{board}}]{b,  }\item[{char}]{res\mbox{[}\+B\+O\+A\+R\+D\+\_\+\+L\+E\+N\mbox{]} }\end{DoxyParamCaption})}
+
+Fill a character array with the character representation of the board. 
+\begin{DoxyParams}{Parameters}
+{\em b} & The board to be printed. \\
+\hline
+{\em res} & The character array to be filled. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Pointer to the character array representing the board. 
+\end{DoxyReturn}
+\hypertarget{board_8h_af71207791916b51a605b9961227caabf}{}\label{board_8h_af71207791916b51a605b9961227caabf} 
+\index{board.\+h@{board.\+h}!test\+\_\+move\+\_\+board@{test\+\_\+move\+\_\+board}}
+\index{test\+\_\+move\+\_\+board@{test\+\_\+move\+\_\+board}!board.\+h@{board.\+h}}
+\subsubsection{\texorpdfstring{test\+\_\+move\+\_\+board()}{test\_move\_board()}}
+{\footnotesize\ttfamily enum \hyperlink{move_8h_a83268621e18b249919bda7f1f6a25afd}{game\+\_\+error\+\_\+code} test\+\_\+move\+\_\+board (\begin{DoxyParamCaption}\item[{struct \hyperlink{structboard}{board} $\ast$}]{b,  }\item[{struct \hyperlink{structmove}{move}}]{m,  }\item[{struct \hyperlink{structslot}{slot} $\ast$$\ast$}]{adjs }\end{DoxyParamCaption})}
+
+Check the input move for validity. \begin{DoxySeeAlso}{See also}
+\hyperlink{structmove}{move}, \hyperlink{structslot}{slot}, \hyperlink{move_8h_a83268621e18b249919bda7f1f6a25afd}{game\+\_\+error\+\_\+code} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em b} & Pointer to the board on which the move is played. \\
+\hline
+{\em m} & The move to be played. \\
+\hline
+{\em adjs} & Pointer to array of slots adjacent to the slot where the move is taking place. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Error code indicating whether or not the move was valid. 0 if valid, non-\/zero if not valid. 
+\end{DoxyReturn}
