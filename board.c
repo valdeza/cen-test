@@ -1,51 +1,213 @@
-#include <stdio.h>
-#include <string.h>	/* memcpy */
-#include <stdlib.h>	/* free() */
-#include "edge.h"	/* edges. */
-#include "tile.h"	/* tiles. */
-#include "slot.h"	/* slots. */
+#include "board.h"
 
-#define AXIS 5 /* AXIS by AXIS board */
-
-struct board {
-	struct tile tiles[AXIS*AXIS];
-	struct slot slot_spots[AXIS*AXIS];
-	unsigned int sps; /* # of open slot spots (placeable slots) */
-	char column_terminators[AXIS];
-};
-
-struct board make_board(void)
-{
-	struct board b;
-	enum edge edges[5] = { NONE, NONE, NONE, NONE, NONE };
-	const unsigned int mid = (AXIS - 1) / 2; /* Must start in center. */
-	b.slot_spots[0] = make_slot(mid, mid);
-	b.sps = 1;
-	for (unsigned int i = 0; i < AXIS*AXIS; ++i) {
-		b.tiles[i] = create_tile(edges);
-	}
-	/* Tab between columns except for the last one, which newlines. */
-	memset(b.column_terminators, '\t', AXIS - 1);
-	b.column_terminators[AXIS - 1] = '\n';
-	return b;
-}
-
-static size_t index_slot(struct slot s)
+/** Gets the array index from the provided slot.
+ * The slot is recorded with x and y values for graphic representation.
+ * The array used for storing all slots is an AXIS*AXIS length array.
+ */
+size_t get_index_from_slot(struct slot s)
 {
 	return AXIS * s.x + s.y;
 }
 
-void print_board(struct board b)
+/** Returns whether the given slot's x/y position
+ * exists somewhere within (0, 0) to (AXIS, AXIS)
+ */
+static inline bool is_slot_in_boundary(struct slot s)
+{
+	return (s.x < AXIS && s.y < AXIS);
+}
+
+void list_adjacent_slots(struct slot s, struct slot **adjs)
+{
+	/*			  up	 right	 bottom	   left */
+	int n[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
+	/* Check adjacent slots to make sure edges match. */
+	for (int i = 0; i < 4; ++i) {
+		struct slot sprime = make_slot(s.x + n[i][0], s.y + n[i][1]);
+		if (is_slot_in_boundary(s)) {
+			*(adjs[i]) = sprime;
+		} else {
+			adjs[i] = NULL;
+		}
+	}
+}
+
+void list_adjacent_tiles(struct board *b, struct slot **ss, struct tile **ts)
+{
+	struct tile empty =
+		make_tile((enum edge[5]){EMPTY,EMPTY,EMPTY,EMPTY,EMPTY}, NONE);
+	for (int i = 0; i < 4; ++i) {
+		if (ss[i] == NULL) {
+			ts[i] = NULL;
+			continue;
+		}
+		struct tile t = b->tiles[get_index_from_slot((*ss[i]))];
+		if (is_tile_equal(t, empty)) {
+			ts[i] = NULL;
+		} else {
+			*ts[i] = t;
+		}
+	}
+}
+
+/**
+ * @remarks Although slots and tiles have the same length arrays,
+ * we search through the board's slot array due to no sorting guarantees.
+ */
+static bool is_slot_placeable(struct board b, struct slot s)
+{
+	/* TODO: Switch to linear search? */
+	/* Linear search open positions for the desired one. */
+	for (unsigned i = 0; i < b.empty_slot_count; ++i) {
+		switch(compare_slot_positions(b.slot_spots[i], s)) {
+		case -1:
+			continue;
+		case 0:
+			return true;
+		case 1:
+			return false;
+		}
+	}
+	return false;
+}
+
+/** Returns whether the given slot on the given board has no tile on it.
+ * @remarks todo: Confirm whether "placing" a tile is done by writing the tile's edge[] onto an empty tile's edge[].
+ */
+static bool is_slot_empty(struct board b, struct slot s)
+{
+	struct tile t = b.tiles[get_index_from_slot(s)];
+	for (int i = 0; i < 5; ++i) {
+		if (t.edges[i] != EMPTY) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/** Returns the index of <em>slots</em> at/immediately following the
+ * given slot <em>s</em>, or <em>count</em> if not found.
+ *
+ * @precondition <em>slots</em> is sorted by ascending position.
+ */
+size_t get_insertion_index(struct slot *slots, size_t count, struct slot s)
+{
+	/* Iterate i until count is reached
+	 * or we pass the given slot's x/y position
+	 */
+	size_t i;
+	for (i = 0; i< count && compare_slot_positions(s, slots[i]) > 0; ++i) {}
+	return i;
+}
+
+/** Inserts the given slot into the given board's slot_spots. */
+static struct board add_placeable_slot(struct board b, struct slot s)
+{
+	struct slot *spots = b.slot_spots;
+	size_t i = get_insertion_index(spots, b.empty_slot_count, s);
+	if (i < b.empty_slot_count) { /* Sorted insert. */
+		memmove(&spots[i+1], &spots[i], sizeof(s)*b.empty_slot_count-i);
+	}
+	spots[i] = s;
+	b.empty_slot_count++;
+	return b;
+}
+
+/** Removes the given slot from the given board's slot_spots. */
+static struct board remove_placeable_slot(struct board b, struct slot s)
+{
+	struct slot *spots = b.slot_spots;
+	size_t i = get_insertion_index(spots, b.empty_slot_count, s);
+	memmove(&spots[i], &spots[i + 1], sizeof(s) * (b.empty_slot_count - i));
+	b.empty_slot_count--;
+	return b;
+}
+
+/** Removes the given slot from the given board's slot_spots
+ * and add the newly available slots adjacent to the removed slot.
+ *
+ * Intended to be called when a tile has been placed
+ * in the position of the removed slot.
+ */
+static struct board update_slot_spots(struct board b, struct slot s)
+{
+	struct slot adj[4];
+	struct slot *adjs[4];
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &adj[i];
+	}
+	list_adjacent_slots(s, adjs);
+	b = remove_placeable_slot(b, s);
+	for (int i = 0; i < 4; ++i) {
+		if (adjs[i] == NULL) {
+			continue;
+		}
+		if (is_slot_empty(b, *adjs[i])) {
+			b = add_placeable_slot(b, adj[i]);
+		}
+	}
+	return b;
+}
+
+/** Returns the validation code of the given move on the given board.
+ * @returns 0 (OK) if a legal valid move, non-zero otherwise.
+ * @see move.h:enum game_error_code
+ */
+static enum game_error_code invalid_move(struct board b, struct move m)
+{
+	if (!is_slot_placeable(b, m.slot)) {
+		return E_TILE_NOT_PLACEABLE; /* Slot not placeable. */
+	}
+
+	struct slot adj[4];
+	struct slot *adjs[4] = {&adj[0], &adj[1], &adj[2], &adj[3]};
+	list_adjacent_slots(m.slot, adjs);
+	struct tile t = rotate_tile(m.tile, m.rotation);
+	for (unsigned int i = 0; i < 4; ++i) { /* Need wrapping */
+		if (adjs[i] == NULL) { /* Ignore if not on board. */
+			continue;
+		}
+		/* The (i + 2) % 4 math here is a bit evil, but it works. */
+		enum edge pair =
+			b.tiles[get_index_from_slot(*adjs[i])].edges[(i+2)%4];
+		if (pair == EMPTY) {
+			continue; /* Empty tiles match with everything. */
+		}
+		if (pair != t.edges[i]) { /* Corresponding don't match. */
+			return E_TILE_EDGE_CONFLICT;
+		}
+	}
+	return OK;
+}
+
+/** Returns an initialised board with an empty slot in the very centre. */
+struct board make_board(void)
+{
+       struct board b;
+       /* Starting centre piece */
+       enum edge edges[5] = { EMPTY, EMPTY, EMPTY, EMPTY, EMPTY };
+       const unsigned int mid = (AXIS - 1) / 2; /* Must start in center. */
+       b.slot_spots[0] = make_slot(mid, mid);
+       b.empty_slot_count = 1;
+       for (unsigned int i = 0; i < AXIS*AXIS; ++i) {
+		b.tiles[i] = make_tile(edges, NONE);
+       }
+       /* Tab between columns except for the last one, which newlines. */
+       memset(b.column_terminators, '\t', AXIS - 1);
+       b.column_terminators[AXIS - 1] = '\n';
+       return b;
+}
+
+char *print_board(struct board b, char res[BOARD_LEN])
 {
 	const size_t cnt = TILE_LINES;
 	const size_t len = TILE_LINE_LEN;
-	char res[(AXIS * AXIS) * (TILE_LEN - 1) + 1]; /* Null terminators */
 	char buf[TILE_LEN];
 
 	/* Pretty print the board in NxN format. */
 	for (size_t i = 0; i < AXIS; ++i) {
 		for (size_t j = 0; j < AXIS; ++j) {
-			print_tile(b.tiles[index_slot(make_slot(i, j))], buf);
+			print_tile(b.tiles[get_index_from_slot(make_slot(i, j))], buf);
 			for (size_t k = 0; k < cnt; ++k) {
 				const size_t ind = ((i *cnt +k) *AXIS +j) *len;
 				buf[(k + 1) *len - 1] = b.column_terminators[j];
@@ -53,236 +215,136 @@ void print_board(struct board b)
 			}
 		}
 	}
-	res[(AXIS * AXIS) * (TILE_LEN - 1)] = '\0';
-	printf("%s\n\n", res);
+	res[BOARD_LEN - 1] = '\0';
+	return res;
 }
 
-static int slot_placeable(struct board b, struct slot s)
+enum game_error_code test_move_board(struct board *b, struct move m)
 {
-#if 0
-	/* TODO: Switch to linear search? */
-	/* Linear search open positions for the desired one. */
-	for (unsigned i = 0; i < b.sps; ++i) {
-		switch(compare_slots(b.slot_spots[i], s)) {
-		case -1:
-			continue;
-		case 0:
-			return i + 1;
-		case 1:
-			return 0;
-		}
+	enum game_error_code rc;
+	if ((rc = invalid_move(*b, m))) {
+		return rc;
 	}
-#endif
-	/* Binary search open positions for the desired one. */
-	int low = 0;
-	int high = b.sps;
-	int m;
-	while (low < high) {
-		m = (low + high) / 2;
-		switch(compare_slots(b.slot_spots[m], s)) {
-		case -1:
-			low = m + 1;
-			break;
-		case 1:
-			high = m - 1;
-			break;
-		case 0:
-			return m + 1; /* Guarenteed to be > 0. */
-		}
-	}
-	return 0;
+	return OK;
 }
 
-static int slot_empty(struct board b, struct slot s)
+/** Tries to play the given move on the given board, returning a status code.
+ *
+ * @postcondition Board is updated if given move is valid.
+ * @returns 0 (OK) on success, otherwise a respective <code>game_error_code</code>
+ */
+enum game_error_code
+play_move_board(struct board *b, struct move m)
 {
-	struct tile t = b.tiles[index_slot(s)];
-	for (int i = 0; i < 5; ++i) {
-		if (t.edges[i] != NONE) {
-			return 0;
-		}
+	enum game_error_code rc;
+	if ((rc = test_move_board(b, m)) == OK) {
+		b->tiles[get_index_from_slot(m.slot)] =
+			rotate_tile(m.tile, m.rotation);
+		*b = update_slot_spots(*b, m.slot);
 	}
-	return 1;
+	return rc;
 }
 
-static int slot_on_board(struct slot s)
-{
-	if (s.x < AXIS && s.y < AXIS) {
-		return 1;
-	}
-	return 0;
-}
-
-static struct board add_placeable_slot(struct board b, struct slot s)
-{
-	size_t i;
-	struct slot *spots = b.slot_spots;
-	for (i = 0; i < b.sps && compare_slots(s, spots[i]) > 0; ++i) {}
-	if (i < b.sps) { /* Make room for the element (Sorted insert). */
-		memmove(&b.slot_spots[i + 1], &spots[i], sizeof(s) * b.sps - i);
-	}
-	b.slot_spots[i] = s;
-	b.sps++;
-	return b;
-}
-
-static struct board remove_placeable_slot(struct board b, struct slot s)
-{
-	size_t i;
-	struct slot *spots = b.slot_spots;
-	for (i = 0; i < b.sps && compare_slots(s, spots[i]) > 0; ++i) {}
-	memmove(&spots[i], &spots[i + 1], sizeof(s) * (b.sps-- - i));
-	return b;
-}
-
+#ifdef TEST
 static void print_placeable_slots(struct board b)
 {
 	printf("Slots:\n");
 	printf("X\tY\n");
-	for (size_t i = 0; i < b.sps; ++i) {
+	for (size_t i = 0; i < b.empty_slot_count; ++i) {
 		printf("%u\t%u\n", b.slot_spots[i].x, b.slot_spots[i].y);
 	}
 	return;
 }
 
-struct board update_slot_spots(struct board b, struct slot s)
+static void play_and_check_move(struct board *b,struct move m,struct slot **adj)
 {
-	/* Check the slots above, left, right, and below. */
-	struct slot adj[4] = { 
-		make_slot(s.x, s.y - 1), make_slot(s.x - 1, s.y),
-		make_slot(s.x + 1, s.y), make_slot(s.x, s.y + 1)
-	};
-	b = remove_placeable_slot(b, s);
-	for (int i = 0; i < 4; ++i) {
-		if (slot_empty(b, adj[i]) && slot_on_board(adj[i])) {
-			b = add_placeable_slot(b, adj[i]);
-		}
+	enum game_error_code rc;
+	if ((rc = play_move_board(b, m))) {
+		printf("Invalid move! %d\n", rc);
+	} else {
+		printf("Good move!\n");
 	}
-	return b;
-}
-
-struct move {
-	struct tile tile;
-	struct slot slot;
-	int rotation;
-};
-
-struct move make_move(struct tile t, struct slot s, int rotation)
-{
-	struct move m = {
-		.tile = t,
-		.slot = s,
-		.rotation = rotation
-	};
-	return m;
-}
-
-static int validate_move(struct board b, struct move m)
-{
-	if (!slot_placeable(b, m.slot)) {
-		fprintf(stderr, "Invalid location for tile.\n");
-		return 1;
-	}
-	/* Check adjacent tiles to make sure edges match. */
-	struct slot adj[4] = {
-		make_slot(m.slot.x, m.slot.y + 1),	/* up */
-		make_slot(m.slot.x + 1, m.slot.y),	/* right */
-		make_slot(m.slot.x, m.slot.y - 1),	/* down */
-		make_slot(m.slot.x - 1, m.slot.y)	/* left*/
-	};
-	for (unsigned int i = 0; i < sizeof(adj); ++i) { /* Need wrapping */
-		if (!slot_on_board(adj[i])) { /* ignore if not on board. */
-			continue;
-		}
-		/* The (i + 2) % 4 math here is a bit evil, but it works. */
-		enum edge pair = b.tiles[index_slot(adj[i])].edges[(i + 2) % 4];
-		if (pair == NONE) {
-			continue; /* Empty tiles match with everything. */
-		}
-		if (pair != m.tile.edges[i]) { /* Corresponding don't match. */
-			fprintf(stderr, "Edges don't match.\n");
-			return 1;
-		}
-	}
-	return 0;
-}
-
-/* TODO refactor to return error code - we need to know if we make a bad move */
-struct board play_move(struct board b, struct move m)
-{
-	if (validate_move(b, m)) {
-		return b;
-	}
-	printf("Valid location for tile (%u, %u)!\n", m.slot.x, m.slot.y);
-	b.tiles[index_slot(m.slot)] = rotate_tile(m.tile, m.rotation);
-	return update_slot_spots(b, m.slot);
 }
 
 int main(void)
 {
 	char buffer[TILE_LEN];
+	char board_buffer[BOARD_LEN];
 	enum edge edges[5][5] = {
-		{ NONE, NONE, NONE, NONE, NONE },
-		{ ROAD, ROAD, ROAD, ROAD, ROAD },
-		{ FIELD, FIELD, FIELD, FIELD, FIELD },
-		{ CITY, CITY, CITY, CITY, CITY },
-		{ CITY, FIELD, ROAD, CITY, ROAD }
+		{ EMPTY, EMPTY, EMPTY, EMPTY, EMPTY },
+		{ GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL, GAMETRAIL },
+		{ JUNGLE, JUNGLE, JUNGLE, JUNGLE, JUNGLE },
+		{ LAKE, LAKE, LAKE, LAKE, LAKE },
+		{ LAKE, JUNGLE, GAMETRAIL, LAKE, GAMETRAIL }
 	};
 	struct tile tiles[5] = {
-		create_tile(edges[0]),
-		create_tile(edges[1]),
-		create_tile(edges[2]),
-		create_tile(edges[3]),
-		create_tile(edges[4])
+		make_tile(edges[0], NONE),
+		make_tile(edges[1], NONE),
+		make_tile(edges[2], NONE),
+		make_tile(edges[3], NONE),
+		make_tile(edges[4], NONE)
 	};
 
 	const char string[5][30] = {
-		"\nEmpty tile: \n%s\n",
-		"\nAll Road tile: \n%s\n",
-		"\nAll Field tile: \n%s\n",
-		"\nAll City tile: \n%s\n",
-		"\nMixed tile: \n%s\n"
+		"\nEmpty tile:",
+		"\nAll Road tile:",
+		"\nAll Field tile:",
+		"\nAll City tile:",
+		"\nMixed tile:"
 	};
 
 	printf("Testing different tile types.\n");
 	for (int i = 0; i < 5; ++i) {
-		print_tile(tiles[i], buffer);
-		printf(string[i], buffer);
+		printf("%s\n%s\n", string[i], print_tile(tiles[i], buffer));
 	}
 
 	printf("\nTile Rotations: \n");
 	for (int i = 0; i < 4; ++i) {
-		print_tile(rotate_tile(tiles[4], i), buffer);
-		printf("%d rotation:\n%s\n", i, buffer);
+		printf("%d rotation:\n%s\n", i,
+			print_tile(rotate_tile(tiles[4], i), buffer));
 	}
 
 	printf("\nTesting board creation. All Null.\n");
 	struct board b = make_board();
-	print_board(b);
-
-	printf("\nTop row city. All invalid: \n");
-	for (int i = 0; i < AXIS; ++i) {
-		struct slot s = make_slot(i, 0);
-		play_move(b, make_move(tiles[3], s, 0));
-	}
+	printf("%s\n", print_board(b, board_buffer));
 
 	printf("\nLet's see what slots are placeable.\n");
 	print_placeable_slots(b);
-	printf("\nPlay the center. Valid starting move.\n");
-	const unsigned int mid = AXIS / 2; /* BAD, REFACTOR. FIXME */
-	b = play_move(b, make_move(tiles[3], make_slot(mid, mid), 0));
-	print_board(b);
+	const unsigned int mid = AXIS / 2;
+	printf("\nPlay the center (%d, %d), the starting move.\n", mid, mid);
+	struct slot adj[4];
+	struct slot *adjs[4];
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &adj[i];
+	}
+	play_and_check_move(&b,
+			make_move(tiles[3], make_slot(mid, mid), 0, -1, -1),
+			adjs);
+	printf("%s\n", print_board(b, board_buffer));
 
 	printf("\nAnd now what slots are placeable?\n");
 	print_placeable_slots(b);
 
-	printf("\nLet's test the tile validator.\n");
-	b = play_move(b, make_move(tiles[2], make_slot(mid, mid + 1), 0));
-	print_board(b);
+	printf("\nTest tile validator (should fail): (%d, %d)\n", mid, mid + 1);
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &adj[i];
+	}
+	play_and_check_move(&b,make_move(tiles[2],
+			make_slot(mid, mid + 1), 0, -1, -1),
+			adjs);
+	printf("%s\n", print_board(b, board_buffer));
 	print_placeable_slots(b);
 
-	b = play_move(b, make_move(tiles[3], make_slot(mid, mid + 1), 0));
-	print_board(b);
+	printf("\nTest tile validator (should pass): (%d, %d)\n", mid, mid + 1);
+	for (size_t i = 0; i < 4; ++i) {
+		adjs[i] = &adj[i];
+	}
+	play_and_check_move(&b,
+			make_move(tiles[3], make_slot(mid, mid + 1), 0, -1, -1),
+			adjs);
+	printf("%s\n", print_board(b, board_buffer));
 	print_placeable_slots(b);
 
 	return 0;
 }
+#endif
