@@ -4,28 +4,16 @@ CFLAGS=-std=c99 -g -march=native -flto -Wall -Wextra -pedantic -O0
 
 all: test_game test_board server client feature aiclient tests
 
+clean-all: clean
+	$(MAKE) -C tests clean
+
 clean:
 	rm *.o
 	rm client server
-	rm test_game test_board test_feature \
-		boardDriver gameDriver moveDriver serializationDriver slotDriver \
-		tileDriver
+	rm test_game test_board test_feature
 
-tests: boardDriver moveDriver serializationDriver slotDriver tileDriver \
-	gameDriver
-
-boardDriver: boardDriver.c board.o slot.o tile.o move.o
-
-moveDriver: moveDriver.c slot.o tile.o move.o
-
-serializationDriver: serializationDriver.c serialization.o slot.o tile.o move.o
-
-slotDriver: slotDriver.c slot.o
-
-tileDriver: tileDriver.c tile.o
-
-gameDriver: gameDriver.c game.o board.o slot.o tile.o move.o feature.o rng.o
-	$(CC) $(CFLAGS) -o $@ $^ -lm
+tests:
+	$(MAKE) -C tests
 
 server: server.c game.o rng.o tile.o board.o slot.o serialization.o feature.o
 	$(CC) $(CFLAGS) -o server server.c game.o rng.o tile.o move.o board.o \
