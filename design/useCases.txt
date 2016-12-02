@@ -1,0 +1,35 @@
+Front: A player completes a road 
+Back:  
+●	Road segments on both ends connect to a: 
+○	Crossing 
+○	City segment
+○	Monastery 
+○	Road forms a complete loop
+
+●	Player has a thief on the road 
+○	Scores one point for each tile 
+
+Front: Player completes a city 
+Back: 
+●	City is completely surrounded by a city wall with no gaps
+●	Player has a knight in completed city 
+○	Scores two points for each tile 
+○	If there is a pennant on segments in city, player earns 2 points
+
+Front: Completed city is shared with both players
+Back: 
+●	Player with most thieves or knights scores all the points
+●	If tied, both share all the points 
+
+Front: A monastery is fully surrounded 
+Back: 
+●	Completely surrounded by land tiles 
+●	Player has a monk on the monastery
+○	Player earns 9 points 
+
+Front: Field has two farmers
+Back: 
+●	For each city a farm supplies
+○	Player with most farmers score 3 points
+○	If tie, both earn 3 points
+
