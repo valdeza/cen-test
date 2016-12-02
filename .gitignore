@@ -4,6 +4,12 @@ server
 test
 test_board
 test_game
+boardDriver
+gameDriver
+moveDriver
+serializationDriver
+slotDriver
+tileDriver
 # Windows
 *.exe
 # OSX?
