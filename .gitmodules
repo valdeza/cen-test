@@ -1,0 +1,4 @@
+[submodule "tgz-server"]
+	path = tgz-server
+	url = https://github.com/chausen/TigerZoneServer.git
+	branch = master
