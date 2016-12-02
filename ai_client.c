@@ -76,21 +76,6 @@ static int connect_game(char *host, int welcome_port)
 		printf("Error: %s\n", strerror(errno));
 		return -1;
 	} 
-	uint16_t port = 0;
-	unsigned char buf[sizeof(port)];
-	if (read(sockfd, &buf, sizeof(buf)) < 0) {
-		printf("Read error: %s\n", strerror(errno));
-		return -1;
-	}
-	for (size_t i = 0; i < sizeof(buf); ++i) {
-		port += (buf[i] << (8 * i));
-	}
-	printf("Got port: %u\n", ntohs(port));
-	close(sockfd);
-	if ((sockfd = connect_retry(host, port)) < 0) {
-		printf("Error: %s\n", strerror(errno));
-		return -1;
-	}
 	return sockfd;
 }
 
@@ -123,7 +108,7 @@ static int get_deck(int sockfd, struct tile *deck, size_t clen, size_t dlen)
 }
 
 #define REMOTE_HOST "127.0.0.1" /* TODO: Get a command line variable. */
-#define REMOTE_PORT 5000 /* TODO: Factor into command line variable. */
+#define REMOTE_PORT 50002 /* TODO: Factor into command line variable. */
 
 static struct game *init_game(int socket)
 {
@@ -159,53 +144,46 @@ int main(void)
 
 	int first; uint64_t move_clock;
 	unsigned char buf[1 + TILE_SZ + MOVE_SZ]; // game_over? + tile + move
-	while (1) { /* Play tournament */
+
+	struct move potential[100];
+	size_t potentials = 100;
+	while (1) { /* Play game. */
+		struct game *g = init_game(sockfd); /*TODO: Refactor? */
 		get_clock_and_order(sockfd, &first, &move_clock);
-		printf("Clock: %llu\n", move_clock);
-		if (first) {
-			printf("I'm first!\n");
-		} else {
-			printf("I'm second!\n");
-		}
-		while (1) { /* Play game. */
-			struct game *g = init_game(sockfd); /*TODO: Refactor? */
-			while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
-				int gfirst = first;
-				printf("Recieved: "); print_buffer(buf,
-						sizeof(buf));
-				if (buf[0] != 0) { /* Game over. */
-					game_over(buf);
-					break;
-				}
-				struct tile t = deserialize_tile(&buf[1]);
-				unsigned char b[100];
-				printf("Tile: \n%s\n", print_tile(t, b));
-				if (gfirst) { /* No previous move. */
-					gfirst = 0;
-				} else {
-					struct move prev =
-						deserialize_move(&buf[7]);
-					printf("Prev move | x: %d y: %d: "
-						"rotation: %d \n%s\n",
-					prev.slot.x, prev.slot.y, prev.rotation,
-					print_tile(prev.tile, b));
-					play_move(g, prev, 1);
-					printf("DEBUG: %zu %zu\n",
-						g->scores[0], g->scores[1]);
-				}
-				/* A.I. HERE */
-				int mid = (AXIS - 1) / 2;
-				struct move m =
-					make_move(t,make_slot(mid,mid),0,-1,-1);
-				/* End A.I. */
-				play_move(g, m, 0);
-				serialize_move(m, buf);
-				write(sockfd, buf, sizeof(buf));
+		struct move mp = make_move(g->tile_deck[0], 
+				make_slot((AXIS-1)/2, (AXIS-1)/2), 0, -1, -1);
+		while (read(sockfd, buf, sizeof(buf)) == sizeof(buf)) {
+			printf("Recieved: "); print_buffer(buf, sizeof(buf));
+			if (buf[0] != 0) { /* Game over. */
+				game_over(buf);
+				break;
 			}
-			free_game(g);
-			free(g);
+			struct tile t = deserialize_tile(&buf[1]);
+			unsigned char b[100];
+			printf("Tile: \n%s\n", print_tile(t, b));
+			struct move prev = deserialize_move(&buf[7]);
+			printf("Prev move | x: %d y: %d: "
+				"rotation: %d \n%s\n",
+				prev.slot.x, prev.slot.y, prev.rotation,
+				print_tile(prev.tile, b));
+			play_move(g, prev, 1);
+			printf("DEBUG: us: %zu them: %zu\n",
+					g->scores[0], g->scores[1]);
+			size_t potentials = 100;
+			generate_available_moves(g, 0,
+					t, &potential, &potentials);
+			struct move m;
+			if (potentials > 0) { /* We can place a tile. */
+				m = potential[0]; /* Pick first. */
+			} else { /* PASS */
+			}
+			play_move(g, m, 0);
+			serialize_move(m, buf);
+			write(sockfd, buf, sizeof(buf));
 		}
-		if (buf[2] == 0) {
+		free_game(g);
+		free(g);
+		if (buf[0] == 2) {
 			break;
 		}
 	}
