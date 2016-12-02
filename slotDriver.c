@@ -20,9 +20,9 @@ int main(){
 
   struct slot slotX = make_slot(1, 2);
   struct slot slotY = make_slot(2, 3);
-  printf("Test function compare_slots\n");
-  printf("Expected result of compare_slots(x, y): -1\n");
-  printf("Actual value: %i\n", compare_slots(slotX,slotY));
-  assert(compare_slots(slotX,slotY) == -1);
-  printf("function compare_slots works fine\n");
+  printf("Test function compare_slot_positions\n");
+  printf("Expected result of compare_slot_positions(x, y): -1\n");
+  printf("Actual value: %i\n", compare_slot_positions(slotX,slotY));
+  assert(compare_slot_positions(slotX,slotY) == -1);
+  printf("function compare_slot_positions works fine\n");
 }

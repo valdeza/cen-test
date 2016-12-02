@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #include "board.h"
-#include "board.h"
+#include "slot.h"
 
 int main(){
   int x = 3;
@@ -41,8 +41,8 @@ int main(){
     else
       printf("there are some tiles\n");
 
-    printf("Excepted result for sps: 1\n");
-    printf("Actual result for sps: %i\n",setBoard.sps);
+    printf("Excepted result for empty_slot_count: 1\n");
+    printf("Actual result for empty_slot_count: %i\n",setBoard.empty_slot_count);
 
     printf("Excepted result for slot_spots[0]: \n");
     printf("slot_spots[0].x: %i\tslot_spots[0].y: %i\n", (AXIS - 1) / 2, (AXIS - 1) / 2);
@@ -50,7 +50,7 @@ int main(){
     printf("slot_spots[0].x: %i\tslot_spots[0].y: %i\n", setBoard.slot_spots[0].x, setBoard.slot_spots[0].y);
 
     assert(setBoard.tiles[0].edges[0] == 0);  // To test weather board has tiles or not
-    assert(setBoard.sps == 1);
+    assert(setBoard.empty_slot_count == 1);
     assert(setBoard.slot_spots[0].x == (AXIS - 1) / 2);
     assert(setBoard.slot_spots[0].y == (AXIS - 1) / 2);
     printf("Function make_board works fine\n\n");

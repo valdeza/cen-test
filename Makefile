@@ -1,9 +1,31 @@
 CFLAGS=-std=c99 -g -march=native -flto -Wall -Wextra -pedantic -O0
 
-all: game board server client
+.PHONY: all tests clean
+
+all: test_game test_board server client tests
 
 clean:
 	rm *.o
+	rm client server
+	rm test_game test_board test_feature \
+		boardDriver gameDriver moveDriver serializationDriver slotDriver \
+		tileDriver
+
+tests: boardDriver moveDriver serializationDriver slotDriver tileDriver \
+	gameDriver
+
+boardDriver: boardDriver.c board.o slot.o tile.o move.o
+
+moveDriver: moveDriver.c slot.o tile.o move.o
+
+serializationDriver: serializationDriver.c serialization.o slot.o tile.o move.o
+
+slotDriver: slotDriver.c slot.o
+
+tileDriver: tileDriver.c tile.o
+
+gameDriver: gameDriver.c game.o board.o slot.o tile.o move.o rng.o
+	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 server: server.c game.o rng.o tile.o board.o slot.o serialization.o
 	$(CC) $(CFLAGS) -o server server.c game.o rng.o tile.o move.o board.o \
@@ -13,11 +35,11 @@ client: client.c game.o rng.o tile.o board.o slot.o serialization.o
 	$(CC) $(CFLAGS) -o client client.c game.o rng.o tile.o move.o board.o \
 		slot.o serialization.o -lm
 
-game: game.c game.h rng.o tile.o board.o slot.o
+test_game: game.c game.h rng.o tile.o board.o slot.o
 	$(CC) $(CFLAGS) -DTEST -o test_game game.c rng.o tile.o board.o slot.o \
 		-lm
 
-board: board.c board.h tile.o slot.o move.o
+test_board: board.c board.h tile.o slot.o move.o
 	$(CC) $(CFLAGS) -DTEST -o test_board board.c tile.o slot.o move.o
 
 serialization.o: serialization.c serialization.h
