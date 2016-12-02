@@ -192,8 +192,17 @@ int play_move(struct game *g, struct move m, int player)
 	int rc;
 	struct slot adj[4];
 	struct slot *adjs[4] = {&adj[0], &adj[1], &adj[2], &adj[3]};
-	list_adjacent_slots(m.slot, adjs);
+	struct tile tadj[4];
+	struct tile *tadjs[4] = {&tadj[0], &tadj[1], &tadj[2], &tadj[3]};
 
+	list_adjacent_slots(m.slot, adjs);
+	list_adjacent_tiles(&g->board, adjs, tadjs);
+
+	for (int i = 0; i < 4; ++i) {
+		if (tadjs[i] == NULL) {
+			adjs[i] = NULL; /* Only want placed slots. */
+		}
+	}
 	if ((rc = is_move_valid(g, m, player))) {
 		return rc;
 	}

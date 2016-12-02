@@ -90,9 +90,9 @@ static void merge_features(struct feature **ap, struct feature **bp)
 	*bp = a;
 }
 
-static size_t get_index(int x, int y, int side, int corner)
+static size_t get_index(int x, int y, int zone)
 {
-	return (((x * AXIS + y) * 4) + side) * 3 + corner;
+	return (x * AXIS + y) * 12 + zone;
 }
 
 static void merge_nodupes(struct feature **out, struct feature **a, size_t *len)
@@ -194,7 +194,8 @@ static int test_corner_feature(int is_tiger, int player,
 	int opp_cnrs[12] = {8, 7, 6, 11, 10, 9, 2, 1, 0, 5, 4, 3};
 	int opp_side[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
 	int adjs[12 * 12];
-	init_adj(m.tile, adjs);
+	struct tile t = rotate_tile(m.tile, m.rotation);
+	init_adj(t, adjs);
 	int check;
 	if (is_tiger) {
 		check = m.tcorner;
@@ -209,7 +210,7 @@ static int test_corner_feature(int is_tiger, int player,
 		assert(m.ccorner < 12);
 		struct feature *opp = f[get_index(
 			m.slot.x+ opp_side[a/3][0], m.slot.y+ opp_side[a/3][1],
-			opp_cnrs[a] / 3, opp_cnrs[a] % 3)];
+			opp_cnrs[a])];
 		if (!opp) {
 			continue;
 		}
@@ -270,7 +271,7 @@ int play_move_feature(struct move m, struct slot **neighbors,
 
 	for (size_t i = 0; i < 12; ++i) { /* Connect corners to placed tiles. */
 		const struct slot *n = neighbors[i / 3];
-		if (n == NULL) { /* Neighbor off board. */
+		if (n == NULL) { /* Neighbor off board. TODO Add 2 open_slots */
 			continue;
 		}
 		/* Grab the opposing corner to this one.
@@ -278,8 +279,8 @@ int play_move_feature(struct move m, struct slot **neighbors,
 		 * is potentially connected to.
 		*/
 		const int opp_cnr = opp_corners[i];
-		struct feature *opp_feat = /* opp_feature shares connection. */
-			f[get_index(n->x, n->y, opp_cnr / 3, opp_cnr % 3)];
+		/* opp_feature shares connection. */
+		struct feature *opp_feat = f[get_index(n->x, n->y, opp_cnr)];
 		assert(opp_feat != NULL);
 
 		size_t lead = i; /* Base case, we're the group leader. */
@@ -288,7 +289,7 @@ int play_move_feature(struct move m, struct slot **neighbors,
 		}
 
 		struct feature *lead_feat =
-			f[get_index(m.slot.x, m.slot.y, lead / 3, lead % 3)];
+			f[get_index(m.slot.x, m.slot.y, lead)];
 		if (lead_feat == NULL) { /* Set the feature. */
 			f[lead] = opp_feat;
 		} else {
@@ -299,7 +300,7 @@ int play_move_feature(struct move m, struct slot **neighbors,
 		if (adj[i * 12] == 0) { /* Only want leaders. */
 			continue;
 		}
-		const size_t index = get_index(m.slot.x, m.slot.y, i/3, i%3);
+		const size_t index = get_index(m.slot.x, m.slot.y, i);
 		if (f[index] != NULL) {
 			continue;
 		}
@@ -313,10 +314,10 @@ int play_move_feature(struct move m, struct slot **neighbors,
 		if (adj[12 * i] == 0) { /* Only grab leaders. */
 			continue;
 		}
-		struct feat *leadf = f[get_index(m.slot.x, m.slot.y, i/3, i%3)];
+		struct feat *leadf = f[get_index(m.slot.x, m.slot.y, i)];
 		for (size_t j = 0; adj[i * 12 + j] != 0; ++j) {
 			const int a = adj[i * 12 + j];
-			f[get_index(m.slot.x, m.slot.y, a/3, a%3)] = leadf;
+			f[get_index(m.slot.x, m.slot.y, a)] = leadf;
 		}
 	}
 	return 0;
@@ -328,8 +329,7 @@ int play_meeple(struct move m, int player, struct feature **f)
 	if ((rc = test_meeple(m, player, f))) {
 		return rc;
 	}
-	struct feature *feat = f[get_index(m.slot.x, m.slot.y,
-			m.tcorner/3, m.tcorner%3)];
+	struct feature *feat = f[get_index(m.slot.x, m.slot.y, m.tcorner)];
 	if (m.tcorner >= 0) {
 		feat->tigers[player]++;
 	}

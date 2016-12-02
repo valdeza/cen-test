@@ -23,6 +23,7 @@ struct board {
 size_t get_index_from_slot(struct slot s);
 struct board make_board(void);
 void list_adjacent_slots(struct slot s, struct slot **adjs);
+void list_adjacent_tiles(struct board *b, struct slot **ss, struct tile **ts);
 char *print_board(struct board b, char res[BOARD_LEN]);
 enum game_error_code play_move_board(struct board *b, struct move m);
 enum game_error_code test_move_board(struct board *b, struct move m);

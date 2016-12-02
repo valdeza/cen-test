@@ -21,13 +21,31 @@ void list_adjacent_slots(struct slot s, struct slot **adjs)
 {
 	/*			  up	 right	 bottom	   left */
 	int n[4][2] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} };
-	/* Check adjacent tiles to make sure edges match. */
+	/* Check adjacent slots to make sure edges match. */
 	for (int i = 0; i < 4; ++i) {
 		struct slot sprime = make_slot(s.x + n[i][0], s.y + n[i][1]);
 		if (is_slot_in_boundary(s)) {
 			*(adjs[i]) = sprime;
 		} else {
 			adjs[i] = NULL;
+		}
+	}
+}
+
+void list_adjacent_tiles(struct board *b, struct slot **ss, struct tile **ts)
+{
+	struct tile empty =
+		make_tile((enum edge[5]){EMPTY,EMPTY,EMPTY,EMPTY,EMPTY}, NONE);
+	for (int i = 0; i < 4; ++i) {
+		if (ss[i] == NULL) {
+			ts[i] = NULL;
+			continue;
+		}
+		struct tile t = b->tiles[get_index_from_slot((*ss[i]))];
+		if (is_tile_equal(t, empty)) {
+			ts[i] = NULL;
+		} else {
+			*ts[i] = t;
 		}
 	}
 }
